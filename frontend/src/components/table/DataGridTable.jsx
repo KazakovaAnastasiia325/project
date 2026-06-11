@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { mockExpertise } from '../../data/mockExpertise';
+
 
 const columns = [
   { field: 'id', headerName: '№', width: 80, headerAlign: 'center', align: 'center' },
@@ -10,9 +10,9 @@ const columns = [
   { field: 'fabula', headerName: 'Фабула', flex: 2 },
 ];
 
-export const DataGridTable = ({ onRowClick }) => (
+export const DataGridTable = ({ rows, onRowClick }) => (
   <DataGrid 
-    rows={mockExpertise} 
+    rows={rows} 
     columns={columns}
     onRowClick={onRowClick}
     disableRowSelectionOnClick
