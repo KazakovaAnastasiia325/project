@@ -1,40 +1,59 @@
 import React from 'react';
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, Divider, Typography } from '@mui/material';
+import { inputStyle } from '../../Registration/RegistrationStyles';
 
 export const ProcessSection = ({ formData, setFormData }) => {
+  
+
   const handleChange = (field) => (event) => {
     setFormData((prev) => ({ ...prev, [field]: event.target.value }));
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={3} sx={{ mt: 1 }}>
+      {/* Блок Сроки */}
       <Grid size={{ xs: 12 }}>
         <TextField 
-          fullWidth label="Ф.И.О. эксперта" 
-          value={formData.fioexpert || ''} 
-          onChange={handleChange('fioexpert')} 
+          fullWidth label="Срок производства экспертизы (в днях)" type="number"
+          value={formData.deadlineDays || ''} 
+          onChange={handleChange('deadlineDays')} 
+          sx={inputStyle}
         />
       </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          fullWidth label="Кол-во вопросов" type="number" 
-          value={formData.kolvo || ''} 
-          onChange={handleChange('kolvo')} 
-        />
+
+      {/* Блок Приостановление */}
+      <Grid size={{ xs: 12 }}><Typography variant="subtitle2" sx={{ mt: 2 }}>Приостановление производства</Typography></Grid>
+      <Grid size={{ xs: 4 }}>
+        <TextField fullWidth label="Дата приостановления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.suspendDate || ''} onChange={handleChange('suspendDate')} sx={inputStyle} />
       </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          fullWidth label="Кол-во объектов" type="number" 
-          value={formData.kolvoobj || ''} 
-          onChange={handleChange('kolvoobj')} 
-        />
+      <Grid size={{ xs: 4 }}>
+        <TextField fullWidth label="Дата возобновления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''} onChange={handleChange('resumeDate')} sx={inputStyle} />
       </Grid>
+      <Grid size={{ xs: 4 }}>
+        <TextField fullWidth label="Причина приостановления" value={formData.suspendReason || ''} onChange={handleChange('suspendReason')} sx={inputStyle} />
+      </Grid>
+
       <Grid size={{ xs: 12 }}>
-        <TextField 
-          fullWidth label="Примечание (№ пломбы)" 
-          value={formData.plomba || ''} 
-          onChange={handleChange('plomba')} 
-        />
+        <TextField fullWidth label="Дата (срок) продления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDate || ''} onChange={handleChange('extensionDate')} sx={inputStyle} />
+      </Grid>
+
+      {/* Блок Затраты */}
+      <Grid size={{ xs: 12 }}><Divider sx={{ my: 2 }} /></Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField fullWidth label="Трудозатраты эксперта (чел/час)" type="number" value={formData.laborCosts || ''} onChange={handleChange('laborCosts')} sx={inputStyle} />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField fullWidth label="Материальные затраты" type="number" value={formData.materialCosts || ''} onChange={handleChange('materialCosts')} sx={inputStyle} />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField fullWidth label="Расходы по эксплуатации оборудования" type="number" value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle} />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField fullWidth label="Общая стоимость исследования" type="number" value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle} />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField fullWidth label="Примечание (№ пломбы)" value={formData.plomba || ''} onChange={handleChange('plomba')} sx={inputStyle} />
       </Grid>
     </Grid>
   );

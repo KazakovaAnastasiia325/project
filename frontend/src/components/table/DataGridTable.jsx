@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 
 const columns = [
   { field: 'id', headerName: '№', width: 80, headerAlign: 'center', align: 'center' },
   { field: 'date', headerName: 'Дата', flex: 0.8 },
-  { field: 'fioexpert', headerName: 'Эксперт', flex: 1.2 },
+  { 
+    field: 'fioexpert', 
+    headerName: 'Эксперт', 
+    flex: 1.2,
+    valueGetter: (value, row) => {
+      if (row.experts && Array.isArray(row.experts)) {
+        return row.experts.map(e => e.name).join(', ');
+      }
+      return value || '';
+    }
+  },
   { field: 'status', headerName: 'Статус', flex: 1 },
   { field: 'fabula', headerName: 'Фабула', flex: 2 },
 ];
@@ -15,6 +25,12 @@ export const DataGridTable = ({ rows, onRowClick }) => (
     rows={rows} 
     columns={columns}
     onRowClick={onRowClick}
+    pageSizeOptions={[25, 50, 100]} 
+    initialState={{
+      pagination: {
+        paginationModel: { pageSize: 50 },
+      },
+    }}
     disableRowSelectionOnClick
     rowHeight={55}
     sx={{
@@ -23,13 +39,13 @@ export const DataGridTable = ({ rows, onRowClick }) => (
       
       // Стилизация самой полосы заголовков
       '& .MuiDataGrid-columnHeaders': {
-        backgroundColor: '#f1f5f9 !important',
+        backgroundColor: '#f9f9fa !important',
         borderBottom: '2px solid #e2e8f0 !important',
       },
 
       // Стилизация каждой ячейки заголовка (это самый важный селектор!)
       '& .MuiDataGrid-columnHeader': {
-        backgroundColor: '#f1f5f9 !important',
+        backgroundColor: '#f6f6f6 !important',
         color: '#0f172a !important',
         fontWeight: '700 !important',
         fontSize: '14px !important',
@@ -38,7 +54,7 @@ export const DataGridTable = ({ rows, onRowClick }) => (
 
       // Чередование цветов СТОЛБЦОВ
       '& .MuiDataGrid-cell:nth-of-type(even)': {
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#f9f9f9',
       },
       '& .MuiDataGrid-cell:nth-of-type(odd)': {
         backgroundColor: '#ffffff',

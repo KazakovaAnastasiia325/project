@@ -7,8 +7,6 @@ export const DetailsDrawer = ({ open, onClose, data, onSave }) => (
     anchor="right" 
     open={open} 
     onClose={onClose}
-    // Используем sx вместо PaperProps, если MUI версии 5.15+
-    // Это самый современный и чистый способ стилизации Drawer
     sx={{
       '& .MuiDrawer-paper': { 
         width: '60%', 
