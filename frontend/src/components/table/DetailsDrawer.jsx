@@ -1,13 +1,16 @@
 import { Drawer, Box, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { ExpertForm } from '../Forms/ExpertForm';
+import { ExpertForm } from '../forms/ExpertForm';
 
 export const DetailsDrawer = ({ open, onClose, data }) => (
   <Drawer 
     anchor="right" 
     open={open} 
     onClose={onClose}
-    PaperProps={{ sx: { width: '60%', minWidth: 400 } }} // Занимает 60% экрана
+    // PaperProps передается напрямую, чтобы не было конфликтов
+    PaperProps={{ 
+      sx: { width: '60%', minWidth: 400 } 
+    }}
   >
     <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <Typography variant="h6">

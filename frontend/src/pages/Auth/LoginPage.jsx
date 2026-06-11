@@ -1,21 +1,46 @@
-import { Typography, TextField, Button, Checkbox, FormControlLabel, Link, Box } from '@mui/material';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Typography, Checkbox, FormControlLabel, Link, Box } from '@mui/material';
 import { SplitLayout, BrandingSide, FormSide, ContentOverlay } from './AuthStyles';
 import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './StyledInput';
 import SoftAurora from '../../components/AuroraBackground/SoftAurora';
+
 export const LoginPage = () => {
+  // Состояние для хранения введенных данных
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+
+  // Обновление состояния при вводе
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Обработка отправки формы
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      // Отправка POST-запроса на бэкенд
+      const response = await axios.post('/api/login', formData);
+      console.log('Успешный ответ сервера:', response.data);
+      
+      // Здесь будет логика сохранения токена и редиректа, например:
+      // localStorage.setItem('token', response.data.token);
+      // window.location.href = '/admin';
+      
+    } catch (error) {
+      console.error('Ошибка входа:', error.response?.data?.message || 'Ошибка сети');
+      alert('Неверный логин или пароль');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SplitLayout>
-      {/* Левая панель */}
       <BrandingSide>
-        <SoftAurora
-          speed={0.6}
-          scale={1.5}
-          color1="#f7f7f7"
-          color2="#e100ff"
-          enableMouseInteraction
-        />
-
-        {/* Контент поверх фона */}
+        <SoftAurora speed={0.6} scale={1.5} color1="#f7f7f7" color2="#e100ff" enableMouseInteraction />
         <ContentOverlay>
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
@@ -28,17 +53,33 @@ export const LoginPage = () => {
         </ContentOverlay>
       </BrandingSide>
 
-      {/* Правая панель с формой */}
       <FormSide>
-        <Box sx={{ width: '100%', maxWidth: '400px' }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: '400px' }}>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>Вход</Typography>
           <Typography sx={{ color: 'text.secondary', mb: 4 }}>Введите данные учетной записи</Typography>
 
           <InputWrapper>
-            <StyledTextField fullWidth label="Email" variant="outlined" />
+            <StyledTextField 
+              fullWidth 
+              label="Email" 
+              name="email" 
+              variant="outlined" 
+              value={formData.email} 
+              onChange={handleChange} 
+              required 
+            />
           </InputWrapper>
           <InputWrapper>
-            <StyledTextField fullWidth label="Пароль" type="password" variant="outlined" />
+            <StyledTextField 
+              fullWidth 
+              label="Пароль" 
+              name="password" 
+              type="password" 
+              variant="outlined" 
+              value={formData.password} 
+              onChange={handleChange} 
+              required 
+            />
           </InputWrapper>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
@@ -46,13 +87,9 @@ export const LoginPage = () => {
             <Link href="#" underline="hover">Забыли пароль?</Link>
           </Box>
 
-          <GradientButton type="submit">
+          <GradientButton type="submit" disabled={loading}>
             <ButtonInner>
-
-              <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-              </svg>
-              Войти в систему
+              {loading ? 'Загрузка...' : 'Войти в систему'}
             </ButtonInner>
           </GradientButton>
         </Box>
