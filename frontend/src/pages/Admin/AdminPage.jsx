@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Container } from '@mui/material';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
-import { mockExpertise } from '../../data/mockExpertise';
 import AddIcon from '@mui/icons-material/Add';
 import * as S from './AdminStyles';
+
+// Начальные данные, если localStorage пуст
+const initialMockData = [
+  { id: 1, date: '2026-06-10', fioexpert: 'Иванов И.И.', status: 'В работе', fabula: 'Кража', ud: '12345/2026', organ: 'ОВД', result: 'В производстве' },
+  { id: 2, date: '2026-06-09', fioexpert: 'Петров П.П.', status: 'Создано', fabula: 'ДТП', ud: '67890/2026', organ: 'Суды', result: 'Ожидает' }
+];
 
 export const AdminPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
 
-  // Инициализируем состояние: сначала смотрим в localStorage, если там пусто - берем моки
   const [rows, setRows] = useState(() => {
     const savedRows = localStorage.getItem('expertiseData');
-    return savedRows ? JSON.parse(savedRows) : mockExpertise;
+    return savedRows ? JSON.parse(savedRows) : initialMockData;
   });
 
-  // Эффект: сохраняем данные в localStorage при каждом изменении rows
   useEffect(() => {
     localStorage.setItem('expertiseData', JSON.stringify(rows));
   }, [rows]);
@@ -33,18 +36,20 @@ export const AdminPage = () => {
 
   const handleSave = (newData) => {
     if (selectedExpertise) {
-      // Редактирование существующей записи
       setRows((prev) => prev.map((r) => (r.id === newData.id ? newData : r)));
     } else {
-      // Добавление новой записи
       const newRow = { 
         ...newData, 
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1, // Безопасная генерация ID
-        status: 'Новая' 
+        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
+        status: 'Создано' 
       };
       setRows((prev) => [...prev, newRow]);
     }
     setIsDrawerOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setRows((prev) => prev.filter((r) => r.id !== id));
   };
 
   return (
@@ -58,7 +63,11 @@ export const AdminPage = () => {
         </S.HeaderRow>
         
         <S.TableWrapper>
-          <DataGridTable rows={rows} onRowClick={handleRowClick} />
+          <DataGridTable 
+            rows={rows} 
+            onRowClick={handleRowClick} 
+            onDelete={handleDelete} 
+          />
         </S.TableWrapper>
 
         <DetailsDrawer 

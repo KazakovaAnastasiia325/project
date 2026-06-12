@@ -34,6 +34,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
         <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                required
                     fullWidth label="Дата поступления" type="date"
                     slotProps={{ inputLabel: { shrink: true } }}
                     value={formData.date || ''}
@@ -43,6 +44,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                required
                     fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела"
                     value={formData.ud || ''}
                     onChange={handleChange('ud')}
@@ -51,6 +53,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 12 }}>
                 <TextField
+                required
                     fullWidth label="Фабула" multiline rows={2}
                     value={formData.fabula || ''}
                     onChange={handleChange('fabula')}
@@ -59,6 +62,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     fullWidth label="№ Статьи"
                     value={formData.state || ''}
                     onChange={handleChange('state')}
@@ -67,6 +71,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     fullWidth label="Вид экспертизы (код)"
                     value={formData.view || ''}
                     onChange={handleChange('view')}
@@ -75,6 +80,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     select fullWidth label="Статус экспертизы"
                     value={formData.statys || ''}
                     onChange={handleChange('statys')}
@@ -87,6 +93,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     select fullWidth label="Тип экспертизы"
                     value={formData.typeExpertise || ''}
                     onChange={handleChange('typeExpertise')}
@@ -98,6 +105,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     select fullWidth label="Категория дел"
                     value={formData.category || ''}
                     onChange={handleChange('category')}
@@ -110,6 +118,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                required
                     select fullWidth label="Орган, назначивший экспертизу"
                     value={formData.organCode || ''}
                     onChange={handleChange('organCode')}
@@ -130,6 +139,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
 
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                required
                     fullWidth
                     label="Наименование органа"
                     value={formData.organName || ''}
@@ -140,6 +150,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
+                required
                     select fullWidth
                     label="Регион, назначивший экспертизу"
                     value={formData.region || ''}
@@ -155,6 +166,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     select fullWidth label="Категория сложности"
                     value={formData.complexity || ''}
                     onChange={handleChange('complexity')}
@@ -168,6 +180,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     fullWidth label="Кол-во поставленных вопросов" type="number"
                     value={formData.kolvo || ''}
                     onChange={handleChange('kolvo')}
@@ -176,6 +189,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 6 }}>
                 <TextField
+                required
                     fullWidth label="Кол-во объектов" type="number"
                     value={formData.kolvoobj || ''}
                     onChange={handleChange('kolvoobj')}
@@ -184,6 +198,7 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             </Grid>
             <Grid size={{ xs: 12 }}>
                 <TextField
+                required
                     fullWidth
                     label="Ф.И.О. лица, назначившего экспертизу"
                     value={formData.appointingPerson || ''}
@@ -196,10 +211,12 @@ export const RegistrationSection = ({ formData, setFormData }) => {
             {experts.map((expert, index) => (
                 <Grid size={{ xs: 12 }} key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <TextField
+                    required
                         fullWidth
                         label={`Ф.И.О. эксперта ${index + 1}`}
                         value={expert.name}
                         onChange={(e) => handleExpertChange(index, e.target.value)}
+                        sx={inputStyle}               
                     />
                     {experts.length > 1 && (
                         <IconButton onClick={() => removeExpert(index)} color="error">

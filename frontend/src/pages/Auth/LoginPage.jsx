@@ -4,6 +4,7 @@ import { Typography, Checkbox, FormControlLabel, Link, Box } from '@mui/material
 import { SplitLayout, BrandingSide, FormSide, ContentOverlay } from './AuthStyles';
 import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './StyledInput';
 import SoftAurora from '../../components/AuroraBackground/SoftAurora';
+import LogoImage from '../../assets/logo.png';
 
 export const LoginPage = () => {
   // Состояние для хранения введенных данных
@@ -42,14 +43,22 @@ export const LoginPage = () => {
       <BrandingSide>
         <SoftAurora speed={0.6} scale={1.5} color1="#f7f7f7" color2="#e100ff" enableMouseInteraction />
         <ContentOverlay>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
-              Добро пожаловать
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-              Система управления данными
-            </Typography>
-          </Box>
+          <Box sx={{ mb: 4 }}>
+      <img 
+        src={LogoImage} 
+        alt="Logo" 
+        style={{ width: '180px', height: 'auto', display: 'block' }} 
+      />
+    </Box>
+
+    <Box sx={{ textAlign: 'center' }}>
+      <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
+        Добро пожаловать
+      </Typography>
+      <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+        Система управления данными
+      </Typography>
+    </Box>
         </ContentOverlay>
       </BrandingSide>
 
@@ -61,10 +70,10 @@ export const LoginPage = () => {
           <InputWrapper>
             <StyledTextField 
               fullWidth 
-              label="Email" 
-              name="email" 
+              label="Логин" 
+              name="login" 
               variant="outlined" 
-              value={formData.email} 
+              value={formData.login} 
               onChange={handleChange} 
               required 
             />
