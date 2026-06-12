@@ -17,36 +17,53 @@ export const Sidebar = () => {
   return (
     <Drawer 
       variant="permanent" 
+      PaperProps={{
+        elevation: 0, 
+        sx: { borderRight: 'none', backgroundColor: 'transparent' } 
+      }}
       sx={{ 
         width: 240, 
         flexShrink: 0,
         '& .MuiDrawer-paper': { 
           width: 240, 
-          backgroundColor: '#1a1a1a', // Тот же цвет
-          color: '#ffffff'
+          // Делаем фон градиента более прозрачным для эффекта стекла
+          background: 'linear-gradient(to bottom right, rgba(46, 142, 255, 0.8) 0%, rgba(139, 92, 246, 0.8) 100%)',
+          // Размытие фона за панелью
+          backdropFilter: 'blur(10px)',
+          color: '#ffffff',
+          borderRight: 'none' 
         } 
       }}
     >
       <Box sx={{ mt: 4, px: 2 }}>
         <List>
-          {menuItems.map((item) => (
-            <ListItem 
-  key={item.text} // Удалили проп "button"
-  onClick={() => navigate(item.path)}
-  sx={{ 
-    borderRadius: '13px',
-    mb: 1,
-    cursor: 'pointer', // Добавляем курсор, так как кнопки больше нет
-    backgroundColor: location.pathname === item.path ? '#333333' : 'transparent',
-    '&:hover': { backgroundColor: '#2a2a2a' }
-  }}
->
-  <ListItemIcon sx={{ color: '#ffffff', minWidth: 40 }}>
-    {item.icon}
-  </ListItemIcon>
-  <ListItemText primary={item.text} />
-</ListItem>
-          ))}
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <ListItem 
+                key={item.text}
+                onClick={() => navigate(item.path)}
+                sx={{ 
+                  borderRadius: '13px',
+                  mb: 1,
+                  cursor: 'pointer',
+                  transition: '0.3s ease',
+                  backgroundColor: isActive ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
+                  '&:hover': { 
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)' 
+                  }
+                }}
+              >
+                <ListItemIcon sx={{ color: '#ffffff', minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.text} 
+                  primaryTypographyProps={{ style: { fontWeight: isActive ? 700 : 500 } }}
+                />
+              </ListItem>
+            );
+          })}
         </List>
       </Box>
     </Drawer>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from '@mui/material';
+import { Box } from '@mui/material';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import AddIcon from '@mui/icons-material/Add';
@@ -54,7 +54,8 @@ export const AdminPage = () => {
 
   return (
     <S.AdminContainer>
-      <Container maxWidth="xl">
+
+      <Box sx={{ px: 4, width: '100%', boxSizing: 'border-box' }}>
         <S.HeaderRow>
           <S.Title>Реестр экспертиз</S.Title>
           <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate}>
@@ -76,7 +77,7 @@ export const AdminPage = () => {
           data={selectedExpertise}
           onSave={handleSave} 
         />
-      </Container>
+      </Box>
     </S.AdminContainer>
   );
 };

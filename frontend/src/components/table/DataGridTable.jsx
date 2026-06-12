@@ -6,42 +6,64 @@ import EditIcon from '@mui/icons-material/Edit';
 import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
 export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
+
     const columns = [
-        { field: 'id', headerName: '№', width: 80, headerAlign: 'center', align: 'center' },
-        { field: 'date', headerName: 'Дата', flex: 0.8 },
-        {
-            field: 'fioexpert',
-            headerName: 'Эксперт',
-            flex: 1.2,
-            valueGetter: (value, row) => row?.experts?.map(e => e.name).join(', ') || value || ''
+        { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
+        { field: 'date', headerName: 'Дата', width: 130 },
+        { 
+            field: 'fioexpert', 
+            headerName: 'Эксперт', 
+            width: 220,
+            valueGetter: (value, row) => {
+                if (row && row.experts && Array.isArray(row.experts)) {
+                    return row.experts.map(e => e.name).join(', ');
+                }
+                return value || '';
+            }
         },
         {
             field: 'status',
             headerName: 'Статус',
-            flex: 1,
+            width: 160,
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
                 const statusLabel = params.value || 'Новая';
-                const statusConfig = Object.values(EXPERTISE_STATUSES || {}).find(s => s.label === statusLabel) 
+                const statuses = EXPERTISE_STATUSES || {};
+                const statusConfig = Object.values(statuses).find(s => s.label === statusLabel)
                     || { label: statusLabel, color: '#757575' };
+
                 return (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                        <Chip label={statusConfig.label} sx={{ backgroundColor: statusConfig.color, color: '#fff', fontWeight: 'bold', height: '24px', fontSize: '11px' }} />
-                    </Box>
+                    <Chip
+                        label={statusConfig.label}
+                        sx={{
+                            backgroundColor: statusConfig.color,
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            height: '24px',
+                            fontSize: '11px',
+                            borderRadius: '6px'
+                        }}
+                    />
                 );
             }
         },
-        { field: 'fabula', headerName: 'Фабула', flex: 2 },
+        { field: 'fabula', headerName: 'Фабула', flex: 1 },
         {
             field: 'actions',
             headerName: 'Действия',
             width: 120,
             sortable: false,
+            headerAlign: 'center',
+            align: 'center',
             renderCell: (params) => (
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRowClick?.(params); }}><EditIcon fontSize="small" /></IconButton>
-                    <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); onDelete?.(params.row.id); }}><DeleteIcon fontSize="small" /></IconButton>
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRowClick(params); }}>
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
                 </Box>
             )
         }
@@ -49,42 +71,47 @@ export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
 
     return (
         <DataGrid
-            rows={rows || []}
+            rows={rows || []} 
             columns={columns}
+            onRowClick={onRowClick}
+            pageSizeOptions={[25, 50, 100]}
+            initialState={{
+                pagination: { paginationModel: { pageSize: 50 } },
+            }}
             disableRowSelectionOnClick
             rowHeight={55}
             sx={{
-                border: '1px solid #e2e8f0',
-                borderRadius: '16px',
-                overflow: 'hidden',
+                height: '100%',
+                border: 'none',
+                // Заголовки
                 '& .MuiDataGrid-columnHeaders': {
-                    // Стиль шапки в стиле вашего градиента
-                    background: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%) !important',
-                    borderBottom: '2px solid #e2e8f0 !important',
+                    backgroundColor: '#f8fafc',
+                    borderBottom: '1px solid #e2e8f0',
                 },
                 '& .MuiDataGrid-columnHeader': {
-                    color: '#475569 !important',
-                    fontWeight: '700 !important',
-                    fontSize: '12px !important',
+                    color: '#64748b',
+                    fontWeight: 700,
+                    fontSize: '12px',
                     textTransform: 'uppercase',
+                    // Вертикальные линии в заголовках
                     borderRight: '1px solid #e2e8f0',
+                    '&:last-child': { borderRight: 'none' },
                 },
                 '& .MuiDataGrid-cell': {
+                    borderBottom: '1px solid #f1f5f9',
+                    // Вертикальные линии в ячейках
                     borderRight: '1px solid #f1f5f9',
                     color: '#334155',
-                },
-                // Чередование строк
-                '& .MuiDataGrid-row:nth-of-type(odd)': {
-                    backgroundColor: '#ffffff',
-                },
-                '& .MuiDataGrid-row:nth-of-type(even)': {
-                    backgroundColor: '#fcfcfd', 
+                    padding: '0 16px',
+                    '&:last-child': { borderRight: 'none' },
                 },
                 '& .MuiDataGrid-row:hover': {
-                    backgroundColor: '#f1f5f9 !important',
+                    backgroundColor: '#f8fafc',
+                    transition: '0.2s',
                 },
-                
+                // Убираем лишнее
                 '& .MuiDataGrid-columnSeparator': { display: 'none' },
+                '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
             }}
         />
     );

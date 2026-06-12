@@ -1,12 +1,16 @@
-// src/pages/Admin/AdminStyles.js
+
 import styled from 'styled-components';
 import { Box, Button } from '@mui/material';
 
 export const AdminContainer = styled(Box)`
-    background-color: #f8fafc; 
-    min-height: 100vh;
-    padding: 40px 0;
-    `;
+  background: radial-gradient(circle at 0% 0%, rgba(46, 142, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+              #f8fafc;
+  min-height: 100vh;
+  width: 100%; 
+  padding: 40px 0;
+  box-sizing: border-box;
+`;
 
 export const HeaderRow = styled(Box)`
     display: flex;
@@ -22,19 +26,21 @@ export const Title = styled.h1`
     margin: 0;
     `;
 
-export const TableWrapper = styled.div`
-    background: transparent; 
+    export const TableWrapper = styled.div`
+        background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    
+    
     border-radius: 20px; 
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
     overflow: hidden; 
     min-height: 400px; 
     height: 650px; 
     display: flex;
     flex-direction: column;
-    `;
+        `;
 
-// Кнопка основного действия (как в LoginPage)
+
 export const ActionButton = styled(Button)`
   background: linear-gradient(135deg, #2e8eff 0%, #8b5cf6 100%) !important;
   color: #ffffff !important;
@@ -51,7 +57,7 @@ export const ActionButton = styled(Button)`
   }
 `;
 
-// Стиль заголовка модального окна в тон с общей темой
+
 export const ModalTitle = styled.div`
   font-size: 20px;
   font-weight: 700;
@@ -61,7 +67,7 @@ export const ModalTitle = styled.div`
   margin-bottom: 24px;
 `;
 
-// Аккуратная "серая" кнопка отмены
+
 export const GreyButton = styled(Button)`
   color: #64748b !important;
   text-transform: none !important;
