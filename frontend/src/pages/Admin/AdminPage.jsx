@@ -1,39 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // 1. Импортируем хук
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import AddIcon from '@mui/icons-material/Add';
 import * as S from './AdminStyles';
+
+// Создаем инстанс API
 const api = axios.create({
   baseURL: 'http://localhost:8080',
   withCredentials: true,
 });
+
 export const AdminPage = () => {
-  const navigate = useNavigate(); // 2. Инициализируем хук
+  const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
+  const [rows, setRows] = useState([]);
 
-  const [rows, setRows] = useState(() => {
-    const savedRows = localStorage.getItem('expertiseData');
-    return savedRows ? JSON.parse(savedRows) : [];
-  });
+  // 1. Загрузка данных с сервера (GET)
+  useEffect(() => {
+    const fetchExpertise = async () => {
+      try {
+        const response = await api.get('/api/expertiza/list');
+        setRows(response.data || []);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+      }
+    };
+    fetchExpertise();
+  }, []);
 
-  // Функция выхода
   const handleLogout = () => {
-    // Если вы храните токен, удалите его:
-    // localStorage.removeItem('authToken'); 
-    
-    // Переход на страницу логина
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
     navigate('/login');
   };
-  
-
-  useEffect(() => {
-    localStorage.setItem('expertiseData', JSON.stringify(rows));
-  }, [rows]);
 
   const handleCreate = () => {
     setSelectedExpertise(null);
@@ -45,19 +49,15 @@ export const AdminPage = () => {
     setIsDrawerOpen(true);
   };
 
+  // 2. Сохранение данных (POST: создание или обновление)
   const handleSave = async (newData) => {
     try {
-      // Отправляем данные на сервер
       const response = await api.post('/api/expertiza/save', newData);
-      
-      // Если сервер вернул успех, обновляем таблицу
-      const savedData = response.data; // Предполагаем, что бэк вернул объект с присвоенным ID
+      const savedData = response.data;
 
       if (selectedExpertise) {
-        // Редактирование
         setRows((prev) => prev.map((r) => (r.id === savedData.id ? savedData : r)));
       } else {
-        // Добавление
         setRows((prev) => [...prev, savedData]);
       }
       
@@ -69,14 +69,10 @@ export const AdminPage = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    setRows((prev) => prev.filter((r) => r.id !== id));
-  };
-
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       
-      {/* 1. ВЕРХНЯЯ ПАНЕЛЬ */}
+      {/* ВЕРХНЯЯ ПАНЕЛЬ */}
       <Box 
         sx={{ 
           width: '100%', 
@@ -103,7 +99,7 @@ export const AdminPage = () => {
         </Button>
       </Box>
 
-      {/* 2. ОСНОВНОЙ КОНТЕНТ */}
+      {/* ОСНОВНОЙ КОНТЕНТ */}
       <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
         <Box 
           sx={{ 
@@ -142,7 +138,6 @@ export const AdminPage = () => {
             rows={rows} 
             density="compact"
             onRowClick={handleRowClick} 
-            onDelete={handleDelete} 
             isAdmin={true}
           />
         </S.TableWrapper>
