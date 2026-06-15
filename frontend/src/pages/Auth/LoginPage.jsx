@@ -32,14 +32,14 @@ export const LoginPage = () => {
       const response = await api.post('/api/login', formData);
       
       // Предполагаем, что ответ сервера: { "token": "...", "role": "admin" }
-      const { token, role } = response.data;
+      const {role } = response.data;
       
-      if (!token || !role) {
+      if (!role) {
         throw new Error('Некорректный ответ от сервера');
       }
 
       // Сохраняем данные для PrivateRoute
-      localStorage.setItem('token', token);
+      
       localStorage.setItem('userRole', role);
       
       // Перенаправление по ролям
