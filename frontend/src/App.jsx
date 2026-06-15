@@ -19,7 +19,7 @@ function App() {
         <Route path="/admin" element={<MainLayout />}>
           <Route path="expertise" element={<AdminPage />} />
           <Route path="users" element={<Users />} />
-          <Route path="reports" element={<Reports />} />
+          
 
           {/* Редирект с /admin на экспертизы по умолчанию */}
           <Route index element={<Navigate to="expertise" replace />} />
@@ -27,12 +27,12 @@ function App() {
         </Route>
         <Route path="/employee" element={<MainLayout />}>
           <Route path="expertise" element={<EmployeePage />} />
-          <Route path="reports" element={<Reports />} />
+          
           <Route index element={<Navigate to="expertise" replace />} />
         </Route>
         <Route path="/manager" element={<MainLayout />}>
           <Route path="expertise" element={<ManagerPage />} />
-          <Route path="reports" element={<Reports />} />
+          
           <Route index element={<Navigate to="expertise" replace />} />
         </Route>
         {/* Редирект на логин при заходе в корень */}

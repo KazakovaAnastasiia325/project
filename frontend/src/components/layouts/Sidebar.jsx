@@ -30,11 +30,7 @@ export const Sidebar = () => {
     },
     // Показываем пользователей ТОЛЬКО если это админ
     ...(isAdmin ? [{ text: 'Пользователи', icon: <PeopleIcon />, path: '/admin/users' }] : []),
-    {
-      text: 'Отчеты',
-      icon: <AssessmentIcon />,
-      path: isEmployee ? '/employee/reports' : isManager ? '/manager/reports' : '/admin/reports'
-    },
+    
   ];
 
   return (

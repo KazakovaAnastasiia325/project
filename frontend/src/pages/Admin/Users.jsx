@@ -137,7 +137,7 @@ export const Users = () => {
     return (
         <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}></Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>Панель администратора</Typography>
                 <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={() => console.log('Выход')}>Выйти</Button>
             </Box>
 
