@@ -8,11 +8,11 @@ import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
 export const DataGridTable = ({ 
     rows, 
-    rowCount,             // Общее количество записей из БД
+    rowCount,             // Общее количество записей с сервера
     loading,              // Состояние загрузки
     paginationModel,      // { page, pageSize }
     onPaginationModelChange, 
-    onSortModelChange,    // Обработчик изменения сортировки
+    onSortModelChange,    // Обработчик сортировки
     onRowClick, 
     onDelete, 
     isAdmin = false, 
@@ -69,7 +69,7 @@ export const DataGridTable = ({
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                const isCompleted = params.row.status === EXPERTISE_STATUSES.COMPLETED.label;
+                const isCompleted = params.row.status === (EXPERTISE_STATUSES.COMPLETED?.label || 'Завершено');
                 const showViewOnly = isManager || isCompleted;
 
                 return (
@@ -101,7 +101,7 @@ export const DataGridTable = ({
             rows={rows || []} 
             columns={columns}
             
-            // СЕРВЕРНЫЕ НАСТРОЙКИ
+            // Настройки для серверной обработки
             rowCount={rowCount}
             paginationMode="server"
             sortingMode="server"
