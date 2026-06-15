@@ -8,11 +8,11 @@ import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
 export const DataGridTable = ({ 
     rows, 
-    rowCount,             // Общее количество записей с сервера
-    loading,              // Состояние загрузки
-    paginationModel,      // { page, pageSize }
+    rowCount, 
+    loading, 
+    paginationModel, 
     onPaginationModelChange, 
-    onSortModelChange,    // Обработчик сортировки
+    onSortModelChange, 
     onRowClick, 
     onDelete, 
     isAdmin = false, 
@@ -21,35 +21,36 @@ export const DataGridTable = ({
 
     const columns = useMemo(() => [
         { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
-        { field: 'date', headerName: 'Дата', width: 130 },
+        // Обновлено: data_post вместо date
+        { field: 'data_post', headerName: 'Дата', width: 130 },
         { 
-            field: 'fioexpert', 
+            field: 'experts', 
             headerName: 'Эксперт', 
             width: 220,
             valueGetter: (value, row) => {
                 if (row && row.experts && Array.isArray(row.experts)) {
                     return row.experts.map(e => e.name).join(', ');
                 }
-                return value || '';
+                return '';
             }
         },
         {
-            field: 'status',
+            // Обновлено: используем поле is_closed из Go-структуры
+            field: 'is_closed',
             headerName: 'Статус',
             width: 160,
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                const statusLabel = params.value || 'Новая';
-                const statuses = EXPERTISE_STATUSES || {};
-                const statusConfig = Object.values(statuses).find(s => s.label === statusLabel)
-                    || { label: statusLabel, color: '#757575' };
-
+                const isClosed = params.value; // true или false
+                const label = isClosed ? 'Завершено' : 'В работе';
+                
+                // Используем ваши стили статусов
                 return (
                     <Chip
-                        label={statusConfig.label}
+                        label={label}
                         sx={{
-                            backgroundColor: statusConfig.color,
+                            backgroundColor: isClosed ? '#2e7d32' : '#1976d2',
                             color: '#fff',
                             fontWeight: 'bold',
                             height: '24px',
@@ -60,7 +61,8 @@ export const DataGridTable = ({
                 );
             }
         },
-        { field: 'fabula', headerName: 'Фабула', flex: 1 },
+        // Обновлено: fab вместо fabula
+        { field: 'fab', headerName: 'Фабула', flex: 1 },
         {
             field: 'actions',
             headerName: 'Действия',
@@ -69,7 +71,7 @@ export const DataGridTable = ({
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                const isCompleted = params.row.status === (EXPERTISE_STATUSES.COMPLETED?.label || 'Завершено');
+                const isCompleted = params.row.is_closed;
                 const showViewOnly = isManager || isCompleted;
 
                 return (
@@ -100,8 +102,6 @@ export const DataGridTable = ({
         <DataGrid
             rows={rows || []} 
             columns={columns}
-            
-            // Настройки для серверной обработки
             rowCount={rowCount}
             paginationMode="server"
             sortingMode="server"
@@ -109,7 +109,6 @@ export const DataGridTable = ({
             onPaginationModelChange={onPaginationModelChange}
             onSortModelChange={onSortModelChange}
             loading={loading}
-            
             pageSizeOptions={[25, 50, 100]}
             disableRowSelectionOnClick
             rowHeight={55}
