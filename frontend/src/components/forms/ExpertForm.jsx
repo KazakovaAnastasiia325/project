@@ -9,12 +9,14 @@ import * as AdminS from '../../pages/Admin/AdminStyles';
 
 export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) => {
   
-  // 1. Функция: превращаем JSON с бэкенда в понятный формат для полей формы
+  // 1. Функция: Превращаем JSON с бэкенда в формат для полей формы
   const parseDataFromBackend = (data) => {
     if (!data) return { 
-      date: '', ud: '', fabula: '', state: '', category: '', 
-      dateend: '', result: '', cost: '', kolvohour: '', 
-      fioexpert: '', kolvo: '', kolvoobj: '', plomba: '',
+      date: '', ud: '', fabula: '', 
+      organCode: '', organName: '', appointingPerson: '', 
+      kolvo: '', kolvoobj: '', 
+      experts: [], 
+      stat_id: 1, category_id: 1, region_id: 1, iz_nix_id: 1, diff_cat_id: 1,
       status: EXPERTISE_STATUSES.NEW.label 
     };
 
@@ -28,9 +30,13 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       appointingPerson: data.name_naznch || '',
       kolvo: data.question_count || '',
       kolvoobj: data.object_count || '',
-      // Восстанавливаем статус из булева значения
+      experts: data.experts || [],
+      stat_id: data.stat_id || 1,
+      category_id: data.category_id || 1,
+      region_id: data.region_id || 1,
+      iz_nix_id: data.iz_nix_id || 1,
+      diff_cat_id: data.diff_cat_id || 1,
       status: data.is_closed ? EXPERTISE_STATUSES.COMPLETED.label : EXPERTISE_STATUSES.IN_PROGRESS.label,
-      // Добавьте остальные поля, если они нужны в форме
     };
   };
 
@@ -40,21 +46,18 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
-  const registrationFields = [
-    'date', 'ud', 'fabula', 'state', 'view', 'statys', 
-    'typeExpertise', 'category', 'organCode', 'organName', 
-    'region', 'complexity', 'kolvo', 'kolvoobj', 'appointingPerson'
-  ];
+  // Список полей, обязательных для заполнения на этапе регистрации
+  const registrationFields = ['date', 'ud', 'fabula', 'organCode', 'organName', 'kolvo', 'kolvoobj'];
 
   const isRegistrationComplete = () => registrationFields.every(field => 
     formData[field]?.toString().trim() !== ''
   );
 
-  // 2. Функция: превращаем данные формы в JSON для отправки на Go-бэкенд
+  // 2. Функция: Превращаем данные формы в JSON для отправки на Go-бэкенд
   const prepareDataForServer = (data) => {
     return {
       id: data.id || 0,
-      creator_id: 1, 
+      creator_id: 1, // Заглушка текущего пользователя
       data_post: data.date || "",
       fab: data.fabula || "",
       adm_material: 1,
@@ -63,15 +66,16 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       organ: data.organCode || "",
       name_organ: data.organName || "",
       name_naznch: data.appointingPerson || "",
-      experts: data.fioexpert ? [{ id: 0, name: data.fioexpert, second_name: "Изм.", patronymic: "" }] : [],
+      second_name_naznch: "Фамилия", // Можно вынести в стейт при необходимости
+      experts: data.experts || [], // Отправляем массив объектов
       question_count: Number(data.kolvo) || 0,
       object_count: Number(data.kolvoobj) || 0,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
-      stat_id: 1,
-      category_id: 1,
-      region_id: 1,
-      iz_nix_id: 1,
-      diff_cat_id: 1
+      stat_id: Number(data.stat_id) || 1,
+      category_id: Number(data.category_id) || 1,
+      region_id: Number(data.region_id) || 1,
+      iz_nix_id: Number(data.iz_nix_id) || 1,
+      diff_cat_id: Number(data.diff_cat_id) || 1
     };
   };
 
