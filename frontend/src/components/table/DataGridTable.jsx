@@ -6,7 +6,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
-export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isManager = false }) => {
+export const DataGridTable = ({ 
+    rows, 
+    rowCount,             // Общее количество записей из БД
+    loading,              // Состояние загрузки
+    paginationModel,      // { page, pageSize }
+    onPaginationModelChange, 
+    onSortModelChange,    // Обработчик изменения сортировки
+    onRowClick, 
+    onDelete, 
+    isAdmin = false, 
+    isManager = false 
+}) => {
 
     const columns = useMemo(() => [
         { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
@@ -58,10 +69,7 @@ export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isM
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                // Определяем, завершена ли текущая экспертиза
                 const isCompleted = params.row.status === EXPERTISE_STATUSES.COMPLETED.label;
-                
-                // Иконка "глаз" показывается если: это менеджер ИЛИ экспертиза завершена
                 const showViewOnly = isManager || isCompleted;
 
                 return (
@@ -77,7 +85,6 @@ export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isM
                             )}
                         </IconButton>
                         
-                        {/* Удаление: доступно ТОЛЬКО администратору */}
                         {isAdmin && (
                             <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
                                 <DeleteIcon fontSize="small" />
@@ -93,11 +100,17 @@ export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isM
         <DataGrid
             rows={rows || []} 
             columns={columns}
-            onRowClick={onRowClick}
+            
+            // СЕРВЕРНЫЕ НАСТРОЙКИ
+            rowCount={rowCount}
+            paginationMode="server"
+            sortingMode="server"
+            paginationModel={paginationModel}
+            onPaginationModelChange={onPaginationModelChange}
+            onSortModelChange={onSortModelChange}
+            loading={loading}
+            
             pageSizeOptions={[25, 50, 100]}
-            initialState={{
-                pagination: { paginationModel: { pageSize: 25 } },
-            }}
             disableRowSelectionOnClick
             rowHeight={55}
             sx={{

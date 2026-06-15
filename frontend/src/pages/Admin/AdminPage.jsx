@@ -3,12 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import AddIcon from '@mui/icons-material/Add';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
-import AddIcon from '@mui/icons-material/Add';
 import * as S from './AdminStyles';
 
-// Создаем инстанс API
 const api = axios.create({
   baseURL: 'http://localhost:8080',
   withCredentials: true,
@@ -18,20 +17,42 @@ export const AdminPage = () => {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
+  
+  // Состояния для данных и пагинации
   const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [loading, setLoading] = useState(false);
+  
+  // Настройки пагинации и сортировки
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
+  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
 
-  // 1. Загрузка данных с сервера (GET)
+  // Функция загрузки данных с сервера
+  const fetchExpertise = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page: paginationModel.page,
+        size: paginationModel.pageSize,
+        sort: sortModel.length > 0 ? `${sortModel[0].field},${sortModel[0].sort}` : 'id,desc'
+      };
+
+      // Убедитесь, что ваш бэкенд возвращает { content: [], totalElements: 0 }
+      const response = await api.get('/api/expertiza/list', { params });
+      
+      setRows(response.data.content || []);
+      setTotalRows(response.data.totalElements || 0);
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Эффект перезагрузки при смене страницы или сортировки
   useEffect(() => {
-    const fetchExpertise = async () => {
-      try {
-        const response = await api.get('/api/expertiza/list');
-        setRows(response.data || []);
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-      }
-    };
     fetchExpertise();
-  }, []);
+  }, [paginationModel, sortModel]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -49,94 +70,52 @@ export const AdminPage = () => {
     setIsDrawerOpen(true);
   };
 
-  // 2. Сохранение данных (POST: создание или обновление)
   const handleSave = async (newData) => {
     try {
-      const response = await api.post('/api/expertiza/save', newData);
-      const savedData = response.data;
-
-      if (selectedExpertise) {
-        setRows((prev) => prev.map((r) => (r.id === savedData.id ? savedData : r)));
-      } else {
-        setRows((prev) => [...prev, savedData]);
-      }
-      
+      await api.post('/api/expertiza/save', newData);
       setIsDrawerOpen(false);
       alert('Экспертиза успешно сохранена');
+      fetchExpertise(); // Обновляем таблицу после сохранения
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Не удалось сохранить экспертизу на сервере');
+      alert('Не удалось сохранить экспертизу');
     }
   };
 
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      
-      {/* ВЕРХНЯЯ ПАНЕЛЬ */}
-      <Box 
-        sx={{ 
-          width: '100%', 
-          height: '50px', 
-          backgroundColor: '#131924', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          px: 3,
-          color: '#fff',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          mb: 2
+      <Box sx={{ 
+          width: '100%', height: '50px', backgroundColor: '#131924', 
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', mb: 2
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>
-           Панель администратора 
-        </Typography>
-        <Button 
-          startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
-          sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={handleLogout} 
-        >
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
+        <Button startIcon={<LogoutIcon />} sx={{ color: '#fff', fontSize: '12px' }} onClick={handleLogout}>
           Выйти
         </Button>
       </Box>
 
-      {/* ОСНОВНОЙ КОНТЕНТ */}
       <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            backgroundColor: '#1e293b',
-            padding: '8px 16px',
-            borderRadius: '10px',
-            mb: 1.5,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+        <Box sx={{ 
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            backgroundColor: '#1e293b', padding: '8px 16px', borderRadius: '10px', mb: 1.5 
           }}
         >
-          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>
-            Реестр экспертиз
-          </Typography>
-          
-          <S.ActionButton 
-            startIcon={<AddIcon fontSize="small" />} 
-            onClick={handleCreate}
-            size="small"
-            sx={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
-              color: '#ffffff',
-              fontSize: '12px',
-              py: 0.5
-            }}
-          >
+          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
+          <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small">
             Добавить
           </S.ActionButton>
         </Box>
         
         <S.TableWrapper sx={{ '& .MuiDataGrid-root': { minHeight: '300px' } }}>
           <DataGridTable 
-            rows={rows} 
-            density="compact"
+            rows={rows}
+            rowCount={totalRows}
+            loading={loading}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            onSortModelChange={setSortModel}
             onRowClick={handleRowClick} 
             isAdmin={true}
           />
