@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Typography, Checkbox, FormControlLabel, Link, Box } from '@mui/material';
 import { SplitLayout, BrandingSide, FormSide, ContentOverlay } from './AuthStyles';
 import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './StyledInput';
@@ -7,28 +8,44 @@ import SoftAurora from '../../components/AuroraBackground/SoftAurora';
 import LogoImage from '../../assets/logo.png';
 
 export const LoginPage = () => {
-  // Состояние для хранения введенных данных
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  // Инициализируем правильно: логин и пароль
+  const [formData, setFormData] = useState({ login: '', password: '' });
   const [loading, setLoading] = useState(false);
 
-  // Обновление состояния при вводе
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Обработка отправки формы
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // Отправка POST-запроса на бэкенд
+      // Отправка запроса на сервер
       const response = await axios.post('/api/login', formData);
-      console.log('Успешный ответ сервера:', response.data);
       
-      // Здесь будет логика сохранения токена и редиректа, например:
-      // localStorage.setItem('token', response.data.token);
-      // window.location.href = '/admin';
+      // Предполагаем, что сервер возвращает объект вида: { token: '...', role: 'admin' }
+      // Роли: 'admin', 'manager', 'employee'
+      const { token, role } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', role);
+      
+      // Перенаправление в зависимости от роли
+      switch (role) {
+        case 'admin':
+          navigate('/admin');
+          break;
+        case 'manager':
+          navigate('/manager');
+          break;
+        case 'employee':
+          navigate('/employee');
+          break;
+        default:
+          navigate('/login');
+      }
       
     } catch (error) {
       console.error('Ошибка входа:', error.response?.data?.message || 'Ошибка сети');
@@ -44,21 +61,16 @@ export const LoginPage = () => {
         <SoftAurora speed={0.6} scale={1.5} color1="#f7f7f7" color2="#e100ff" enableMouseInteraction />
         <ContentOverlay>
           <Box sx={{ mb: 4 }}>
-      <img 
-        src={LogoImage} 
-        alt="Logo" 
-        style={{ width: '180px', height: 'auto', display: 'block' }} 
-      />
-    </Box>
-
-    <Box sx={{ textAlign: 'center' }}>
-      <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
-        Добро пожаловать
-      </Typography>
-      <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-        Система управления данными
-      </Typography>
-    </Box>
+            <img src={LogoImage} alt="Logo" style={{ width: '180px', height: 'auto', display: 'block' }} />
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h3" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
+              Добро пожаловать
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              Система управления данными
+            </Typography>
+          </Box>
         </ContentOverlay>
       </BrandingSide>
 
