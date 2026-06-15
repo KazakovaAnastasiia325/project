@@ -23,6 +23,7 @@ export const AdminPage = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   
+  // Модели пагинации и сортировки
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
 
@@ -37,18 +38,25 @@ export const AdminPage = () => {
 
       const response = await api.get('/api/expertiza/list', { params });
       
-      // Логируем, чтобы увидеть структуру данных
+      // Логируем для отладки
       console.log('Ответ сервера:', response.data);
       
-      setRows(response.data.content || []);
-      setTotalRows(response.data.totalElements || 0);
+      // Обеспечиваем корректное извлечение данных
+      // Если сервер возвращает { content: [], totalElements: 0 }
+      const data = response.data || {};
+      setRows(Array.isArray(data.content) ? data.content : []);
+      setTotalRows(typeof data.totalElements === 'number' ? data.totalElements : 0);
+      
     } catch (error) {
-      console.error('Ошибка загрузки:', error);
+      console.error('Ошибка загрузки данных:', error);
+      setRows([]);
+      setTotalRows(0);
     } finally {
       setLoading(false);
     }
   };
 
+  // Перезагружаем данные при изменении пагинации или сортировки
   useEffect(() => {
     fetchExpertise();
   }, [paginationModel, sortModel]);
@@ -65,6 +73,7 @@ export const AdminPage = () => {
   };
 
   const handleRowClick = (params) => {
+    // Передаем полную строку данных
     setSelectedExpertise(params.row);
     setIsDrawerOpen(true);
   };
@@ -74,37 +83,43 @@ export const AdminPage = () => {
       await api.post('/api/expertiza/save', newData);
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
-      fetchExpertise();
+      fetchExpertise(); // Обновляем список после сохранения
     } catch (error) {
-      alert('Ошибка при сохранении');
+      console.error('Ошибка сохранения:', error);
+      alert('Ошибка при сохранении данных');
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Удалить запись?')) {
+    if (window.confirm('Вы действительно хотите удалить эту запись?')) {
       try {
         await api.delete(`/api/expertiza/delete/${id}`);
         fetchExpertise();
       } catch (error) {
+        console.error('Ошибка удаления:', error);
         alert('Ошибка при удалении');
       }
     }
   };
 
   return (
-    <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', mb: 2 }}>
+    <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* Header */}
+      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>Выйти</Button>
       </Box>
 
-      <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '8px 16px', borderRadius: '10px', mb: 1.5 }}>
-          <Typography variant="subtitle1" sx={{ color: '#ffffff' }}>Реестр экспертиз</Typography>
-          <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small">Добавить</S.ActionButton>
+      {/* Main Content */}
+      <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
+          <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small" variant="contained">
+            Добавить
+          </S.ActionButton>
         </Box>
         
-        <S.TableWrapper sx={{ '& .MuiDataGrid-root': { minHeight: '300px' } }}>
+        <Box sx={{ flexGrow: 1, mb: 3 }}>
           <DataGridTable 
             rows={rows}
             rowCount={totalRows}
@@ -114,15 +129,17 @@ export const AdminPage = () => {
             onSortModelChange={setSortModel}
             onRowClick={handleRowClick}
             onDelete={handleDelete}
-            isAdmin={true} // ЭТО ВАЖНО для отображения удаления
+            isAdmin={true} 
+            isManager={false}
           />
-        </S.TableWrapper>
+        </Box>
 
         <DetailsDrawer 
           open={isDrawerOpen} 
           onClose={() => setIsDrawerOpen(false)} 
           data={selectedExpertise}
           onSave={handleSave} 
+          isManager={false}
         />
       </Box>
     </S.AdminContainer>

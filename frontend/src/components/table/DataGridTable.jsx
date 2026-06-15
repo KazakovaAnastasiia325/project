@@ -4,7 +4,6 @@ import { Box, IconButton, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
 export const DataGridTable = ({ 
     rows, 
@@ -21,34 +20,31 @@ export const DataGridTable = ({
 
     const columns = useMemo(() => [
         { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
-        // Обновлено: data_post вместо date
         { field: 'data_post', headerName: 'Дата', width: 130 },
         { 
             field: 'experts', 
             headerName: 'Эксперт', 
             width: 220,
+            // Безопасный доступ: если row.experts нет, вернем пустую строку
             valueGetter: (value, row) => {
-                if (row && row.experts && Array.isArray(row.experts)) {
+                if (Array.isArray(row?.experts)) {
                     return row.experts.map(e => e.name).join(', ');
                 }
                 return '';
             }
         },
         {
-            // Обновлено: используем поле is_closed из Go-структуры
             field: 'is_closed',
             headerName: 'Статус',
             width: 160,
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                const isClosed = params.value; // true или false
-                const label = isClosed ? 'Завершено' : 'В работе';
-                
-                // Используем ваши стили статусов
+                // Преобразуем значение в явный boolean
+                const isClosed = !!params.value; 
                 return (
                     <Chip
-                        label={label}
+                        label={isClosed ? 'Завершено' : 'В работе'}
                         sx={{
                             backgroundColor: isClosed ? '#2e7d32' : '#1976d2',
                             color: '#fff',
@@ -61,7 +57,6 @@ export const DataGridTable = ({
                 );
             }
         },
-        // Обновлено: fab вместо fabula
         { field: 'fab', headerName: 'Фабула', flex: 1 },
         {
             field: 'actions',
@@ -71,7 +66,8 @@ export const DataGridTable = ({
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                const isCompleted = params.row.is_closed;
+                // Безопасный доступ к статусу
+                const isCompleted = !!params.row?.is_closed;
                 const showViewOnly = isManager || isCompleted;
 
                 return (
@@ -88,7 +84,10 @@ export const DataGridTable = ({
                         </IconButton>
                         
                         {isAdmin && (
-                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
+                            <IconButton 
+                                size="small" 
+                                onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}
+                            >
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         )}
@@ -103,6 +102,8 @@ export const DataGridTable = ({
             rows={rows || []} 
             columns={columns}
             rowCount={rowCount}
+            // Указываем явный ID (если бэкенд шлет id, это не обязательно, но для надежности добавим)
+            getRowId={(row) => row.id}
             paginationMode="server"
             sortingMode="server"
             paginationModel={paginationModel}
@@ -117,26 +118,15 @@ export const DataGridTable = ({
                 border: 'none',
                 '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#e0f2fe',
-                    borderBottom: '1px solid rgba(46, 142, 255, 0.2)',
                 },
                 '& .MuiDataGrid-columnHeader': {
                     color: '#0369a1',
                     fontWeight: 800,
                     fontSize: '12px',
                     textTransform: 'uppercase',
-                    borderRight: '1px solid rgba(46, 142, 255, 0.1)',
-                    '&:last-child': { borderRight: 'none' },
                 },
                 '& .MuiDataGrid-cell': {
-                    borderBottom: '1px solid #f1f5f9',
-                    borderRight: '1px solid #f1f5f9',
                     color: '#334155',
-                    padding: '0 16px',
-                    '&:last-child': { borderRight: 'none' },
-                },
-                '& .MuiDataGrid-row:hover': {
-                    backgroundColor: '#f8fafc',
-                    transition: '0.2s',
                 },
                 '& .MuiDataGrid-columnSeparator': { display: 'none' },
                 '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
