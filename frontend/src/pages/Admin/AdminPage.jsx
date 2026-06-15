@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // 1. Импортируем хук
 import { Box, Typography, Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -6,7 +7,10 @@ import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import AddIcon from '@mui/icons-material/Add';
 import * as S from './AdminStyles';
-
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
+});
 export const AdminPage = () => {
   const navigate = useNavigate(); // 2. Инициализируем хук
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -41,18 +45,28 @@ export const AdminPage = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleSave = (newData) => {
-    if (selectedExpertise) {
-      setRows((prev) => prev.map((r) => (r.id === newData.id ? newData : r)));
-    } else {
-      const newRow = {
-        ...newData,
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
-        status: 'Создано'
-      };
-      setRows((prev) => [...prev, newRow]);
+  const handleSave = async (newData) => {
+    try {
+      // Отправляем данные на сервер
+      const response = await api.post('/api/expertiza/save', newData);
+      
+      // Если сервер вернул успех, обновляем таблицу
+      const savedData = response.data; // Предполагаем, что бэк вернул объект с присвоенным ID
+
+      if (selectedExpertise) {
+        // Редактирование
+        setRows((prev) => prev.map((r) => (r.id === savedData.id ? savedData : r)));
+      } else {
+        // Добавление
+        setRows((prev) => [...prev, savedData]);
+      }
+      
+      setIsDrawerOpen(false);
+      alert('Экспертиза успешно сохранена');
+    } catch (error) {
+      console.error('Ошибка сохранения:', error);
+      alert('Не удалось сохранить экспертизу на сервере');
     }
-    setIsDrawerOpen(false);
   };
 
   const handleDelete = (id) => {
