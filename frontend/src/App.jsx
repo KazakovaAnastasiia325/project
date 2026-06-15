@@ -5,7 +5,8 @@ import { MainLayout } from './components/layouts/MainLayout';
 import { Users } from './pages/Admin/Users';
 import { AdminPage } from './pages/Admin/AdminPage';
 import { Reports } from './pages/Admin/Reports';
-
+import { EmployeePage } from './pages/Employee/EmployeePage';
+import { ManagerPage } from './pages/Manager/ManagerPage';
 function App() {
   return (
     <Router>
@@ -19,10 +20,21 @@ function App() {
           <Route path="expertise" element={<AdminPage />} />
           <Route path="users" element={<Users />} />
           <Route path="reports" element={<Reports />} />
+
           {/* Редирект с /admin на экспертизы по умолчанию */}
           <Route index element={<Navigate to="expertise" replace />} />
-        </Route>
 
+        </Route>
+        <Route path="/employee" element={<MainLayout />}>
+          <Route path="expertise" element={<EmployeePage />} />
+          <Route path="reports" element={<Reports />} />
+          <Route index element={<Navigate to="expertise" replace />} />
+        </Route>
+        <Route path="/manager" element={<MainLayout />}>
+          <Route path="expertise" element={<ManagerPage />} />
+          <Route path="reports" element={<Reports />} />
+          <Route index element={<Navigate to="expertise" replace />} />
+        </Route>
         {/* Редирект на логин при заходе в корень */}
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>

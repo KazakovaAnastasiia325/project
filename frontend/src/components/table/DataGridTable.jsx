@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, IconButton, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 
-export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
+export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isManager = false }) => {
 
-    const columns = [
+    const columns = useMemo(() => [
         { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
         { field: 'date', headerName: 'Дата', width: 130 },
         { 
@@ -58,16 +59,28 @@ export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
             align: 'center',
             renderCell: (params) => (
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRowClick(params); }}>
-                        <EditIcon fontSize="small" />
+                    {/* Если менеджер — только просмотр (глаз), иначе редактирование (карандаш) */}
+                    <IconButton 
+                        size="small" 
+                        onClick={(e) => { e.stopPropagation(); onRowClick(params); }}
+                    >
+                        {isManager ? (
+                            <VisibilityIcon fontSize="small" color="primary" />
+                        ) : (
+                            <EditIcon fontSize="small" />
+                        )}
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
-                        <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    
+                    {/* Удаление: доступно ТОЛЬКО администратору */}
+                    {isAdmin && (
+                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }
-    ];
+    ], [isManager, isAdmin, onRowClick, onDelete]);
 
     return (
         <DataGrid
@@ -83,23 +96,20 @@ export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
             sx={{
                 height: '100%',
                 border: 'none',
-                // Заголовки
                 '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#f8fafc',
-                    borderBottom: '1px solid #e2e8f0',
+                    backgroundColor: '#e0f2fe',
+                    borderBottom: '1px solid rgba(46, 142, 255, 0.2)',
                 },
                 '& .MuiDataGrid-columnHeader': {
-                    color: '#64748b',
-                    fontWeight: 700,
+                    color: '#0369a1',
+                    fontWeight: 800,
                     fontSize: '12px',
                     textTransform: 'uppercase',
-                    // Вертикальные линии в заголовках
-                    borderRight: '1px solid #e2e8f0',
+                    borderRight: '1px solid rgba(46, 142, 255, 0.1)',
                     '&:last-child': { borderRight: 'none' },
                 },
                 '& .MuiDataGrid-cell': {
                     borderBottom: '1px solid #f1f5f9',
-                    // Вертикальные линии в ячейках
                     borderRight: '1px solid #f1f5f9',
                     color: '#334155',
                     padding: '0 16px',
@@ -109,7 +119,6 @@ export const DataGridTable = ({ rows, onRowClick, onDelete }) => {
                     backgroundColor: '#f8fafc',
                     transition: '0.2s',
                 },
-                // Убираем лишнее
                 '& .MuiDataGrid-columnSeparator': { display: 'none' },
                 '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
             }}

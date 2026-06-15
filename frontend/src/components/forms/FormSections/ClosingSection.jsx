@@ -1,33 +1,70 @@
 import React from 'react';
-import { Grid, TextField, MenuItem, Typography, Divider } from '@mui/material';
+import { Grid, TextField, MenuItem, Typography, Divider, Button } from '@mui/material';
 
-export const ClosingSection = ({ formData, setFormData, inputStyle, errors = {} }) => {
+import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
+import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
+
+// Добавляем isManager в пропсы
+export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isManager = false }) => {
+  // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
+  const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
+
+  const updateStatus = (prevData) => {
+    if (prevData.status === EXPERTISE_STATUSES.NEW.label) {
+      return { ...prevData, status: EXPERTISE_STATUSES.IN_PROGRESS.label };
+    }
+    return prevData;
+  };
+
   const handleChange = (field) => (event) => {
-    setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+    if (isLocked) return; 
+    setFormData((prev) => updateStatus({ ...prev, [field]: event.target.value }));
+  };
+
+  const handleComplete = () => {
+    // В случае менеджера эта функция даже не должна вызываться, 
+    // но на всякий случай оставляем проверку
+    if (isLocked) return;
+
+    const requiredFields = [
+      'dateend', 'result', 'daysInUnit', 'daysWithExpert', 
+      'conclCategorical', 'conclProbable', 'conclNPV', 'hoursSpent'
+    ];
+    
+    const hasEmptyFields = requiredFields.some(field => !formData[field] || String(formData[field]).trim() === '');
+
+    if (hasEmptyFields) {
+      alert('Пожалуйста, заполните все обязательные поля перед завершением!');
+      return;
+    }
+
+    const completedData = { ...formData, status: EXPERTISE_STATUSES.COMPLETED.label };
+    setFormData(completedData);
+    
+    if (onSave) {
+      onSave(completedData);
+    }
   };
 
   return (
-    <Grid container spacing={3} sx={{ mt: 1 }}>
+    <Grid container spacing={2} sx={{ mt: 0 }}>
+      {/* Секция завершения */}
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
-          required 
-          error={!!errors.dateend}
-          fullWidth label="Дата завершения" type="date"
-          sx={inputStyle}
+          disabled={isLocked} // Заменяем на isLocked
+          size="small" fullWidth required error={!!errors.dateend}
+          label="Дата завершения" type="date" sx={inputStyle}
           slotProps={{ inputLabel: { shrink: true } }}
-          value={formData.dateend || ''} 
-          onChange={handleChange('dateend')}
+          value={formData.dateend || ''} onChange={handleChange('dateend')}
         />
       </Grid>
       
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
-          required 
-          error={!!errors.result}
-          select fullWidth label="Результат исследования" 
-          sx={inputStyle}
-          value={formData.result || ''}
-          onChange={handleChange('result')}
+          disabled={isLocked}
+          size="small" fullWidth required select error={!!errors.result}
+          label="Результат исследования" sx={inputStyle}
+          value={formData.result || ''} onChange={handleChange('result')}
         >
           <MenuItem value={1}>Заключение</MenuItem>
           <MenuItem value={2}>СНДЗ</MenuItem>
@@ -36,51 +73,74 @@ export const ClosingSection = ({ formData, setFormData, inputStyle, errors = {} 
       </Grid>
 
       <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Количество дней нахождения материалов</Typography>
+      </Grid>
       
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
-          required 
-          error={!!errors.daysInUnit}
-          fullWidth label="Дней в тер. подразделении" type="number"
-          sx={inputStyle} 
-          value={formData.daysInUnit || ''} 
-          onChange={handleChange('daysInUnit')}
+          disabled={isLocked}
+          size="small" fullWidth required error={!!errors.daysInUnit}
+          label="Дней в подразделении" type="number" sx={inputStyle} 
+          value={formData.daysInUnit || ''} onChange={handleChange('daysInUnit')}
         />
       </Grid>
       
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
-          required 
-          error={!!errors.daysWithExpert}
-          fullWidth label="Дней у эксперта" type="number"
-          sx={inputStyle} 
-          value={formData.daysWithExpert || ''} 
-          onChange={handleChange('daysWithExpert')}
+          disabled={isLocked}
+          size="small" fullWidth required error={!!errors.daysWithExpert}
+          label="Дней у эксперта" type="number" sx={inputStyle} 
+          value={formData.daysWithExpert || ''} onChange={handleChange('daysWithExpert')}
         />
       </Grid>
 
-      <Grid size={{ xs: 12 }}><Typography variant="subtitle2" sx={{ mt: 1 }}>Дано выводов:</Typography></Grid>
+      <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Дано выводов</Typography>
+      </Grid>
       
       <Grid size={{ xs: 4 }}>
-        <TextField required error={!!errors.conclCategorical} fullWidth label="Категорические" type="number" sx={inputStyle} value={formData.conclCategorical || ''} onChange={handleChange('conclCategorical')} />
+        <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclCategorical} label="Категор." type="number" sx={inputStyle} value={formData.conclCategorical || ''} onChange={handleChange('conclCategorical')} />
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField required error={!!errors.conclProbable} fullWidth label="Вероятные" type="number" sx={inputStyle} value={formData.conclProbable || ''} onChange={handleChange('conclProbable')} />
+        <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclProbable} label="Вероятные" type="number" sx={inputStyle} value={formData.conclProbable || ''} onChange={handleChange('conclProbable')} />
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField required error={!!errors.conclNPV} fullWidth label="НПВ" type="number" sx={inputStyle} value={formData.conclNPV || ''} onChange={handleChange('conclNPV')} />
+        <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclNPV} label="НПВ" type="number" sx={inputStyle} value={formData.conclNPV || ''} onChange={handleChange('conclNPV')} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
         <TextField 
-          required 
-          error={!!errors.hoursSpent}
-          fullWidth label="Кол-во часов на производство экспертизы" type="number"
-          sx={inputStyle} 
-          value={formData.hoursSpent || ''} 
-          onChange={handleChange('hoursSpent')}
+          disabled={isLocked}
+          size="small" fullWidth required error={!!errors.hoursSpent}
+          label="Кол-во часов на производство" type="number" sx={inputStyle} 
+          value={formData.hoursSpent || ''} onChange={handleChange('hoursSpent')}
         />
       </Grid>
+
+      {/* Кнопка завершения - теперь она не видна или заблокирована для менеджера */}
+      {!isManager && (
+        <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
+          <Button 
+            variant="contained" 
+            fullWidth 
+            disabled={isLocked}
+            onClick={handleComplete}
+            sx={{ 
+              backgroundColor: isLocked ? '#bdbdbd' : EXPERTISE_STATUSES.COMPLETED.color,
+              color: '#fff',
+              borderRadius: '10px',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: isLocked ? '#bdbdbd' : '#527a55'
+              }
+            }}
+          >
+            {formData.status === EXPERTISE_STATUSES.COMPLETED.label ? 'Экспертиза завершена' : 'Завершить экспертизу'}
+          </Button>
+        </Grid>
+      )}
     </Grid>
   );
 };

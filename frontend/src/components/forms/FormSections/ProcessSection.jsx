@@ -1,59 +1,116 @@
 import React from 'react';
 import { Grid, TextField, Divider, Typography } from '@mui/material';
-import { inputStyle } from '../../Registration/RegistrationStyles';
+import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
+import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 
-export const ProcessSection = ({ formData, setFormData }) => {
-  
+// Добавляем isManager в пропсы
+export const ProcessSection = ({ formData, setFormData, isManager = false }) => {
+  // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
+  const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
+
+  const updateStatus = (prevData) => {
+    if (prevData.status === EXPERTISE_STATUSES.NEW.label) {
+      return { ...prevData, status: EXPERTISE_STATUSES.IN_PROGRESS.label };
+    }
+    return prevData;
+  };
 
   const handleChange = (field) => (event) => {
-    setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+    if (isLocked) return; 
+    setFormData((prev) => updateStatus({ ...prev, [field]: event.target.value }));
   };
 
   return (
-    <Grid container spacing={3} sx={{ mt: 1 }}>
+    <Grid container spacing={2} sx={{ mt: 0 }}>
       {/* Блок Сроки */}
       <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Сроки производства</Typography>
+      </Grid>
+      <Grid size={{ xs: 12 }}>
         <TextField 
-          fullWidth label="Срок производства экспертизы (в днях)" type="number"
-          value={formData.deadlineDays || ''} 
-          onChange={handleChange('deadlineDays')} 
-          sx={inputStyle}
+          disabled={isLocked} // Используем isLocked
+          size="small" fullWidth label="Срок производства экспертизы (в днях)" type="number"
+          value={formData.deadlineDays || ''} onChange={handleChange('deadlineDays')} sx={inputStyle}
         />
       </Grid>
 
       {/* Блок Приостановление */}
-      <Grid size={{ xs: 12 }}><Typography variant="subtitle2" sx={{ mt: 2 }}>Приостановление производства</Typography></Grid>
-      <Grid size={{ xs: 4 }}>
-        <TextField fullWidth label="Дата приостановления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.suspendDate || ''} onChange={handleChange('suspendDate')} sx={inputStyle} />
+      <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Приостановление производства</Typography>
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField fullWidth label="Дата возобновления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''} onChange={handleChange('resumeDate')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Дата приост." type="date" 
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.suspendDate || ''} 
+          onChange={handleChange('suspendDate')} sx={inputStyle} 
+        />
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField fullWidth label="Причина приостановления" value={formData.suspendReason || ''} onChange={handleChange('suspendReason')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Дата возоб." type="date" 
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''} 
+          onChange={handleChange('resumeDate')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 4 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Причина" value={formData.suspendReason || ''} 
+          onChange={handleChange('suspendReason')} sx={inputStyle} 
+        />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <TextField fullWidth label="Дата (срок) продления" type="date" slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDate || ''} onChange={handleChange('extensionDate')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Дата (срок) продления" type="date" 
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDate || ''} 
+          onChange={handleChange('extensionDate')} sx={inputStyle} 
+        />
       </Grid>
 
       {/* Блок Затраты */}
-      <Grid size={{ xs: 12 }}><Divider sx={{ my: 2 }} /></Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField fullWidth label="Трудозатраты эксперта (чел/час)" type="number" value={formData.laborCosts || ''} onChange={handleChange('laborCosts')} sx={inputStyle} />
+      <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
+      <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Затраты</Typography>
       </Grid>
       <Grid size={{ xs: 6 }}>
-        <TextField fullWidth label="Материальные затраты" type="number" value={formData.materialCosts || ''} onChange={handleChange('materialCosts')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Трудозатраты (чел/час)" type="number" 
+          value={formData.laborCosts || ''} onChange={handleChange('laborCosts')} sx={inputStyle} 
+        />
       </Grid>
       <Grid size={{ xs: 6 }}>
-        <TextField fullWidth label="Расходы по эксплуатации оборудования" type="number" value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Материал. затраты" type="number" 
+          value={formData.materialCosts || ''} onChange={handleChange('materialCosts')} sx={inputStyle} 
+        />
       </Grid>
       <Grid size={{ xs: 6 }}>
-        <TextField fullWidth label="Общая стоимость исследования" type="number" value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Эксплуатация оборуд." type="number" 
+          value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Общая стоимость" type="number" 
+          value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle} 
+        />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <TextField fullWidth label="Примечание (№ пломбы)" value={formData.plomba || ''} onChange={handleChange('plomba')} sx={inputStyle} />
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Примечание (№ пломбы)" value={formData.plomba || ''} 
+          onChange={handleChange('plomba')} sx={inputStyle} 
+        />
       </Grid>
     </Grid>
   );
