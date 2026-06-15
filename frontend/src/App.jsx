@@ -8,12 +8,12 @@ import { EmployeePage } from './pages/Employee/EmployeePage';
 import { ManagerPage } from './pages/Manager/ManagerPage';
 
 // Простая обертка для защиты маршрутов
-const PrivateRoute = ({ children, role }) => {
+const PrivateRoute = ({ children, requiredRole }) => {
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
+  const userRole = Number(localStorage.getItem('userRole')); // Приводим к числу
 
   if (!token) return <Navigate to="/login" replace />;
-  if (role && userRole !== role) return <Navigate to="/login" replace />;
+  if (requiredRole && userRole !== requiredRole) return <Navigate to="/login" replace />;
   
   return children;
 };
@@ -26,20 +26,20 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
 
         {/* Защищенные маршруты для Администратора */}
-        <Route path="/admin" element={<PrivateRoute role="admin"><MainLayout /></PrivateRoute>}>
+        <Route path="/admin" element={<PrivateRoute requiredRole={1}><MainLayout /></PrivateRoute>}>
           <Route path="expertise" element={<AdminPage />} />
           <Route path="users" element={<Users />} />
           <Route index element={<Navigate to="expertise" replace />} />
         </Route>
 
         {/* Защищенные маршруты для Сотрудника */}
-        <Route path="/employee" element={<PrivateRoute role="employee"><MainLayout /></PrivateRoute>}>
+        <Route path="/employee" element={<PrivateRoute requiredRole={3}><MainLayout /></PrivateRoute>}>
           <Route path="expertise" element={<EmployeePage />} />
           <Route index element={<Navigate to="expertise" replace />} />
         </Route>
 
         {/* Защищенные маршруты для Руководителя */}
-        <Route path="/manager" element={<PrivateRoute role="manager"><MainLayout /></PrivateRoute>}>
+        <Route path="/manager" element={<PrivateRoute requiredRole={2}><MainLayout /></PrivateRoute>}>
           <Route path="expertise" element={<ManagerPage />} />
           <Route index element={<Navigate to="expertise" replace />} />
         </Route>

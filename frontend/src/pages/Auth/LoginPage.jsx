@@ -27,30 +27,27 @@ export const LoginPage = () => {
     setLoading(true);
     
     try {
-      // Отправка POST-запроса
-      // Убедитесь, что ваш LoginHandler в Go ожидает JSON с полями login и password
       const response = await api.post('/api/login', formData);
       
-      // Предполагаем, что ответ сервера: { "token": "...", "role": "admin" }
-      const {role } = response.data;
+      // Приводим роль к числу для единообразия
+      const role = Number(response.data.role); 
       
       if (!role) {
-        throw new Error('Некорректный ответ от сервера');
+        throw new Error('Роль не получена');
       }
 
-      // Сохраняем данные для PrivateRoute
-      
+      localStorage.setItem('token', response.data.token);
       localStorage.setItem('userRole', role);
       
-      // Перенаправление по ролям
+      // Перенаправление по числовым ролям
       switch (role) {
-        case 'admin':
+        case 1: // Админ
           navigate('/admin', { replace: true });
           break;
-        case 'manager':
+        case 2: // Менеджер
           navigate('/manager', { replace: true });
           break;
-        case 'employee':
+        case 3: // Сотрудник
           navigate('/employee', { replace: true });
           break;
         default:
@@ -60,7 +57,7 @@ export const LoginPage = () => {
       
     } catch (error) {
       console.error('Ошибка входа:', error);
-      alert(error.response?.data?.message || 'Ошибка авторизации. Проверьте данные.');
+      alert('Ошибка авторизации');
     } finally {
       setLoading(false);
     }
