@@ -3,6 +3,7 @@ import { Box, Tabs, Tab } from '@mui/material';
 import { RegistrationSection } from './FormSections/RegistrationSection';
 import { ProcessSection } from './FormSections/ProcessSection';
 import { ClosingSection } from './FormSections/ClosingSection';
+import { EXPERTISE_STATUSES } from '../../data/mockExpertise'; // Убедитесь в правильности пути
 import * as S from './ExpertStyles';
 import * as AdminS from '../../pages/Admin/AdminStyles';
 
@@ -10,11 +11,15 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
   const [formData, setFormData] = useState(initialData || { 
     date: '', ud: '', fabula: '', state: '', category: '', 
     dateend: '', result: '', cost: '', kolvohour: '', 
-    fioexpert: '', kolvo: '', kolvoobj: '', plomba: '' 
+    fioexpert: '', kolvo: '', kolvoobj: '', plomba: '',
+    status: EXPERTISE_STATUSES.NEW.label // Убедимся, что статус инициализирован
   });
   
   const [tab, setTab] = useState(0);
   const [isNewRecord] = useState(!initialData);
+
+  // Проверка: завершена ли экспертиза
+  const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
   const registrationFields = [
     'date', 'ud', 'fabula', 'state', 'view', 'statys', 
@@ -54,33 +59,32 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       </S.CustomTabs>
 
       <S.SectionWrapper>
-  {/* Передаем проп под правильным именем: isManager */}
-  {tab === 0 && (
-    <RegistrationSection 
-      formData={formData} 
-      setFormData={setFormData} 
-      isManager={isManager} // Было disabled={isManager}
-    />
-  )}
-  {tab === 1 && !isNewRecord && (
-    <ProcessSection 
-      formData={formData} 
-      setFormData={setFormData} 
-      isManager={isManager} // Было disabled={isManager}
-    />
-  )}
-  {tab === 2 && !isNewRecord && (
-    <ClosingSection 
-      formData={formData} 
-      setFormData={setFormData} 
-      onSave={onSave} 
-      isManager={isManager} // Было disabled={isManager}
-    />
-  )}
-</S.SectionWrapper>
+        {tab === 0 && (
+          <RegistrationSection 
+            formData={formData} 
+            setFormData={setFormData} 
+            isManager={isManager} 
+          />
+        )}
+        {tab === 1 && !isNewRecord && (
+          <ProcessSection 
+            formData={formData} 
+            setFormData={setFormData} 
+            isManager={isManager} 
+          />
+        )}
+        {tab === 2 && !isNewRecord && (
+          <ClosingSection 
+            formData={formData} 
+            setFormData={setFormData} 
+            onSave={onSave} 
+            isManager={isManager} 
+          />
+        )}
+      </S.SectionWrapper>
 
-      {/* Кнопка сохраняется только если это НЕ менеджер */}
-      {!isManager && (
+      {/* Кнопка видна только если это НЕ менеджер И экспертиза НЕ завершена */}
+      {!isManager && !isCompleted && (
         <Box sx={{ display: 'flex', mt: 1, pt: 1, borderTop: '1px solid #eee' }}>
           <AdminS.ActionButton variant="contained" size="small" fullWidth onClick={handleSave}>
             {isNewRecord ? 'Сохранить' : 'Изменить'}

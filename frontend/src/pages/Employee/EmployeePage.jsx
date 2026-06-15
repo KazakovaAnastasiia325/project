@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Импортируем хук
 import { Box, Typography, Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { DataGridTable } from '../../components/table/DataGridTable';
@@ -13,6 +14,7 @@ const initialMockData = [
 ];
 
 export const EmployeePage = () => {
+  const navigate = useNavigate(); // 2. Инициализируем хук
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
 
@@ -20,6 +22,12 @@ export const EmployeePage = () => {
     const savedRows = localStorage.getItem('expertiseData');
     return savedRows ? JSON.parse(savedRows) : initialMockData;
   });
+
+  // Функция выхода
+  const handleLogout = () => {
+    // Здесь можно очистить данные пользователя, если они есть
+    navigate('/login');
+  };
 
   useEffect(() => {
     localStorage.setItem('expertiseData', JSON.stringify(rows));
@@ -37,10 +45,8 @@ export const EmployeePage = () => {
 
   const handleSave = (newData) => {
     if (selectedExpertise) {
-      // Редактирование
       setRows((prev) => prev.map((r) => (r.id === newData.id ? newData : r)));
     } else {
-      // Создание
       const newRow = {
         ...newData,
         id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
@@ -73,7 +79,7 @@ export const EmployeePage = () => {
         <Button 
           startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
           sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={() => console.log('Выход')}
+          onClick={handleLogout} // 3. Привязываем функцию выхода
         >
           Выйти
         </Button>
@@ -118,7 +124,6 @@ export const EmployeePage = () => {
             rows={rows} 
             density="compact"
             onRowClick={handleRowClick} 
-            // onDelete не передаем, чтобы скрыть кнопку удаления в таблице
           />
         </S.TableWrapper>
 

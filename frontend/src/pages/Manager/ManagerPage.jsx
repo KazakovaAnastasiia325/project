@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Импортируем хук
 import { Box, Typography, Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
-import AddIcon from '@mui/icons-material/Add';
 import * as S from '../Admin/AdminStyles';
 
-// Начальные данные, если localStorage пуст
 const initialMockData = [
   { id: 1, date: '2026-06-10', fioexpert: 'Иванов И.И.', status: 'В работе', fabula: 'Кража', ud: '12345/2026', organ: 'ОВД', result: 'В производстве' },
   { id: 2, date: '2026-06-09', fioexpert: 'Петров П.П.', status: 'Создано', fabula: 'ДТП', ud: '67890/2026', organ: 'Суды', result: 'Ожидает' }
 ];
 
 export const ManagerPage = () => {
+  const navigate = useNavigate(); // 2. Инициализируем хук
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
 
@@ -21,14 +21,14 @@ export const ManagerPage = () => {
     return savedRows ? JSON.parse(savedRows) : initialMockData;
   });
 
+  // 3. Функция выхода
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   useEffect(() => {
     localStorage.setItem('expertiseData', JSON.stringify(rows));
   }, [rows]);
-
-  const handleCreate = () => {
-    setSelectedExpertise(null);
-    setIsDrawerOpen(true);
-  };
 
   const handleRowClick = (params) => {
     setSelectedExpertise(params.row);
@@ -37,10 +37,8 @@ export const ManagerPage = () => {
 
   const handleSave = (newData) => {
     if (selectedExpertise) {
-      // Редактирование
       setRows((prev) => prev.map((r) => (r.id === newData.id ? newData : r)));
     } else {
-      // Создание
       const newRow = {
         ...newData,
         id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
@@ -73,7 +71,7 @@ export const ManagerPage = () => {
         <Button 
           startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
           sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={() => console.log('Выход')}
+          onClick={handleLogout} // 4. Привязываем обработчик
         >
           Выйти
         </Button>
@@ -81,8 +79,6 @@ export const ManagerPage = () => {
 
       {/* 2. ОСНОВНОЙ КОНТЕНТ */}
       <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
-        
-        {/* Панель управления реестром */}
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
@@ -96,8 +92,6 @@ export const ManagerPage = () => {
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>
             Реестр экспертиз
           </Typography>
-          
-          
         </Box>
         
         <S.TableWrapper sx={{ '& .MuiDataGrid-root': { minHeight: '300px' } }}>
@@ -106,7 +100,6 @@ export const ManagerPage = () => {
             isManager={true}
             density="compact"
             onRowClick={handleRowClick} 
-            // onDelete не передаем, чтобы скрыть кнопку удаления в таблице
           />
         </S.TableWrapper>
 

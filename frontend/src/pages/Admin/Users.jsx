@@ -15,70 +15,68 @@ const FormFields = memo(({ initialData, ref }) => {
     }));
 
     return (
-    <Grid container spacing={1.5}> {/* Увеличил отступы для «воздуха» */}
-        {[
-            { label: 'Фамилия', key: 'lastName', xs: 4 },
-            { label: 'Имя', key: 'firstName', xs: 4 },
-            { label: 'Отчество', key: 'middleName', xs: 4, required: false },
-            { label: 'Логин', key: 'login', xs: 6 },
-            { label: 'Пароль', key: 'password', xs: 6, type: 'password' },
-            { label: 'Email', key: 'email', xs: 6, required: false },
-            { label: 'Телефон', key: 'phone', xs: 6, required: false }
-        ].map((field) => (
-            <Grid size={{ xs: field.xs }} key={field.key}>
+        <Grid container spacing={1.5}> {/* Увеличил отступы для «воздуха» */}
+            {[
+                { label: 'Фамилия', key: 'lastName', xs: 4 },
+                { label: 'Имя', key: 'firstName', xs: 4 },
+                { label: 'Отчество', key: 'middleName', xs: 4, required: false },
+                { label: 'Логин', key: 'login', xs: 6 },
+                { label: 'Пароль', key: 'password', xs: 6, type: 'password' },
+                { label: 'Email', key: 'email', xs: 6, required: false },
+                { label: 'Телефон', key: 'phone', xs: 6, required: false }
+            ].map((field) => (
+                <Grid size={{ xs: field.xs }} key={field.key}>
+                    <TextField
+                        fullWidth
+                        label={field.label}
+                        type={field.type || 'text'}
+                        value={data[field.key]}
+                        onChange={(e) => setData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        required={field.required !== false}
+                        size="small"
+                        slotProps={{
+                            inputLabel: {
+                                shrink: true,
+                                sx: { fontSize: '0.90rem', transform: 'translate(14px, -9px) scale(0.85)' }
+                            }
+                        }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '12px',
+                                backgroundColor: '#ffffff',
+                                '& fieldset': { borderColor: '#cbd5e1' },
+                                '&:hover fieldset': { borderColor: '#94a3b8' },
+                                '&.Mui-focused fieldset': { borderColor: '#2563eb', borderWidth: '2px' },
+                            },
+                            marginTop: '6px'
+                        }}
+                    />
+                </Grid>
+            ))}
+            <Grid size={{ xs: 12 }}>
                 <TextField
-    fullWidth
-    label={field.label}
-    type={field.type || 'text'}
-    value={data[field.key]}
-    onChange={(e) => setData(prev => ({ ...prev, [field.key]: e.target.value }))}
-    required={field.required !== false}
-    size="small"
-    // Добавляем этот блок, чтобы метка была чуть меньше и не конфликтовала с рамкой
-    slotProps={{
-        inputLabel: {
-            shrink: true, // Фиксируем метку наверху (она не будет перекрывать ввод)
-            sx: { fontSize: '0.90rem', transform: 'translate(14px, -9px) scale(0.85)' }
-        }
-    }}
-    sx={{
-        '& .MuiOutlinedInput-root': {
-            borderRadius: '12px',
-            backgroundColor: '#ffffff',
-            '& fieldset': { borderColor: '#cbd5e1' },
-            '&:hover fieldset': { borderColor: '#94a3b8' },
-            '&.Mui-focused fieldset': { borderColor: '#2563eb', borderWidth: '2px' },
-        },
-        // Добавляем небольшой отступ сверху, чтобы метка не «врезалась» в контент
-        marginTop: '6px' 
-    }}
-/>
+                    required
+                    select
+                    fullWidth
+                    label="Роль"
+                    size="small"
+                    value={data.role}
+                    onChange={(e) => setData(prev => ({ ...prev, role: e.target.value }))}
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                            backgroundColor: '#fafafa',
+                            '&.Mui-focused fieldset': { borderColor: '#2563eb', borderWidth: '2px' }
+                        }
+                    }}
+                >
+                    <MenuItem value="Админ">Админ</MenuItem>
+                    <MenuItem value="Сотрудник">Сотрудник</MenuItem>
+                    <MenuItem value="Руководитель">Руководитель</MenuItem>
+                </TextField>
             </Grid>
-        ))}
-        <Grid size={{ xs: 12 }}>
-            <TextField
-                required 
-                select 
-                fullWidth 
-                label="Роль"
-                size="small"
-                value={data.role}
-                onChange={(e) => setData(prev => ({ ...prev, role: e.target.value }))}
-                sx={{ 
-                    '& .MuiOutlinedInput-root': { 
-                        borderRadius: '12px',
-                        backgroundColor: '#fafafa',
-                        '&.Mui-focused fieldset': { borderColor: '#2563eb', borderWidth: '2px' }
-                    } 
-                }}
-            >
-                <MenuItem value="Админ">Админ</MenuItem>
-                <MenuItem value="Сотрудник">Сотрудник</MenuItem>
-                <MenuItem value="Руководитель">Руководитель</MenuItem>
-            </TextField>
         </Grid>
-    </Grid>
-);
+    );
 });
 
 export const Users = () => {
@@ -130,7 +128,7 @@ export const Users = () => {
             renderCell: (params) => (
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                     <IconButton size="small" onClick={() => handleOpen(params.row)}><EditIcon fontSize="small" /></IconButton>
-                    <IconButton size="small"  onClick={() => handleDelete(params.row.id)}><DeleteIcon fontSize="small" /></IconButton>
+                    <IconButton size="small" onClick={() => handleDelete(params.row.id)}><DeleteIcon fontSize="small" /></IconButton>
                 </Box>
             )
         }
@@ -153,18 +151,24 @@ export const Users = () => {
                     <DataGrid
                         rows={users}
                         columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: { pageSize: 25, page: 0 },
+                            },
+                        }}
+                        pageSizeOptions={[25, 50, 100]}
                         disableRowSelectionOnClick
                         rowHeight={55}
                         sx={{
                             border: 'none',
                             '& .MuiDataGrid-columnHeaders': { backgroundColor: '#e0f2fe', borderBottom: '2px solid rgba(46, 142, 255, 0.2)' },
-                            '& .MuiDataGrid-columnHeader': { 
-                                color: '#0369a1', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', 
-                                borderRight: '1px solid rgba(46, 142, 255, 0.1)', '&:last-child': { borderRight: 'none' } 
+                            '& .MuiDataGrid-columnHeader': {
+                                color: '#0369a1', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase',
+                                borderRight: '1px solid rgba(46, 142, 255, 0.1)', '&:last-child': { borderRight: 'none' }
                             },
-                            '& .MuiDataGrid-cell': { 
-                                borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', color: '#334155', 
-                                '&:last-child': { borderRight: 'none' } 
+                            '& .MuiDataGrid-cell': {
+                                borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', color: '#334155',
+                                '&:last-child': { borderRight: 'none' }
                             },
                             '& .MuiDataGrid-row:hover': { backgroundColor: '#f8fafc' },
                             '& .MuiDataGrid-columnSeparator': { display: 'none' }
@@ -173,33 +177,33 @@ export const Users = () => {
                 </Paper>
             </Box>
 
-            <Dialog 
-    open={open} 
-    onClose={() => setOpen(false)} 
-    maxWidth="sm" 
-    fullWidth 
-    slotProps={{ 
-        paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } } 
-    }}
->
-    <DialogTitle sx={{ 
-        backgroundColor: '#1e293b',
-        color: '#ffffff', 
-        padding: '16px 24px',
-        mb: 2
-    }}>
-        {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
-    </DialogTitle>
-    
-    <DialogContent sx={{ pt: 0 }}>
-        {open && <FormFields ref={formRef} initialData={editingUser || { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' }} />}
-    </DialogContent>
-    
-    <DialogActions sx={{ p: 3, pt: 1 }}>
-        <S.GreyButton onClick={() => setOpen(false)}>Отмена</S.GreyButton>
-        <S.ActionButton onClick={handleSave} sx={{ px: 4 }}>Сохранить</S.ActionButton>
-    </DialogActions>
-</Dialog>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                slotProps={{
+                    paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } }
+                }}
+            >
+                <DialogTitle sx={{
+                    backgroundColor: '#1e293b',
+                    color: '#ffffff',
+                    padding: '16px 24px',
+                    mb: 2
+                }}>
+                    {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 0 }}>
+                    {open && <FormFields ref={formRef} initialData={editingUser || { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' }} />}
+                </DialogContent>
+
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    <S.GreyButton onClick={() => setOpen(false)}>Отмена</S.GreyButton>
+                    <S.ActionButton onClick={handleSave} sx={{ px: 4 }}>Сохранить</S.ActionButton>
+                </DialogActions>
+            </Dialog>
         </S.AdminContainer>
     );
 };

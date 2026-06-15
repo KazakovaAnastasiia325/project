@@ -57,28 +57,35 @@ export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isM
             sortable: false,
             headerAlign: 'center',
             align: 'center',
-            renderCell: (params) => (
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                    {/* Если менеджер — только просмотр (глаз), иначе редактирование (карандаш) */}
-                    <IconButton 
-                        size="small" 
-                        onClick={(e) => { e.stopPropagation(); onRowClick(params); }}
-                    >
-                        {isManager ? (
-                            <VisibilityIcon fontSize="small" color="primary" />
-                        ) : (
-                            <EditIcon fontSize="small" />
-                        )}
-                    </IconButton>
-                    
-                    {/* Удаление: доступно ТОЛЬКО администратору */}
-                    {isAdmin && (
-                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
-                            <DeleteIcon fontSize="small" />
+            renderCell: (params) => {
+                // Определяем, завершена ли текущая экспертиза
+                const isCompleted = params.row.status === EXPERTISE_STATUSES.COMPLETED.label;
+                
+                // Иконка "глаз" показывается если: это менеджер ИЛИ экспертиза завершена
+                const showViewOnly = isManager || isCompleted;
+
+                return (
+                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                        <IconButton 
+                            size="small" 
+                            onClick={(e) => { e.stopPropagation(); onRowClick(params); }}
+                        >
+                            {showViewOnly ? (
+                                <VisibilityIcon fontSize="small" color="primary" />
+                            ) : (
+                                <EditIcon fontSize="small" />
+                            )}
                         </IconButton>
-                    )}
-                </Box>
-            )
+                        
+                        {/* Удаление: доступно ТОЛЬКО администратору */}
+                        {isAdmin && (
+                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        )}
+                    </Box>
+                );
+            }
         }
     ], [isManager, isAdmin, onRowClick, onDelete]);
 
@@ -89,7 +96,7 @@ export const DataGridTable = ({ rows, onRowClick, onDelete, isAdmin = false, isM
             onRowClick={onRowClick}
             pageSizeOptions={[25, 50, 100]}
             initialState={{
-                pagination: { paginationModel: { pageSize: 50 } },
+                pagination: { paginationModel: { pageSize: 25 } },
             }}
             disableRowSelectionOnClick
             rowHeight={55}
