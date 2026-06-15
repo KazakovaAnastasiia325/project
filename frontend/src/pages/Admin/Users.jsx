@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo, useRef, useImperativeHandle } from 'react';
+import { useNavigate } from 'react-router-dom'; // Импорт хука
 import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,7 +16,7 @@ const FormFields = memo(({ initialData, ref }) => {
     }));
 
     return (
-        <Grid container spacing={1.5}> {/* Увеличил отступы для «воздуха» */}
+        <Grid container spacing={1.5}>
             {[
                 { label: 'Фамилия', key: 'lastName', xs: 4 },
                 { label: 'Имя', key: 'firstName', xs: 4 },
@@ -80,6 +81,7 @@ const FormFields = memo(({ initialData, ref }) => {
 });
 
 export const Users = () => {
+    const navigate = useNavigate(); // Инициализация
     const [users, setUsers] = useState(() => {
         const saved = localStorage.getItem('myUsers');
         return saved ? JSON.parse(saved) : [{ id: 1, lastName: 'Петров', firstName: 'Иван', middleName: 'Иванович', role: 'Администратор', email: 'test@mail.ru', login: 'ivanov', phone: '+77777777777', password: '123', fio: 'Петров И.И.' }];
@@ -88,6 +90,10 @@ export const Users = () => {
     const [open, setOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const formRef = useRef();
+
+    const handleLogout = () => {
+        navigate('/login');
+    };
 
     useEffect(() => {
         localStorage.setItem('myUsers', JSON.stringify(users));
@@ -138,7 +144,7 @@ export const Users = () => {
         <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', mb: 2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>Панель администратора</Typography>
-                <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={() => console.log('Выход')}>Выйти</Button>
+                <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
             </Box>
 
             <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
@@ -186,12 +192,7 @@ export const Users = () => {
                     paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } }
                 }}
             >
-                <DialogTitle sx={{
-                    backgroundColor: '#1e293b',
-                    color: '#ffffff',
-                    padding: '16px 24px',
-                    mb: 2
-                }}>
+                <DialogTitle sx={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '16px 24px', mb: 2 }}>
                     {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
                 </DialogTitle>
 

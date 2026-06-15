@@ -25,6 +25,7 @@ export const AdminPage = () => {
     // Переход на страницу логина
     navigate('/login');
   };
+  
 
   useEffect(() => {
     localStorage.setItem('expertiseData', JSON.stringify(rows));
@@ -82,7 +83,7 @@ export const AdminPage = () => {
         <Button 
           startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
           sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={handleLogout} // 3. Привязываем функцию выхода
+          onClick={handleLogout} 
         >
           Выйти
         </Button>

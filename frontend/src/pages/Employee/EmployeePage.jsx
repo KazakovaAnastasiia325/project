@@ -79,7 +79,7 @@ export const EmployeePage = () => {
         <Button 
           startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
           sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={handleLogout} // 3. Привязываем функцию выхода
+          onClick={handleLogout} 
         >
           Выйти
         </Button>
