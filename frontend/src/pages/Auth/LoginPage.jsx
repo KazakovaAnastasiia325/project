@@ -7,9 +7,14 @@ import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './St
 import SoftAurora from '../../components/AuroraBackground/SoftAurora';
 import LogoImage from '../../assets/logo.png';
 
+// Настройка axios (можно вынести в отдельный файл, но для одного компонента сойдет здесь)
+const api = axios.create({
+  baseURL: 'http://localhost:8080', // Укажите порт вашего Go сервера
+  withCredentials: true,
+});
+
 export const LoginPage = () => {
   const navigate = useNavigate();
-  // Инициализируем правильно: логин и пароль
   const [formData, setFormData] = useState({ login: '', password: '' });
   const [loading, setLoading] = useState(false);
 
@@ -22,34 +27,40 @@ export const LoginPage = () => {
     setLoading(true);
     
     try {
-      // Отправка запроса на сервер
-      const response = await axios.post('/api/login', formData);
+      // Отправка POST-запроса
+      // Убедитесь, что ваш LoginHandler в Go ожидает JSON с полями login и password
+      const response = await api.post('/api/login', formData);
       
-      // Предполагаем, что сервер возвращает объект вида: { token: '...', role: 'admin' }
-      // Роли: 'admin', 'manager', 'employee'
+      // Предполагаем, что ответ сервера: { "token": "...", "role": "admin" }
       const { token, role } = response.data;
       
+      if (!token || !role) {
+        throw new Error('Некорректный ответ от сервера');
+      }
+
+      // Сохраняем данные для PrivateRoute
       localStorage.setItem('token', token);
       localStorage.setItem('userRole', role);
       
-      // Перенаправление в зависимости от роли
+      // Перенаправление по ролям
       switch (role) {
         case 'admin':
-          navigate('/admin');
+          navigate('/admin', { replace: true });
           break;
         case 'manager':
-          navigate('/manager');
+          navigate('/manager', { replace: true });
           break;
         case 'employee':
-          navigate('/employee');
+          navigate('/employee', { replace: true });
           break;
         default:
+          alert('Неизвестная роль пользователя');
           navigate('/login');
       }
       
     } catch (error) {
-      console.error('Ошибка входа:', error.response?.data?.message || 'Ошибка сети');
-      alert('Неверный логин или пароль');
+      console.error('Ошибка входа:', error);
+      alert(error.response?.data?.message || 'Ошибка авторизации. Проверьте данные.');
     } finally {
       setLoading(false);
     }
