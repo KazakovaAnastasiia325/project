@@ -25,7 +25,6 @@ export const DataGridTable = ({
             field: 'experts', 
             headerName: 'Эксперт', 
             width: 220,
-            // Безопасный доступ: если row.experts нет, вернем пустую строку
             valueGetter: (value, row) => {
                 if (Array.isArray(row?.experts)) {
                     return row.experts.map(e => e.name).join(', ');
@@ -40,7 +39,6 @@ export const DataGridTable = ({
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                // Преобразуем значение в явный boolean
                 const isClosed = !!params.value; 
                 return (
                     <Chip
@@ -66,7 +64,6 @@ export const DataGridTable = ({
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
-                // Безопасный доступ к статусу
                 const isCompleted = !!params.row?.is_closed;
                 const showViewOnly = isManager || isCompleted;
 
@@ -84,10 +81,7 @@ export const DataGridTable = ({
                         </IconButton>
                         
                         {isAdmin && (
-                            <IconButton 
-                                size="small" 
-                                onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}
-                            >
+                            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         )}
@@ -102,7 +96,6 @@ export const DataGridTable = ({
             rows={rows || []} 
             columns={columns}
             rowCount={rowCount}
-            // Указываем явный ID (если бэкенд шлет id, это не обязательно, но для надежности добавим)
             getRowId={(row) => row.id}
             paginationMode="server"
             sortingMode="server"
@@ -113,20 +106,29 @@ export const DataGridTable = ({
             pageSizeOptions={[25, 50, 100]}
             disableRowSelectionOnClick
             rowHeight={55}
+            // Включаем встроенные границы для сетки
+            showCellVerticalBorder
+            showColumnVerticalBorder
             sx={{
-                height: '100%',
-                border: 'none',
+                borderRadius: '12px',
+                border: '1px solid #cbd5e1',
+                overflow: 'hidden',
                 '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#e0f2fe',
+                    backgroundColor: '#f1f5f9',
+                    borderBottom: '2px solid #cbd5e1',
                 },
                 '& .MuiDataGrid-columnHeader': {
-                    color: '#0369a1',
-                    fontWeight: 800,
+                    color: '#0f172a',
+                    fontWeight: 700,
                     fontSize: '12px',
                     textTransform: 'uppercase',
                 },
+                '& .MuiDataGrid-row': {
+                    borderBottom: '1px solid #e2e8f0',
+                },
                 '& .MuiDataGrid-cell': {
-                    color: '#334155',
+                    borderRight: '1px solid #e2e8f0',
+                    '&:last-child': { borderRight: 'none' }
                 },
                 '& .MuiDataGrid-columnSeparator': { display: 'none' },
                 '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
