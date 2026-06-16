@@ -24,7 +24,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
     return {
       id: data.id,
-      date: data.data_post || '',
+      date: data.data_post ? data.data_post.split('T')[0] : '',
       fabula: data.fab || '',
       ud: data.nom_statyi || '',
       organCode: data.organ || '',
@@ -67,7 +67,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
     return {
       id: data.id || 0,
       creator_id: 1,
-      data_post: data.date || "",
+      data_post: data.date ? data.date : "",
       fab: data.fabula || "",
       adm_material: 1,
       nom_statyi: data.ud || "",
