@@ -11,7 +11,7 @@ const api = axios.create({
   withCredentials: true
 });
 
-export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, isManager = false }) => {
+export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, isManager = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
