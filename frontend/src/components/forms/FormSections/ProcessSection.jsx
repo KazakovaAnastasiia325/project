@@ -47,7 +47,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
           disabled={isLocked}
           size="small" fullWidth label="Дата приост." type="date" 
           slotProps={{ inputLabel: { shrink: true } }} value={formData.stop_date || ''} 
-          onChange={handleChange('suspendDate')} sx={inputStyle} 
+          onChange={handleChange('stop_date')} sx={inputStyle} 
         />
       </Grid>
       <Grid size={{ xs: 4 }}>
