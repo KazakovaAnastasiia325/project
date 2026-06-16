@@ -159,7 +159,7 @@ const handleComplete = async (dataFromClosing) => {
     
     const response = await api.put(`/api/expertize/${dataForServer.id}/complete`, dataForServer);
     // Если всё успешно
-    onUpdate(dataForServer); 
+    if (onUpdate) onUpdate(dataForServer); 
     if (onClose) onClose();
     alert('Экспертиза успешно завершена!');
     
