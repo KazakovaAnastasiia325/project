@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
 import { RegistrationSection } from './FormSections/RegistrationSection';
 import { ProcessSection } from './FormSections/ProcessSection';
