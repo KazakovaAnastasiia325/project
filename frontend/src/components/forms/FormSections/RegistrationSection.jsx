@@ -70,10 +70,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
         // Поля, которые сервер ожидает как числа
         const numberFields = [
-            'statys', 'typeExpertise', 'category', 'complexity', 
-            'kolvo', 'kolvoobj', 'region', 'stat_id', 'category_id', 
-            'region_id', 'adm_material', 'diff_cat_id', 'vid_exp',
-            'state', 'view' 
+            'stat_id', 'category_id', 'diff_cat_id', 'region_id', 'kolvo', 'kolvoobj', 'vid_exp'
         ];
 
         if (numberFields.includes(field)) {
@@ -97,34 +94,29 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             </Grid>
             <Grid size={{ xs: 12 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фабула" multiline rows={2}
                     value={formData.fabula || ''} onChange={handleChange('fabula')} sx={inputStyle} /></Grid>
+            {/* Переименованы поля state -> iz_nix_id, view -> vid_exp (или оставьте как удобно, но обновите в ExpertForm) */}
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="№ Статьи"
-                    value={formData.state || ''} onChange={handleChange('state')} sx={inputStyle} /></Grid>
+                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)"
-                    value={formData.view || ''} onChange={handleChange('view')} sx={inputStyle} /></Grid>
+                    value={formData.vid_exp || ''} onChange={handleChange('vid_exp')} sx={inputStyle} /></Grid>
 
             {/* Параметры экспертизы */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Параметры экспертизы</Typography></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Статус экспертизы"
-                    value={formData.statys || ''} onChange={handleChange('statys')} sx={inputStyle}>
+                    value={formData.stat_id || ''} onChange={handleChange('stat_id')} sx={inputStyle}>
                     <MenuItem value={1}>Первичная</MenuItem><MenuItem value={2}>Повторная</MenuItem><MenuItem value={3}>Дополнительная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Тип экспертизы"
-                    value={formData.typeExpertise || ''} onChange={handleChange('typeExpertise')} sx={inputStyle}>
+                    value={formData.category_id || ''} onChange={handleChange('category_id')} sx={inputStyle}>
                     <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория дел"
-                    value={formData.category || ''} onChange={handleChange('category')} sx={inputStyle}>
+                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle}>
                     <MenuItem value={1}>Уголовное</MenuItem><MenuItem value={2}>Гражданское</MenuItem><MenuItem value={3}>Административное</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория сложности"
-                    value={formData.complexity || ''} onChange={handleChange('complexity')} sx={inputStyle}>
+                    value={formData.diff_cat_id || ''} onChange={handleChange('diff_cat_id')} sx={inputStyle}>
                     <MenuItem value={1}>Простая</MenuItem><MenuItem value={2}>Средней степени сложности</MenuItem><MenuItem value={3}>Сложная</MenuItem><MenuItem value={4}>Особо сложная</MenuItem>
-                </TextField></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Орган, назначивший экспертизу"
-                    value={formData.organCode || ''} onChange={handleChange('organCode')} sx={inputStyle}>
-                    {['Суды', 'Прокуратура', 'ОВД', 'КНБ', 'МДГС', 'КДГ', 'ВСД', 'Адвокатура', 'Следственный суд', 'Прочие'].map((item, idx) => (
-                        <MenuItem key={idx} value={String(idx + 1).padStart(2, '0')}>{item}</MenuItem>
-                    ))}
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
                     value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
