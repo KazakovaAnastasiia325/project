@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo, useRef, useImperativeHandle } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Импорт хука
 import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
@@ -7,7 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import * as S from './AdminStyles';
-
+const api = axios.create({
+    baseURL: 'http://localhost:8080',
+    withCredentials: true,
+});
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
 
@@ -104,24 +108,46 @@ export const Users = () => {
         setOpen(true);
     };
 
-    const handleSave = () => {
-        const formData = formRef.current.getData();
-        if (!formData.lastName || !formData.firstName || !formData.login || !formData.password || !formData.role) {
-            alert('Заполните обязательные поля: Фамилия, Имя, Логин, Пароль, Роль');
-            return;
-        }
-        const fullName = `${formData.lastName} ${formData.firstName[0]}.${formData.middleName ? ' ' + formData.middleName[0] + '.' : ''}`;
-        const userToSave = { ...formData, fio: fullName };
+    const handleSave = async () => {
+    const formData = formRef.current.getData();
+    
+    // Валидация
+    if (!formData.lastName || !formData.login || !formData.password) {
+        alert('Заполните обязательные поля');
+        return;
+    }
 
+    // Сопоставление роли (у вас в БД роль - число, а в UI - строка)
+    const roleMap = { 'Админ': 1, 'Сотрудник': 2, 'Руководитель': 3 };
+
+    try {
         if (editingUser) {
-            setUsers((prev) => prev.map(u => u.id === editingUser.id ? { ...userToSave, id: u.id } : u));
+            // Для PUT (обновления)
+            await api.put(`/api/users/${editingUser.id}`, { ...formData, role: roleMap[formData.role] });
         } else {
-            setUsers((prev) => [...prev, { ...userToSave, id: Date.now() }]);
+            // Для POST (добавления)
+            await api.post('/api/users', { ...formData, role: roleMap[formData.role] });
         }
+        
+        alert('Успешно сохранено');
         setOpen(false);
-    };
+        // Тут нужно вызвать функцию получения списка пользователей (fetchUsers)
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка при сохранении на сервере');
+    }
+};
 
-    const handleDelete = (id) => setUsers((prev) => prev.filter(u => u.id !== id));
+    const handleDelete = async (id) => {
+    if (window.confirm('Удалить пользователя?')) {
+        try {
+            await api.delete(`/api/users/${id}`);
+            setUsers(prev => prev.filter(u => u.id !== id));
+        } catch (error) {
+            alert('Ошибка удаления');
+        }
+    }
+};
 
     const columns = [
         { field: 'fio', headerName: 'ФИО', flex: 1.5 },

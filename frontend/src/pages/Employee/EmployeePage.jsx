@@ -8,7 +8,6 @@ import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from '../Admin/AdminStyles';
 
-// Создаем экземпляр API с поддержкой авторизации
 const api = axios.create({
   baseURL: 'http://localhost:8080',
   withCredentials: true,
@@ -23,7 +22,6 @@ export const EmployeePage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
   
-  // Состояния для работы с данными от бэкенда
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -32,7 +30,6 @@ export const EmployeePage = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
 
-  // Функция получения списка
   const fetchExpertise = async () => {
     setLoading(true);
     setErrorText('');
@@ -56,12 +53,19 @@ export const EmployeePage = () => {
       }
     } catch (error) {
       console.error('Ошибка загрузки:', error);
-      if (error.response?.status === 303 || error.response?.status === 302) {
-        setErrorText('Сессия истекла. Перенаправление...');
-        setTimeout(() => handleLogout(), 2000);
+      
+      const isAuthError = error.response?.status === 401 || 
+                          error.response?.status === 403 || 
+                          error.request?.responseURL?.includes('/login');
+
+      if (isAuthError) {
+        setErrorText('Сессия истекла. Пожалуйста, перезайдите.');
+        setTimeout(() => handleLogout(), 2500);
       } else {
-        setErrorText('Ошибка загрузки данных');
+        setErrorText('Ошибка при получении данных.');
       }
+      setRows([]);
+      setTotalRows(0);
     } finally {
       setLoading(false);
     }
@@ -82,26 +86,39 @@ export const EmployeePage = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleSave = async (newData) => {
+  // Метод для создания новой записи (POST)
+  const handleSave = async (dataToSave) => {
     try {
-      await api.post('/api/expertiza/save', newData);
+      await api.post('/api/expertiza/save', dataToSave);
       setIsDrawerOpen(false);
-      fetchExpertise(); // Обновляем реестр после сохранения
+      alert('Успешно сохранено');
+      fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
       alert('Ошибка при сохранении данных.');
     }
   };
 
+  // Метод для обновления существующей записи (PUT)
+  const handleUpdate = async (dataToUpdate) => {
+    try {
+      await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
+      setIsDrawerOpen(false);
+      alert('Успешно обновлено');
+      fetchExpertise();
+    } catch (error) {
+      console.error('Ошибка обновления:', error);
+      alert('Ошибка при обновлении данных.');
+    }
+  };
+
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      {/* 1. ВЕРХНЯЯ ПАНЕЛЬ */}
       <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель сотрудника</Typography>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
       </Box>
 
-      {/* 2. ОСНОВНОЙ КОНТЕНТ */}
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
         
@@ -120,8 +137,11 @@ export const EmployeePage = () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onRowClick={(params) => { setSelectedExpertise(params.row); setIsDrawerOpen(true); }}
-            isAdmin={false} 
+            onRowClick={(params) => { 
+              setSelectedExpertise(params.row); 
+              setIsDrawerOpen(true); 
+            }}
+            isAdmin={false} // Важно: удаление у сотрудника скрыто (через Table компоненты)
             isManager={false}
           />
         </Box>
@@ -129,8 +149,9 @@ export const EmployeePage = () => {
         <DetailsDrawer 
           open={isDrawerOpen} 
           onClose={() => setIsDrawerOpen(false)} 
-          data={selectedExpertise}
+          expertiseId={selectedExpertise?.id} // Передаем ID для корректной работы формы
           onSave={handleSave} 
+          onUpdate={handleUpdate} // Передаем метод обновления
           isManager={false}
         />
       </Box>
