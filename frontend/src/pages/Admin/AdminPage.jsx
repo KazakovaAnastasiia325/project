@@ -11,10 +11,10 @@ import * as S from './AdminStyles';
 // Создаем экземпляр API
 const api = axios.create({
   baseURL: 'http://localhost:8080',
-  withCredentials: true, // Критично для передачи куки сессии
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json' // Просим сервер присылать JSON, а не HTML-страницу логина
+    'Accept': 'application/json'
   }
 });
 
@@ -35,22 +35,36 @@ export const AdminPage = () => {
     setLoading(true);
     setErrorText('');
     try {
+      // 1. Параметры в соответствии с бэкендом Go
       const params = {
         page: paginationModel.page,
-        size: paginationModel.pageSize,
-        sort: sortModel.length > 0 ? `${sortModel[0].field},${sortModel[0].sort}` : 'id,desc'
+        limit: paginationModel.pageSize, // Используем limit вместо size
       };
 
+      // 2. Разделяем поле и направление сортировки
+      if (sortModel.length > 0) {
+        params.sort_field = sortModel[0].field;
+        params.sort_order = sortModel[0].sort;
+      } else {
+        params.sort_field = 'id';
+        params.sort_order = 'desc';
+      }
+
       const response = await api.get('/api/expertiza/list', { params });
-      
-      const data = response.data || {};
-      setRows(Array.isArray(data.content) ? data.content : []);
-      setTotalRows(typeof data.totalElements === 'number' ? data.totalElements : 0);
+      const data = response.data; // Ожидаем объект { rows: [...], total: X }
+
+      // 3. Достаем данные из структуры Go
+      if (data && Array.isArray(data.rows)) {
+        setRows(data.rows);
+        setTotalRows(data.total || 0);
+      } else {
+        setRows([]);
+        setTotalRows(0);
+      }
       
     } catch (error) {
       console.error('Детали ошибки:', error);
       
-      // Если сервер возвращает редирект (303), значит сессия истекла или нет прав
       if (error.response?.status === 303 || error.response?.status === 302) {
         setErrorText('Ошибка доступа: Сессия истекла. Перенаправление на логин...');
         setTimeout(() => handleLogout(), 2000);

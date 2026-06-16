@@ -25,24 +25,36 @@ export const DataGridTable = ({
             width: 70, 
             headerAlign: 'center', 
             align: 'center',
-            sortable: true // Разрешено
+            sortable: true 
         },
         { 
             field: 'data_post', 
             headerName: 'Дата', 
             width: 130,
-            sortable: true // Разрешено
+            sortable: true 
         },
         { 
             field: 'experts', 
-            headerName: 'Эксперт', 
-            width: 220,
-            sortable: false, // Отключено
-            valueGetter: (value, row) => {
-                if (Array.isArray(row?.experts)) {
-                    return row.experts.map(e => e.name).join(', ');
-                }
-                return '';
+            headerName: 'Эксперты', // Изменено на "Эксперты"
+            width: 200,
+            sortable: false,
+            valueGetter: (value) => {
+                // Безопасно проверяем, что данные пришли и это массив
+                if (!value || !Array.isArray(value)) return '';
+
+                return value
+                    .map(exp => {
+                        const lastName = exp.second_name || '';
+                        // Берем первую букву имени, если оно есть
+                        const firstNameInitial = exp.name ? `${exp.name[0]}.` : '';
+                        // Берем первую букву отчества, только если оно заполнено
+                        const patronymicInitial = exp.patronymic && exp.patronymic.trim() ? `${exp.patronymic[0]}.` : '';
+
+                        // Склеиваем Фамилию и инициалы
+                        return `${lastName} ${firstNameInitial}${patronymicInitial}`.trim();
+                    })
+                    .filter(Boolean) 
+                    .join(', ');
             }
         },
         {
@@ -51,7 +63,7 @@ export const DataGridTable = ({
             width: 160,
             headerAlign: 'center',
             align: 'center',
-            sortable: true, // Разрешено
+            sortable: true,
             renderCell: (params) => {
                 const isClosed = !!params.value; 
                 return (
@@ -73,13 +85,13 @@ export const DataGridTable = ({
             field: 'fab', 
             headerName: 'Фабула', 
             flex: 1,
-            sortable: false // Отключено
+            sortable: false 
         },
         {
             field: 'actions',
             headerName: 'Действия',
             width: 120,
-            sortable: false, // Отключено
+            sortable: false,
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
