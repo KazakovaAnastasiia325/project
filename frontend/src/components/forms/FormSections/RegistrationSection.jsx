@@ -1,16 +1,34 @@
-import React from 'react';
-import { TextField, MenuItem, Grid, IconButton, Button, Typography, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { TextField, MenuItem, Grid, IconButton, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
-import { REGIONS } from './constants';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
 export const RegistrationSection = ({ formData, setFormData, isManager = false }) => {
-    
+    const [regions, setRegions] = useState([]);
+    const [loadingRegions, setLoadingRegions] = useState(false);
+
+    // Подгрузка регионов при монтировании
+    useEffect(() => {
+        const fetchRegions = async () => {
+            setLoadingRegions(true);
+            try {
+                // Замените на ваш актуальный эндпоинт API
+                const response = await axios.get('http://localhost:8080/api/regions');
+                setRegions(response.data);
+            } catch (error) {
+                console.error('Ошибка загрузки регионов:', error);
+            } finally {
+                setLoadingRegions(false);
+            }
+        };
+        fetchRegions();
+    }, []);
+
     const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
     
-    // Инициализация экспертов: всегда один эксперт при пустом массиве
     const experts = (formData.experts && formData.experts.length > 0) 
         ? formData.experts 
         : [{ name: '', second_name: '', patronymic: '' }];
@@ -93,23 +111,26 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
                     value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Регион"
+            
+            {/* Динамический список регионов */}
+            <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField disabled={isLocked || loadingRegions} size="small" required select fullWidth 
+                    label={loadingRegions ? "Загрузка..." : "Регион"}
                     value={formData.region || ''} onChange={handleChange('region')} sx={inputStyle}>
-                    {REGIONS.map((region) => (<MenuItem key={region.id} value={region.id}>{region.id} - {region.name}</MenuItem>))}
-                </TextField></Grid>
+                    {loadingRegions ? (
+                        <MenuItem disabled><CircularProgress size={20} /></MenuItem>
+                    ) : (
+                        regions.map((region) => (
+                            <MenuItem key={region.id} value={region.id}>{region.id} - {region.name}</MenuItem>
+                        ))
+                    )}
+                </TextField>
+            </Grid>
+
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Кол-во вопросов" type="number"
                     value={formData.kolvo || ''} onChange={handleChange('kolvo')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Кол-во объектов" type="number"
                     value={formData.kolvoobj || ''} onChange={handleChange('kolvoobj')} sx={inputStyle} /></Grid>
-
-            {/* Блок лица, назначившего экспертизу */}
-            <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
-                    value={formData.appointing_second_name || ''} onChange={handleChange('appointing_second_name')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Имя"
-                    value={formData.appointing_name || ''} onChange={handleChange('appointing_name')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" fullWidth label="Отчество"
-                    value={formData.appointing_patronymic || ''} onChange={handleChange('appointing_patronymic')} sx={inputStyle} /></Grid>
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
