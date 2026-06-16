@@ -52,6 +52,14 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       iz_nix_id: data.iz_nix_id || 1,
       diff_cat_id: data.diff_cat_id || 1,
       vid_exp: data.vid_exp || 1,
+      dateend: data.end_date ? data.end_date.split('T')[0] : '',
+  result: data.exp_res_id || '',
+  daysInUnit: data.day_count ?? '',
+  daysWithExpert: data.exp_day_count ?? '',
+  conclCategorical: data.cat_vivod ?? '',
+  conclProbable: data.possible_vivod ?? '',
+  conclNPV: data.impossible_vivod ?? '',
+  hoursSpent: data.hour_count ?? '',
       status: data.is_closed ? EXPERTISE_STATUSES.COMPLETED.label : EXPERTISE_STATUSES.IN_PROGRESS.label,
     };
   };
@@ -103,6 +111,14 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     exploitation_cost: Number(data.equipmentCosts) || 0,
     full_cost: Number(data.totalCost) || 0,
     descrip: data.plomba || "",
+    end_date: data.dateend || null,
+    exp_res_id: Number(data.result) || null,
+    day_count: Number(data.daysInUnit) || null,
+    exp_day_count: Number(data.daysWithExpert) || null,
+    cat_vivod: Number(data.conclCategorical) || null,
+    possible_vivod: Number(data.conclProbable) || null,
+    impossible_vivod: Number(data.conclNPV) || null,
+    hour_count: Number(data.hoursSpent) || null,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
       stat_id: Number(data.stat_id) || 1,
       category_id: Number(data.category_id) || 1,
@@ -110,6 +126,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       iz_nix_id: Number(data.iz_nix_id) || 1,
       diff_cat_id: Number(data.diff_cat_id) || 1,
       vid_exp: Number(data.vid_exp) || 1
+      
     };
   };
 
