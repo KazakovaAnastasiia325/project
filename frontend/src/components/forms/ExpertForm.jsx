@@ -36,8 +36,8 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       kolvo: data.question_count || '',
       kolvoobj: data.object_count || '',
       deadlineDays: data.srok_exp ?? '',
-    stop_date: data.stop_date ?? '', // Сменил ключ на stop_date для соответствия форме
-    resumeDate: data.resuming_date ?? '',
+    stop_date: data.stop_date ? data.stop_date.split('T')[0] : '', // Сменил ключ на stop_date для соответствия форме
+    resumeDate: data.resuming_date ? data.resuming_date.split('T')[0] : '',
     suspendReason: data.stop_reason ?? '',
     laborCosts: data.expert_cost ?? '',
     materialCosts: data.material_cost ?? '',
