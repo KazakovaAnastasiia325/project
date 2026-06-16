@@ -66,17 +66,14 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
     };
 
     const handleChange = (field) => (event) => {
-        if (isLocked) return;
-        let value = event.target.value;
-        
-        // Для полей с указателями в Go (например, patronymic_naznch) 
-        // лучше слать null, если строка пустая
-        if (value === '' && (field === 'patronymic_naznch')) {
-            value = null;
-        }
+    if (isLocked) return;
+    
+    // Просто берем значение из инпута. 
+    // Если поле пустое, value будет "" (пустая строка), что безопасно для большинства API.
+    const value = event.target.value;
 
-        setFormData((prev) => updateStatus({ ...prev, [field]: value }));
-    };
+    setFormData((prev) => updateStatus({ ...prev, [field]: value }));
+};
 
     return (
         <Grid container spacing={2} sx={{ mt: 0 }}>
