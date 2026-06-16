@@ -38,7 +38,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       experts: data.experts || [],
       stat_id: data.stat_id || 1,
       category_id: data.category_id || 1,
-      region_id: data.region_id || '',
+      region_id: data.region_id ?? '',
       iz_nix_id: data.iz_nix_id || 1,
       diff_cat_id: data.diff_cat_id || 1,
       status: data.is_closed ? EXPERTISE_STATUSES.COMPLETED.label : EXPERTISE_STATUSES.IN_PROGRESS.label,
@@ -47,7 +47,11 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
   const [formData, setFormData] = useState(() => parseDataFromBackend(initialData));
   const [tab, setTab] = useState(0);
-  const [isNewRecord] = useState(!initialData);
+  useEffect(() => {
+    setFormData(parseDataFromBackend(initialData));
+    setTab(0); // Сбрасываем таб на первую вкладку при смене записи
+  }, [initialData]);
+  const isNewRecord = !initialData;
 
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
