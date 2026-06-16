@@ -96,6 +96,7 @@ export const AdminPage = () => {
       alert('Ошибка при сохранении данных. Проверьте консоль.');
     }
   };
+  
 
   const handleDelete = async (id) => {
     if (window.confirm('Вы действительно хотите удалить эту запись?')) {
@@ -148,8 +149,9 @@ export const AdminPage = () => {
         <DetailsDrawer 
   open={isDrawerOpen} 
   onClose={() => setIsDrawerOpen(false)} 
-  expertiseId={selectedExpertise?.id} // Передаем только ID
-  onSave={handleSave} 
+  expertiseId={selectedExpertise?.id}
+  onSave={handleSave}     // Для создания (POST)
+  onUpdate={handleUpdate} // Для обновления (PUT) - ДОБАВЬТЕ ЭТО
   isManager={false}
 />
       </Box>

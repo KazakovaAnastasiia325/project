@@ -92,7 +92,8 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, isManager = 
           }}>
             <ExpertForm 
               initialData={data} 
-              onSave={onSave} 
+              onSave={onSave}      // Вызывается при создании (POST)
+              onUpdate={onUpdate}
               onClose={onClose} 
               isManager={isManager} 
             />

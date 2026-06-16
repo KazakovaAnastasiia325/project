@@ -99,14 +99,14 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
     setTab(newValue);
   };
 
-  const handleSave = () => {
-    if (isNewRecord && !isRegistrationComplete()) {
-      alert('Заполните все обязательные поля, включая ФИО лица, назначившего экспертизу');
-      return;
-    }
-    
-    const payload = prepareDataForServer(formData);
-    onSave(payload);
+  const handleCreate = () => {
+    if (!isRegistrationComplete()) return alert('Заполните обязательные поля');
+    onSave(prepareDataForServer(formData));
+    if (onClose) onClose();
+  };
+
+  const handleUpdate = () => {
+    onUpdate(prepareDataForServer(formData));
     if (onClose) onClose();
   };
 
@@ -134,7 +134,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
       {!isManager && !isCompleted && (
         <Box sx={{ display: 'flex', mt: 1, pt: 1, borderTop: '1px solid #eee' }}>
-          <AdminS.ActionButton variant="contained" size="small" fullWidth onClick={handleSave}>
+          <AdminS.ActionButton variant="contained" size="small" fullWidth onClick={isNewRecord ? handleCreate : handleUpdate}>
             {isNewRecord ? 'Сохранить' : 'Изменить'}
           </AdminS.ActionButton>
         </Box>
