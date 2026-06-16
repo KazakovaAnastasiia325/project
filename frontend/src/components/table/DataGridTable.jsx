@@ -29,9 +29,15 @@ export const DataGridTable = ({
         },
         { 
             field: 'data_post', 
-            headerName: 'Дата', 
-            width: 130,
-            sortable: true 
+    headerName: 'Дата', 
+    width: 130,
+    sortable: true,
+    valueFormatter: (value) => {
+        if (!value) return '';
+        // Если дата приходит как "2026-06-16T00:00:00Z", 
+        // split('T')[0] оставит только "2026-06-16"
+        return value.toString().split('T')[0]; 
+    }
         },
         { 
             field: 'experts', 
