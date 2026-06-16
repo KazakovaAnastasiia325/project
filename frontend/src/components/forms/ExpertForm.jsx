@@ -181,7 +181,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
           <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} />
         )}
         {tab === 2 && !isNewRecord && (
-          <ClosingSection formData={formData} setFormData={setFormData} onSave={handleComplete} isManager={isManager} />
+          <ClosingSection formData={formData} setFormData={setFormData} onSave={onSave} onComplete={handleComplete} isManager={isManager} />
         )}
       </S.SectionWrapper>
 
