@@ -6,22 +6,27 @@ import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
+// Создаем настроенный инстанс прямо здесь, чтобы куки отправлялись автоматически
+const api = axios.create({
+    baseURL: 'http://localhost:8080',
+    withCredentials: true,
+});
+
 export const RegistrationSection = ({ formData, setFormData, isManager = false }) => {
     const [regions, setRegions] = useState([]);
-    const [loadingRegions, setLoadingRegions] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    // Подгрузка регионов при монтировании
     useEffect(() => {
         const fetchRegions = async () => {
-            setLoadingRegions(true);
+            setLoading(true);
             try {
-                // Замените на ваш актуальный эндпоинт API
-                const response = await axios.get('http://localhost:8080/api/regions');
+                // Используем наш настроенный инстанс api
+                const response = await api.get('/api/regions');
                 setRegions(response.data);
             } catch (error) {
-                console.error('Ошибка загрузки регионов:', error);
+                console.error("Ошибка загрузки регионов:", error);
             } finally {
-                setLoadingRegions(false);
+                setLoading(false);
             }
         };
         fetchRegions();
@@ -112,12 +117,10 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
                     value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
             
-            {/* Динамический список регионов */}
             <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField disabled={isLocked || loadingRegions} size="small" required select fullWidth 
-                    label={loadingRegions ? "Загрузка..." : "Регион"}
+                <TextField disabled={isLocked || loading} size="small" required select fullWidth label={loading ? "Загрузка..." : "Регион"}
                     value={formData.region || ''} onChange={handleChange('region')} sx={inputStyle}>
-                    {loadingRegions ? (
+                    {loading ? (
                         <MenuItem disabled><CircularProgress size={20} /></MenuItem>
                     ) : (
                         regions.map((region) => (
@@ -131,6 +134,15 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                     value={formData.kolvo || ''} onChange={handleChange('kolvo')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Кол-во объектов" type="number"
                     value={formData.kolvoobj || ''} onChange={handleChange('kolvoobj')} sx={inputStyle} /></Grid>
+
+            {/* Блок лица, назначившего экспертизу */}
+            <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
+            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
+                    value={formData.appointing_second_name || ''} onChange={handleChange('appointing_second_name')} sx={inputStyle} /></Grid>
+            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Имя"
+                    value={formData.appointing_name || ''} onChange={handleChange('appointing_name')} sx={inputStyle} /></Grid>
+            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" fullWidth label="Отчество"
+                    value={formData.appointing_patronymic || ''} onChange={handleChange('appointing_patronymic')} sx={inputStyle} /></Grid>
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
