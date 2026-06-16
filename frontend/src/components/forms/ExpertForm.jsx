@@ -148,6 +148,20 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     onUpdate(prepareDataForServer(formData));
     if (onClose) onClose();
   };
+  const handleComplete = (dataFromClosing) => {
+    // 1. Подготавливаем данные, используя те, что пришли из ClosingSection
+    // Мы принудительно ставим статус COMPLETED в prepareDataForServer
+    const dataForServer = prepareDataForServer({
+      ...dataFromClosing,
+      status: EXPERTISE_STATUSES.COMPLETED.label 
+    });
+
+    // 2. Отправляем на сервер через onUpdate
+    onUpdate(dataForServer);
+    
+    // 3. Закрываем форму
+    if (onClose) onClose();
+  };
 
   return (
     <S.FormContainer>
@@ -167,7 +181,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
           <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} />
         )}
         {tab === 2 && !isNewRecord && (
-          <ClosingSection formData={formData} setFormData={setFormData} onSave={onSave} isManager={isManager} />
+          <ClosingSection formData={formData} setFormData={setFormData} onSave={handleComplete} isManager={isManager} />
         )}
       </S.SectionWrapper>
 

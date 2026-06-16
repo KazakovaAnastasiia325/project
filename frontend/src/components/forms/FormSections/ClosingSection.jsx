@@ -4,43 +4,47 @@ import { Grid, TextField, MenuItem, Typography, Divider, Button } from '@mui/mat
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 
-// Добавляем isManager в пропсы
 export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isManager = false }) => {
-  // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
+  // Блокируем поля, если экспертиза уже завершена ИЛИ если пользователь — менеджер
   const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
-
-  const updateStatus = (prevData) => {
-    if (prevData.status === EXPERTISE_STATUSES.NEW.label) {
-      return { ...prevData, status: EXPERTISE_STATUSES.IN_PROGRESS.label };
-    }
-    return prevData;
-  };
 
   const handleChange = (field) => (event) => {
     if (isLocked) return; 
-    setFormData((prev) => updateStatus({ ...prev, [field]: event.target.value }));
+    setFormData((prev) => ({ 
+      ...prev, 
+      [field]: event.target.value 
+    }));
   };
 
   const handleComplete = () => {
-    // В случае менеджера эта функция даже не должна вызываться, 
-    // но на всякий случай оставляем проверку
     if (isLocked) return;
 
+    // 1. Список обязательных полей для завершения
     const requiredFields = [
       'dateend', 'result', 'daysInUnit', 'daysWithExpert', 
       'conclCategorical', 'conclProbable', 'conclNPV', 'hoursSpent'
     ];
     
-    const hasEmptyFields = requiredFields.some(field => !formData[field] || String(formData[field]).trim() === '');
+    // 2. Проверка: есть ли пустые поля
+    const hasEmptyFields = requiredFields.some(field => 
+      formData[field] === undefined || formData[field] === null || String(formData[field]).trim() === ''
+    );
 
     if (hasEmptyFields) {
       alert('Пожалуйста, заполните все обязательные поля перед завершением!');
       return;
     }
 
-    const completedData = { ...formData, status: EXPERTISE_STATUSES.COMPLETED.label };
+    // 3. Формируем объект с измененным статусом
+    const completedData = { 
+      ...formData, 
+      status: EXPERTISE_STATUSES.COMPLETED.label 
+    };
+    
+    // 4. Обновляем локальный стейт
     setFormData(completedData);
     
+    // 5. Вызываем функцию сохранения (которая в ExpertForm отправит данные на сервер)
     if (onSave) {
       onSave(completedData);
     }
@@ -51,7 +55,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
       {/* Секция завершения */}
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
-          disabled={isLocked} // Заменяем на isLocked
+          disabled={isLocked}
           size="small" fullWidth required error={!!errors.dateend}
           label="Дата завершения" type="date" sx={inputStyle}
           slotProps={{ inputLabel: { shrink: true } }}
@@ -119,7 +123,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
         />
       </Grid>
 
-      {/* Кнопка завершения - теперь она не видна или заблокирована для менеджера */}
+      {/* Кнопка завершения */}
       {!isManager && (
         <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
           <Button 
