@@ -6,7 +6,7 @@ import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-// Создаем настроенный инстанс прямо здесь, чтобы куки отправлялись автоматически
+// Создаем настроенный инстанс
 const api = axios.create({
     baseURL: 'http://localhost:8080',
     withCredentials: true,
@@ -20,7 +20,6 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         const fetchRegions = async () => {
             setLoading(true);
             try {
-                // Используем наш настроенный инстанс api
                 const response = await api.get('/api/regions');
                 setRegions(response.data);
             } catch (error) {
@@ -68,7 +67,15 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
     const handleChange = (field) => (event) => {
         if (isLocked) return;
-        setFormData((prev) => updateStatus({ ...prev, [field]: event.target.value }));
+        let value = event.target.value;
+        
+        // Для полей с указателями в Go (например, patronymic_naznch) 
+        // шлем null, если строка пустая
+        if (value === '' && (field === 'patronymic_naznch')) {
+            value = null;
+        }
+
+        setFormData((prev) => updateStatus({ ...prev, [field]: value }));
     };
 
     return (
@@ -97,7 +104,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                     <MenuItem value={1}>Первичная</MenuItem><MenuItem value={2}>Повторная</MenuItem><MenuItem value={3}>Дополнительная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Тип экспертизы"
-                    value={formData.typeExpertise || ''} onChange={handleChange('typeExpertise')} sx={inputStyle}>
+                    value={formData.type_expertise || ''} onChange={handleChange('type_expertise')} sx={inputStyle}>
                     <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория дел"
@@ -109,17 +116,17 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                     <MenuItem value={1}>Простая</MenuItem><MenuItem value={2}>Средней степени сложности</MenuItem><MenuItem value={3}>Сложная</MenuItem><MenuItem value={4}>Особо сложная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Орган, назначивший экспертизу"
-                    value={formData.organCode || ''} onChange={handleChange('organCode')} sx={inputStyle}>
+                    value={formData.organ_code || ''} onChange={handleChange('organ_code')} sx={inputStyle}>
                     {['Суды', 'Прокуратура', 'ОВД', 'КНБ', 'МДГС', 'КДГ', 'ВСД', 'Адвокатура', 'Следственный суд', 'Прочие'].map((item, idx) => (
                         <MenuItem key={idx} value={String(idx + 1).padStart(2, '0')}>{item}</MenuItem>
                     ))}
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
-                    value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
+                    value={formData.organ_name || ''} onChange={handleChange('organ_name')} sx={inputStyle} /></Grid>
             
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked || loading} size="small" required select fullWidth label={loading ? "Загрузка..." : "Регион"}
-                    value={formData.region || ''} onChange={handleChange('region')} sx={inputStyle}>
+                    value={formData.region_id || ''} onChange={handleChange('region_id')} sx={inputStyle}>
                     {loading ? (
                         <MenuItem disabled><CircularProgress size={20} /></MenuItem>
                     ) : (
@@ -137,27 +144,21 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
             {/* Блок лица, назначившего экспертизу */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
-
-{/* Фамилия -> соответствует json:"second_name_naznch" */}
-<Grid size={{ xs: 12, sm: 4 }}>
-    <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
-        value={formData.second_name_naznch || ''} 
-        onChange={handleChange('second_name_naznch')} sx={inputStyle} />
-</Grid>
-
-{/* Имя -> соответствует json:"name_naznch" */}
-<Grid size={{ xs: 12, sm: 4 }}>
-    <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
-        value={formData.name_naznch || ''} 
-        onChange={handleChange('name_naznch')} sx={inputStyle} />
-</Grid>
-
-{/* Отчество -> соответствует json:"patronymic_naznch" */}
-<Grid size={{ xs: 12, sm: 4 }}>
-    <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
-        value={formData.patronymic_naznch || ''} 
-        onChange={handleChange('patronymic_naznch')} sx={inputStyle} />
-</Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
+                    value={formData.second_name_naznch || ''} 
+                    onChange={handleChange('second_name_naznch')} sx={inputStyle} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
+                    value={formData.name_naznch || ''} 
+                    onChange={handleChange('name_naznch')} sx={inputStyle} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
+                    value={formData.patronymic_naznch || ''} 
+                    onChange={handleChange('patronymic_naznch')} sx={inputStyle} />
+            </Grid>
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
