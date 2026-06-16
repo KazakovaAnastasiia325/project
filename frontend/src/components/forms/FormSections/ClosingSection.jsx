@@ -17,38 +17,23 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
   };
 
   const handleComplete = () => {
-    if (isLocked) return;
+  if (isLocked) return;
 
-    // 1. Список обязательных полей для завершения
-    const requiredFields = [
-      'dateend', 'result', 'daysInUnit', 'daysWithExpert', 
-      'conclCategorical', 'conclProbable', 'conclNPV', 'hoursSpent'
-    ];
-    
-    // 2. Проверка: есть ли пустые поля
-    const hasEmptyFields = requiredFields.some(field => 
-      formData[field] === undefined || formData[field] === null || String(formData[field]).trim() === ''
-    );
+  // 1. Простая проверка заполненности
+  const requiredFields = ['dateend', 'result', 'daysInUnit', 'daysWithExpert', 'conclCategorical', 'conclProbable', 'conclNPV', 'hoursSpent'];
+  const hasEmptyFields = requiredFields.some(field => !formData[field] && formData[field] !== 0);
 
-    if (hasEmptyFields) {
-      alert('Пожалуйста, заполните все обязательные поля перед завершением!');
-      return;
-    }
+  if (hasEmptyFields) {
+    alert('Заполните все обязательные поля!');
+    return;
+  }
 
-    // 3. Формируем объект с измененным статусом
-    const completedData = { 
-      ...formData, 
-      status: EXPERTISE_STATUSES.COMPLETED.label 
-    };
-    
-    // 4. Обновляем локальный стейт
-    setFormData(completedData);
-    
-    // 5. Вызываем функцию сохранения (которая в ExpertForm отправит данные на сервер)
-    if (onSave) {
-      onSave(completedData);
-    }
-  };
+  // 2. Просто передаем текущие данные наверх
+  // Мы не меняем статус ЗДЕСЬ, пусть ExpertForm (родитель) решает, какой статус присвоить
+  if (onSave) {
+    onSave(formData); 
+  }
+};
 
   return (
     <Grid container spacing={2} sx={{ mt: 0 }}>

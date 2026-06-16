@@ -29,22 +29,21 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       ud: data.nom_statyi || '',
       organCode: data.organ || '',
       organName: data.name_organ || '',
-      // Синхронизируем имена полей с тем, что ожидает RegistrationSection
       name_naznch: data.name_naznch || '',
       second_name_naznch: data.second_name_naznch || '',
       patronymic_naznch: data.patronymic_naznch || '',
       kolvo: data.question_count || '',
       kolvoobj: data.object_count || '',
       deadlineDays: data.srok_exp ?? '',
-    stop_date: data.stop_date ? data.stop_date.split('T')[0] : '', // Сменил ключ на stop_date для соответствия форме
-    resumeDate: data.resuming_date ? data.resuming_date.split('T')[0] : '',
-    suspendReason: data.stop_reason ?? '',
-    laborCosts: data.expert_cost ?? '',
-    materialCosts: data.material_cost ?? '',
-    equipmentCosts: data.exploitation_cost ?? '',
-    totalCost: data.full_cost ?? '',
-    plomba: data.descrip ?? '',
-    extensionDays: data.srok_resuming ?? '',
+      stop_date: data.stop_date ? data.stop_date.split('T')[0] : '',
+      resumeDate: data.resuming_date ? data.resuming_date.split('T')[0] : '',
+      suspendReason: data.stop_reason ?? '',
+      laborCosts: data.expert_cost ?? '',
+      materialCosts: data.material_cost ?? '',
+      equipmentCosts: data.exploitation_cost ?? '',
+      totalCost: data.full_cost ?? '',
+      plomba: data.descrip ?? '',
+      extensionDays: data.srok_resuming ?? '',
       experts: data.experts || [],
       stat_id: data.stat_id || 1,
       category_id: data.category_id || 1,
@@ -53,25 +52,26 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       diff_cat_id: data.diff_cat_id || 1,
       vid_exp: data.vid_exp || 1,
       dateend: data.end_date ? data.end_date.split('T')[0] : '',
-  result: data.exp_res_id || '',
-  daysInUnit: data.day_count ?? '',
-  daysWithExpert: data.exp_day_count ?? '',
-  conclCategorical: data.cat_vivod ?? '',
-  conclProbable: data.possible_vivod ?? '',
-  conclNPV: data.impossible_vivod ?? '',
-  hoursSpent: data.hour_count ?? '',
+      result: data.exp_res_id || '',
+      daysInUnit: data.day_count ?? '',
+      daysWithExpert: data.exp_day_count ?? '',
+      conclCategorical: data.cat_vivod ?? '',
+      conclProbable: data.possible_vivod ?? '',
+      conclNPV: data.impossible_vivod ?? '',
+      hoursSpent: data.hour_count ?? '',
       status: data.is_closed ? EXPERTISE_STATUSES.COMPLETED.label : EXPERTISE_STATUSES.IN_PROGRESS.label,
     };
   };
 
   const [formData, setFormData] = useState(() => parseDataFromBackend(initialData));
   const [tab, setTab] = useState(0);
+
   useEffect(() => {
     setFormData(parseDataFromBackend(initialData));
-    setTab(0); // Сбрасываем таб на первую вкладку при смене записи
+    setTab(0);
   }, [initialData]);
-  const isNewRecord = !initialData;
 
+  const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
   const registrationFields = ['date', 'ud', 'fabula', 'organCode', 'organName', 'kolvo', 'kolvoobj', 'name_naznch', 'second_name_naznch'];
@@ -92,41 +92,36 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       vid_exp: 1,
       organ: data.organCode || "",
       name_organ: data.organName || "",
-      // Передаем то, что пришло из стейта формы
       name_naznch: data.name_naznch || "",
       second_name_naznch: data.second_name_naznch || "",
       patronymic_naznch: data.patronymic_naznch || "",
       experts: data.experts || [],
       question_count: Number(data.kolvo) || 0,
       object_count: Number(data.kolvoobj) || 0,
-    srok_exp: Number(data.deadlineDays) || 0,
-    stop_date: data.stop_date || null,      // Используем ключ stop_date
-    resuming_date: data.resumeDate || null,
-    stop_reason: data.suspendReason || null,
-    srok_resuming: Number(data.extensionDays) || 0,
-    
-    // Costs Mapping
-    expert_cost: Number(data.laborCosts) || 0,
-    material_cost: Number(data.materialCosts) || 0,
-    exploitation_cost: Number(data.equipmentCosts) || 0,
-    full_cost: Number(data.totalCost) || 0,
-    descrip: data.plomba || "",
-    end_date: data.dateend || null,
-    exp_res_id: Number(data.result) || null,
-    day_count: Number(data.daysInUnit) || null,
-    exp_day_count: Number(data.daysWithExpert) || null,
-    cat_vivod: Number(data.conclCategorical) || null,
-    possible_vivod: Number(data.conclProbable) || null,
-    impossible_vivod: Number(data.conclNPV) || null,
-    hour_count: Number(data.hoursSpent) || null,
+      srok_exp: Number(data.deadlineDays) || 0,
+      stop_date: data.stop_date || null,
+      resuming_date: data.resumeDate || null,
+      stop_reason: data.suspendReason || null,
+      srok_resuming: Number(data.extensionDays) || 0,
+      expert_cost: Number(data.laborCosts) || 0,
+      material_cost: Number(data.materialCosts) || 0,
+      exploitation_cost: Number(data.equipmentCosts) || 0,
+      full_cost: Number(data.totalCost) || 0,
+      descrip: data.plomba || "",
+      end_date: data.dateend || null,
+      exp_res_id: Number(data.result) || null,
+      day_count: Number(data.daysInUnit) || null,
+      exp_day_count: Number(data.daysWithExpert) || null,
+      cat_vivod: Number(data.conclCategorical) || null,
+      possible_vivod: Number(data.conclProbable) || null,
+      impossible_vivod: Number(data.conclNPV) || null,
+      hour_count: Number(data.hoursSpent) || null,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
       stat_id: Number(data.stat_id) || 1,
       category_id: Number(data.category_id) || 1,
       region_id: Number(data.region_id) || 0,
       iz_nix_id: Number(data.iz_nix_id) || 1,
-      diff_cat_id: Number(data.diff_cat_id) || 1,
-      vid_exp: Number(data.vid_exp) || 1
-      
+      diff_cat_id: Number(data.diff_cat_id) || 1
     };
   };
 
@@ -148,20 +143,34 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     onUpdate(prepareDataForServer(formData));
     if (onClose) onClose();
   };
-  const handleComplete = (dataFromClosing) => {
-    // 1. Подготавливаем данные, используя те, что пришли из ClosingSection
-    // Мы принудительно ставим статус COMPLETED в prepareDataForServer
-    const dataForServer = prepareDataForServer({
-      ...dataFromClosing,
-      status: EXPERTISE_STATUSES.COMPLETED.label 
+
+ 
+const handleComplete = async (dataFromClosing) => {
+  const dataForServer = prepareDataForServer({
+    ...dataFromClosing,
+    status: EXPERTISE_STATUSES.COMPLETED.label 
+  });
+
+  try {
+    
+    const response = await fetch(`/api/expertize/${dataForServer.id}/complete`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataForServer),
     });
 
-    // 2. Отправляем на сервер через onUpdate
-    onUpdate(dataForServer);
-    
-    // 3. Закрываем форму
+    if (!response.ok) throw new Error('Ошибка при завершении экспертизы');
+
+    // Если всё успешно, обновляем данные и закрываем
+    onUpdate(dataForServer); 
     if (onClose) onClose();
-  };
+    alert('Экспертиза успешно завершена!');
+    
+  } catch (error) {
+    console.error(error);
+    alert('Не удалось завершить экспертизу. Попробуйте еще раз.');
+  }
+};
 
   return (
     <S.FormContainer>
@@ -181,7 +190,12 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
           <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} />
         )}
         {tab === 2 && !isNewRecord && (
-          <ClosingSection formData={formData} setFormData={setFormData} onSave={onSave} onComplete={handleComplete} isManager={isManager} />
+          <ClosingSection 
+            formData={formData} 
+            setFormData={setFormData} 
+            onSave={handleComplete} 
+            isManager={isManager} 
+          />
         )}
       </S.SectionWrapper>
 
