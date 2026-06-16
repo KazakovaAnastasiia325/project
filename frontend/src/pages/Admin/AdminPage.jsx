@@ -67,7 +67,7 @@ export const AdminPage = () => {
       
       if (error.response?.status === 303 || error.response?.status === 302) {
         setErrorText('Ошибка доступа: Сессия истекла. Перенаправление на логин...');
-        setTimeout(() => handleLogout(), 2000);
+        //setTimeout(() => handleLogout(), 2000);
       } else {
         setErrorText(`Ошибка загрузки: ${error.response?.status || error.message}`);
       }

@@ -65,18 +65,18 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
     };
 
-    const handleChange = (field) => (event) => {
-        if (isLocked) return;
-        let value = event.target.value;
-        
-        // Для полей с указателями в Go (например, patronymic_naznch) 
-        // лучше слать null, если строка пустая
-        if (value === '' && (field === 'patronymic_naznch')) {
-            value = null;
-        }
+    const handleChange = (field, isNumber = false) => (event) => {
+    if (isLocked) return;
+    let value = event.target.value;
+    
+    if (isNumber) {
+        value = value === '' ? null : Number(value);
+    } else if (value === '' && (field === 'patronymic_naznch')) {
+        value = null;
+    }
 
-        setFormData((prev) => updateStatus({ ...prev, [field]: value }));
-    };
+    setFormData((prev) => updateStatus({ ...prev, [field]: value }));
+};
 
     return (
         <Grid container spacing={2} sx={{ mt: 0 }}>
@@ -84,49 +84,49 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Основная информация</Typography></Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="Дата поступления" type="date"
-                    slotProps={{ inputLabel: { shrink: true } }} value={formData.date || ''} onChange={handleChange('date')} sx={inputStyle} />
+                    slotProps={{ inputLabel: { shrink: true } }} value={formData.data_post || ''} onChange={handleChange('data_post')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела"
-                    value={formData.ud || ''} onChange={handleChange('ud')} sx={inputStyle} />
+                    value={formData.adm_material || ''} onChange={handleChange('adm_material', true)} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фабула" multiline rows={2}
-                    value={formData.fabula || ''} onChange={handleChange('fabula')} sx={inputStyle} /></Grid>
+                    value={formData.fab || ''} onChange={handleChange('fab')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="№ Статьи"
-                    value={formData.state || ''} onChange={handleChange('state')} sx={inputStyle} /></Grid>
+                    value={formData.nom_statyi || ''} onChange={handleChange('nom_statyi')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)"
-                    value={formData.view || ''} onChange={handleChange('view')} sx={inputStyle} /></Grid>
+                    value={formData.vid_exp || ''} onChange={handleChange('vid_exp', true)} sx={inputStyle} /></Grid>
 
             {/* Параметры экспертизы */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Параметры экспертизы</Typography></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Статус экспертизы"
-                    value={formData.statys || ''} onChange={handleChange('statys')} sx={inputStyle}>
+                    value={formData.stat_id || ''} onChange={handleChange('stat_id', true)} sx={inputStyle}>
                     <MenuItem value={1}>Первичная</MenuItem><MenuItem value={2}>Повторная</MenuItem><MenuItem value={3}>Дополнительная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Тип экспертизы"
-                    value={formData.typeExpertise || ''} onChange={handleChange('typeExpertise')} sx={inputStyle}>
+                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id', true)} sx={inputStyle}>
                     <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория дел"
-                    value={formData.category || ''} onChange={handleChange('category')} sx={inputStyle}>
+                    value={formData.category_id || ''} onChange={handleChange('category_id', true)} sx={inputStyle}>
                     <MenuItem value={1}>Уголовное</MenuItem><MenuItem value={2}>Гражданское</MenuItem><MenuItem value={3}>Административное</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория сложности"
-                    value={formData.complexity || ''} onChange={handleChange('complexity')} sx={inputStyle}>
+                    value={formData.diff_cat_id || ''} onChange={handleChange('diff_cat_id', true)} sx={inputStyle}>
                     <MenuItem value={1}>Простая</MenuItem><MenuItem value={2}>Средней степени сложности</MenuItem><MenuItem value={3}>Сложная</MenuItem><MenuItem value={4}>Особо сложная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Орган, назначивший экспертизу"
-                    value={formData.organCode || ''} onChange={handleChange('organCode')} sx={inputStyle}>
+                    value={formData.organ || ''} onChange={handleChange('organ')} sx={inputStyle}>
                     {['Суды', 'Прокуратура', 'ОВД', 'КНБ', 'МДГС', 'КДГ', 'ВСД', 'Адвокатура', 'Следственный суд', 'Прочие'].map((item, idx) => (
                         <MenuItem key={idx} value={String(idx + 1).padStart(2, '0')}>{item}</MenuItem>
                     ))}
                 </TextField></Grid>
             <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
-                    value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
+                    value={formData.name_organ || ''} onChange={handleChange('name_organ')} sx={inputStyle} /></Grid>
             
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked || loading} size="small" required select fullWidth label={loading ? "Загрузка..." : "Регион"}
-                    value={formData.region || ''} onChange={handleChange('region')} sx={inputStyle}>
+                    value={formData.region_id || ''} onChange={handleChange('region_id', true)} sx={inputStyle}>
                     {loading ? (
                         <MenuItem disabled><CircularProgress size={20} /></MenuItem>
                     ) : (
@@ -138,9 +138,9 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             </Grid>
 
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Кол-во вопросов" type="number"
-                    value={formData.kolvo || ''} onChange={handleChange('kolvo')} sx={inputStyle} /></Grid>
+                    value={formData.question_count || ''} onChange={handleChange('question_count', true)} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Кол-во объектов" type="number"
-                    value={formData.kolvoobj || ''} onChange={handleChange('kolvoobj')} sx={inputStyle} /></Grid>
+                    value={formData.object_count || ''} onChange={handleChange('object_count', true)} sx={inputStyle} /></Grid>
 
             {/* Блок лица, назначившего экспертизу */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
