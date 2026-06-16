@@ -96,7 +96,20 @@ export const AdminPage = () => {
       alert('Ошибка при сохранении данных. Проверьте консоль.');
     }
   };
-  
+  const handleUpdate = async (dataToUpdate) => {
+  try {
+    console.log("Обновляем запись:", dataToUpdate.id);
+    // Используем PUT для изменения существующей записи
+    await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
+    
+    setIsDrawerOpen(false);
+    alert('Успешно обновлено');
+    fetchExpertise(); // Перезагружаем таблицу
+  } catch (error) {
+    console.error('Ошибка обновления:', error);
+    alert('Ошибка при обновлении данных.');
+  }
+};
 
   const handleDelete = async (id) => {
     if (window.confirm('Вы действительно хотите удалить эту запись?')) {
