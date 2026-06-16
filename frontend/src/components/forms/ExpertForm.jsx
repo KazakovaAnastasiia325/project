@@ -44,7 +44,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     equipmentCosts: data.exploitation_cost ?? '',
     totalCost: data.full_cost ?? '',
     plomba: data.descrip ?? '',
-    extensionDays: data.extension_days ?? '',
+    extensionDays: data.srok_resuming ?? '',
       experts: data.experts || [],
       stat_id: data.stat_id || 1,
       category_id: data.category_id || 1,
@@ -95,7 +95,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     stop_date: data.stop_date || null,      // Используем ключ stop_date
     resuming_date: data.resumeDate || null,
     stop_reason: data.suspendReason || null,
-    extension_days: Number(data.extensionDays) || 0,
+    srok_resuming: Number(data.extensionDays) || 0,
     
     // Costs Mapping
     expert_cost: Number(data.laborCosts) || 0,
