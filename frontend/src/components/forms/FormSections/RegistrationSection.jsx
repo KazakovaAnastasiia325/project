@@ -10,8 +10,20 @@ const api = axios.create({
     baseURL: 'http://localhost:8080',
     withCredentials: true,
 });
-
+const ORGAN_CODES = [
+    { code: '01', label: '01 - Суды' },
+    { code: '02', label: '02 - Прокуратура' },
+    { code: '03', label: '03 - ОВД' },
+    { code: '04', label: '04 - КНБ' },
+    { code: '05', label: '05 - МДГС' },
+    { code: '06', label: '06 - КДГ' },
+    { code: '07', label: '07 - ВСД' },
+    { code: '08', label: '08 - Адвокатура' },
+    { code: '09', label: '09 - Следственный суд' },
+    { code: '10', label: '10 - Прочие' },
+];
 export const RegistrationSection = ({ formData, setFormData, isManager = false }) => {
+    
     const [regions, setRegions] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -32,9 +44,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
     const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
     
-    const experts = (formData.experts && formData.experts.length > 0) 
-        ? formData.experts 
-        : [{ name: '', second_name: '', patronymic: '' }];
+    
 
     const updateStatus = (prevData) => {
         if (prevData.status === EXPERTISE_STATUSES.NEW.label) {
@@ -44,24 +54,37 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
     };
 
     const handleExpertChange = (index, field, value) => {
-        if (isLocked) return;
-        const newExperts = [...experts];
-        newExperts[index][field] = value;
-        setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
-    };
+    if (isLocked) return;
+    
+    setFormData((prev) => {
+        // 1. Копируем массив
+        const newExperts = [...(prev.experts || [])];
+        
+        // 2. Копируем объект конкретного эксперта
+        newExperts[index] = { 
+            ...newExperts[index], 
+            [field]: value 
+        };
+        
+        // 3. Возвращаем новый объект состояния
+        return updateStatus({ ...prev, experts: newExperts });
+    });
+};
 
     const addExpert = () => {
         if (isLocked) return;
         setFormData((prev) => updateStatus({ 
             ...prev, 
-            experts: [...experts, { name: '', second_name: '', patronymic: '' }] 
+            experts: [...(prev.experts || []), { name: '', second_name: '', patronymic: '' }] 
         }));
     };
 
     const removeExpert = (index) => {
-        if (isLocked || experts.length <= 1) return;
-        const newExperts = experts.filter((_, i) => i !== index);
-        setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
+        const currentExperts = formData.experts || [];
+    if (isLocked || currentExperts.length <= 1) return;
+    
+    const newExperts = currentExperts.filter((_, i) => i !== index);
+    setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
     };
 
     const handleChange = (field) => (event) => {
@@ -90,13 +113,13 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела"
-                    value={formData.ud || ''} onChange={handleChange('ud')} sx={inputStyle} />
+                    value={formData.adm_material || ''} onChange={handleChange('adm_material')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фабула" multiline rows={2}
-                    value={formData.fabula || ''} onChange={handleChange('fabula')} sx={inputStyle} /></Grid>
+                    value={formData.fab || ''} onChange={handleChange('fab')} sx={inputStyle} /></Grid>
             {/* Переименованы поля state -> iz_nix_id, view -> vid_exp (или оставьте как удобно, но обновите в ExpertForm) */}
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="№ Статьи"
-                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle} /></Grid>
+                    value={formData.nom_statyi || ''} onChange={handleChange('nom_statyi')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)"
                     value={formData.vid_exp || ''} onChange={handleChange('vid_exp')} sx={inputStyle} /></Grid>
 
@@ -107,20 +130,48 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                     <MenuItem value={1}>Первичная</MenuItem><MenuItem value={2}>Повторная</MenuItem><MenuItem value={3}>Дополнительная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Тип экспертизы"
-                    value={formData.category_id || ''} onChange={handleChange('category_id')} sx={inputStyle}>
+                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle}>
                     <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория дел"
-                    value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle}>
+                    value={formData.category_id || ''} onChange={handleChange('category_id')} sx={inputStyle}>
                     <MenuItem value={1}>Уголовное</MenuItem><MenuItem value={2}>Гражданское</MenuItem><MenuItem value={3}>Административное</MenuItem>
                 </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория сложности"
                     value={formData.diff_cat_id || ''} onChange={handleChange('diff_cat_id')} sx={inputStyle}>
                     <MenuItem value={1}>Простая</MenuItem><MenuItem value={2}>Средней степени сложности</MenuItem><MenuItem value={3}>Сложная</MenuItem><MenuItem value={4}>Особо сложная</MenuItem>
                 </TextField></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Наименование органа"
-                    value={formData.organName || ''} onChange={handleChange('organName')} sx={inputStyle} /></Grid>
-            
+            <Grid size={{ xs: 12, sm: 6 }}>
+    <TextField 
+        disabled={isLocked} 
+        size="small" 
+        required 
+        select 
+        fullWidth 
+        label="Орган назначивший экспертизу"
+        value={formData.organCode || ''} 
+        onChange={handleChange('organCode')} 
+        sx={inputStyle}
+    >
+        {ORGAN_CODES.map((item) => (
+            <MenuItem key={item.code} value={item.code}>
+                {item.label}
+            </MenuItem>
+        ))}
+    </TextField>
+</Grid>
+<Grid size={{ xs: 12, sm: 6 }}>
+    <TextField 
+        disabled={isLocked} 
+        size="small" 
+        required 
+        fullWidth 
+        label="Наименование органа"
+        value={formData.organName || ''} 
+        onChange={handleChange('organName')} 
+        sx={inputStyle} 
+    />
+</Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked || loading} size="small" required select fullWidth label={loading ? "Загрузка..." : "Регион"}
                     value={formData.region_id || ''} onChange={handleChange('region_id')} sx={inputStyle}>
@@ -159,7 +210,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
-            {experts.map((expert, index) => (
+            {(formData.experts || []).map((expert, index) => (
                 <Grid container spacing={2} key={index} sx={{ mb: 1, alignItems: 'center' }}>
                     <Grid size={{ xs: 12, sm: 4 }}>
                         <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия" value={expert.second_name || ''}
@@ -174,7 +225,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                             onChange={(e) => handleExpertChange(index, 'patronymic', e.target.value)} sx={inputStyle} />
                         {!isLocked && (
                             <Box sx={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>
-                                <IconButton onClick={() => removeExpert(index)} disabled={experts.length === 1} color="error">
+                                <IconButton onClick={() => removeExpert(index)} disabled={(formData.experts || []).length === 1} color="error">
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>

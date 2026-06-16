@@ -59,7 +59,28 @@ export const AdminPage = () => {
       }
     } catch (error) {
       console.error('Детали ошибки:', error);
-      setErrorText(`Ошибка загрузки: ${error.response?.status || error.message}`);
+      
+      // Логика обработки истечения сессии
+      // Проверяем, вернул ли сервер 401 (Unauthorized) или 403 (Forbidden)
+      // Либо проверяем, не перенаправил ли нас сервер на /login (если браузер подставил responseURL)
+      const isAuthError = error.response?.status === 401 || 
+                          error.response?.status === 403 || 
+                          error.request?.responseURL?.includes('/login');
+
+      if (isAuthError) {
+        setErrorText('Сессия истекла. Пожалуйста, перезайдите в систему.');
+        // Можно добавить задержку перед выходом, чтобы пользователь успел прочитать сообщение
+        setTimeout(() => {
+            handleLogout();
+        }, 2500);
+      } else {
+        // Для прочих ошибок оставляем понятное сообщение
+        setErrorText('Ошибка при получении данных. Попробуйте обновить страницу.');
+        setTimeout(() => {
+            handleLogout();
+        }, 2500);
+      }
+      
       setRows([]);
       setTotalRows(0);
     } finally {

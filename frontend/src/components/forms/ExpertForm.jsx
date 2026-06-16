@@ -21,23 +21,24 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       name_naznch: '', second_name_naznch: '', patronymic_naznch: '',
       kolvo: '', kolvoobj: '', 
       experts: [], 
-      stat_id: 1, category_id: 1, region_id: 1, iz_nix_id: 1, diff_cat_id: 1,
+      stat_id: '', category_id: '', region_id: '', iz_nix_id: '', diff_cat_id: '',
       region_id: '',
       status: EXPERTISE_STATUSES.NEW.label 
     };
 
     return {
       id: data.id,
-      date: data.data_post ? data.data_post.split('T')[0] : '',
-      fabula: data.fab || '',
-      ud: data.nom_statyi || '',
-      organCode: data.organ || '',
-      organName: data.name_organ || '',
-      name_naznch: data.name_naznch || '',
-      second_name_naznch: data.second_name_naznch || '',
-      patronymic_naznch: data.patronymic_naznch || '',
-      kolvo: data.question_count || '',
-      kolvoobj: data.object_count || '',
+    date: data.data_post ? data.data_post.split('T')[0] : '',
+    fab: data.fab || '',
+    adm_material: data.adm_material || '',
+    nom_statyi: data.nom_statyi || '',
+    organCode: data.organ || '',
+    organName: data.name_organ || '',
+    name_naznch: data.name_naznch || '',
+    second_name_naznch: data.second_name_naznch || '',
+    patronymic_naznch: data.patronymic_naznch || '',
+    kolvo: data.question_count || '',
+    kolvoobj: data.object_count || '',
       deadlineDays: data.srok_exp ?? '',
       stop_date: data.stop_date ? data.stop_date.split('T')[0] : '',
       resumeDate: data.resuming_date ? data.resuming_date.split('T')[0] : '',
@@ -49,12 +50,13 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       plomba: data.descrip ?? '',
       extensionDays: data.srok_resuming ?? '',
       experts: data.experts || [],
-      stat_id: data.stat_id || 1,
-      category_id: data.category_id || 1,
-      region_id: data.region_id ?? '',
-      iz_nix_id: data.iz_nix_id || 1,
-      diff_cat_id: data.diff_cat_id || 1,
-      vid_exp: data.vid_exp || 1,
+      stat_id: data.stat_id ? String(data.stat_id) : '',
+    category_id: data.category_id ? String(data.category_id) : '',
+    region_id: data.region_id ?? '',
+    iz_nix_id: data.iz_nix_id ? String(data.iz_nix_id) : '',
+    nom_statyi: data.nom_statyi ?? '',
+    diff_cat_id: data.diff_cat_id ? String(data.diff_cat_id) : '',
+    vid_exp: data.vid_exp ?? '',
       dateend: data.end_date ? data.end_date.split('T')[0] : '',
       result: data.exp_res_id || '',
       daysInUnit: data.day_count ?? '',
@@ -78,30 +80,49 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
   const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
-  const registrationFields = ['date', 'ud', 'fabula', 'organCode', 'organName', 'kolvo', 'kolvoobj', 'name_naznch', 'second_name_naznch'];
-
-  const isRegistrationComplete = () => registrationFields.every(field => 
-    formData[field]?.toString().trim() !== ''
-  );
+  const registrationFields = [
+    'date', 
+    'nom_statyi',      // вместо 'ud'
+    'fab',             // вместо 'fabula'
+    'organCode', 
+    'organName', 
+    'kolvo', 
+    'kolvoobj', 
+    'name_naznch', 
+    'second_name_naznch',
+    'stat_id',         // добавьте эти, если они обязательны
+    'category_id',
+    'region_id',
+    'vid_exp'
+];
+  const isRegistrationComplete = () => {
+    const missing = registrationFields.filter(field => 
+        !formData[field] || formData[field].toString().trim() === ''
+    );
+    if (missing.length > 0) {
+        console.log("Не заполнены обязательные поля:", missing);
+    }
+    return missing.length === 0;
+};
 
   // 2. Превращаем данные формы в JSON для отправки на Go-бэкенд
   const prepareDataForServer = (data) => {
     return {
       id: data.id || 0,
-      creator_id: 1,
-      data_post: data.date ? data.date : "",
-      fab: data.fabula || "",
-      adm_material: 1,
-      nom_statyi: data.ud || "",
-      vid_exp: 1,
-      organ: data.organCode || "",
-      name_organ: data.organName || "",
-      name_naznch: data.name_naznch || "",
-      second_name_naznch: data.second_name_naznch || "",
-      patronymic_naznch: data.patronymic_naznch || "",
-      experts: data.experts || [],
-      question_count: Number(data.kolvo) || 0,
-      object_count: Number(data.kolvoobj) || 0,
+    creator_id: 1,
+    data_post: data.date || "",
+    fab: data.fab || "",
+    adm_material: Number(data.adm_material) || 0,
+    nom_statyi: data.nom_statyi || "",
+    vid_exp: Number(data.vid_exp) || 0,
+    organ: data.organCode || "",
+    name_organ: data.organName || "",
+    name_naznch: data.name_naznch || "",
+    second_name_naznch: data.second_name_naznch || "",
+    patronymic_naznch: data.patronymic_naznch || null,
+    experts: data.experts || [],
+    question_count: Number(data.kolvo) || 0,
+    object_count: Number(data.kolvoobj) || 0,
       srok_exp: Number(data.deadlineDays) || 0,
       stop_date: data.stop_date || null,
       resuming_date: data.resumeDate || null,
@@ -121,11 +142,11 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       impossible_vivod: Number(data.conclNPV) || null,
       hour_count: Number(data.hoursSpent) || null,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
-      stat_id: Number(data.stat_id) || 1,
-      category_id: Number(data.category_id) || 1,
-      region_id: Number(data.region_id) || 0,
+      stat_id: data.stat_id ? Number(data.stat_id) : 0,
+    category_id: data.category_id ? Number(data.category_id) : 0,
+    region_id: data.region_id ? Number(data.region_id) : 0,
       iz_nix_id: Number(data.iz_nix_id) || 1,
-      diff_cat_id: Number(data.diff_cat_id) || 1
+      diff_cat_id: data.diff_cat_id ? Number(data.diff_cat_id) : 0,
     };
   };
 
