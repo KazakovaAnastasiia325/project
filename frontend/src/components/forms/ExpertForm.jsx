@@ -44,6 +44,8 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
   equipmentCosts: data.exploitation_cost ?? '',
   totalCost: data.full_cost ?? '',
   plomba: data.descrip ?? '',
+  extensionDays: data.extension_days ?? '',
+  deadlineDays: data.srok_exp ?? '',
       experts: data.experts || [],
       stat_id: data.stat_id || 1,
       category_id: data.category_id || 1,
@@ -95,7 +97,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     stop_date: data.suspendDate || null,
     resuming_date: data.resumeDate || null,
     stop_reason: data.suspendReason || null,
-    // extensionDate (поле продления) можно добавить в модель Go, если нужно
+    extension_days: data.extensionDays ? Number(data.extensionDays) : 0,
     
     // --- Данные Затрат ---
     expert_cost: data.laborCosts ? Number(data.laborCosts) : null,

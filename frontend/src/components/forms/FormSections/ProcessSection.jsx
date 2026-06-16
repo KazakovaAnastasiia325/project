@@ -46,7 +46,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
         <TextField 
           disabled={isLocked}
           size="small" fullWidth label="Дата приост." type="date" 
-          slotProps={{ inputLabel: { shrink: true } }} value={formData.suspendDate || ''} 
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.stop_date || ''} 
           onChange={handleChange('suspendDate')} sx={inputStyle} 
         />
       </Grid>
@@ -69,9 +69,9 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
       <Grid size={{ xs: 12 }}>
         <TextField 
           disabled={isLocked}
-          size="small" fullWidth label="Дата (срок) продления" type="date" 
-          slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDate || ''} 
-          onChange={handleChange('extensionDate')} sx={inputStyle} 
+          size="small" fullWidth label="Дата (срок) продления" type="number" 
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDays || ''} 
+          onChange={handleChange('extensionDays')} sx={inputStyle} 
         />
       </Grid>
 
