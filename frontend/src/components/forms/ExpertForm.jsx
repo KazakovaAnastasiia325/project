@@ -7,7 +7,7 @@ import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 import * as S from './ExpertStyles';
 import * as AdminS from '../../pages/Admin/AdminStyles';
 
-export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) => {
+export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager = false }) => {
   
   // 1. Превращаем JSON с бэкенда в формат для полей формы
   const parseDataFromBackend = (data) => {
