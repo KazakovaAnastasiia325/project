@@ -146,12 +146,12 @@ export const AdminPage = () => {
         </Box>
 
         <DetailsDrawer 
-          open={isDrawerOpen} 
-          onClose={() => setIsDrawerOpen(false)} 
-          data={selectedExpertise}
-          onSave={handleSave} 
-          isManager={false}
-        />
+  open={isDrawerOpen} 
+  onClose={() => setIsDrawerOpen(false)} 
+  expertiseId={selectedExpertise?.id} // Передаем только ID
+  onSave={handleSave} 
+  isManager={false}
+/>
       </Box>
     </S.AdminContainer>
   );
