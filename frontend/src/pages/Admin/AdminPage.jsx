@@ -89,47 +89,42 @@ export const AdminPage = () => {
 
   // МАСШТАБНЫЙ МАППИНГ ДАННЫХ ДЛЯ БЭКЕНДА GO
   const handleSave = async (newData) => {
-    // Безопасный съем фокуса с активной кнопки перед отправкой
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
 
+    console.log("=== ЧТО ПРИШЛО ИЗ ФОРМЫ (newData) ===", newData);
 
-    // Собираем объект строго по спецификации Go-структуры структуры Exp
     const mappedBackendData = {
       id: newData.id ? Number(newData.id) : 0,
       creator_id: newData.creator_id ? Number(newData.creator_id) : 1,
-      data_post: newData.date || "",                     // из 'date' в 'data_post'
-      adm_material: newData.ud ? Number(newData.ud) : 0, // из 'ud' в 'adm_material'
-      fab: newData.fabula || "",                         // из 'fabula' в 'fab'
-      nom_statyi: newData.state || "",                   // из 'state' в 'nom_statyi'
-      vid_exp: newData.view ? Number(newData.view) : 0,  // из 'view' в 'vid_exp'
+      is_closed: !!newData.is_closed,
       
-      // Списки параметров экспертизы
-      stat_id: newData.statys ? Number(newData.statys) : 1,
-      iz_nix_id: newData.typeExpertise ? Number(newData.typeExpertise) : 1,
-      category_id: newData.category ? Number(newData.category) : 1,
-      diff_cat_id: newData.complexity ? Number(newData.complexity) : 1,
-      region_id: newData.region ? Number(newData.region) : 0,
+      data_post: newData.date || newData.data_post || "",                     
+      adm_material: newData.ud !== undefined ? Number(newData.ud) : (Number(newData.adm_material) || 0), 
+      fab: newData.fabula || newData.fab || "",                         
+      nom_statyi: newData.state || newData.nom_statyi || "",                   
+      vid_exp: newData.view !== undefined ? Number(newData.view) : (Number(newData.vid_exp) || 0),  
       
-      // Органы назначения
-      organ: newData.organCode || "01",
-      name_organ: newData.organName || "",
+      stat_id: Number(newData.statys || newData.stat_id || 1),
+      iz_nix_id: Number(newData.typeExpertise || newData.iz_nix_id || 1),
+      category_id: Number(newData.category || newData.category_id || 1),
+      diff_cat_id: Number(newData.complexity || newData.diff_cat_id || 1),
+      region_id: Number(newData.region || newData.region_id || 0),
       
-      // Счетчики
-      question_count: newData.kolvo ? Number(newData.kolvo) : 0,
-      object_count: newData.kolvoobj ? Number(newData.kolvoobj) : 0,
-      is_closed: newData.is_closed || false,
+      organ: newData.organCode || newData.organ || "01",
+      name_organ: newData.organName || newData.name_organ || "",
       
-      // Лицо, назначившее экспертизу (Устраняем проблему пустых строк)
-      second_name_naznch: newData.naznch_last || "",   // Фамилия
-      name_naznch: newData.naznch_first || "",         // Имя
-      patronymic_naznch: newData.naznch_middle || "", // Отчество (теперь гарантированно летит ключом)
+      question_count: Number(newData.kolvo || newData.question_count || 0),
+      object_count: Number(newData.kolvoobj || newData.object_count || 0),
+      
+      second_name_naznch: newData.naznch_last || newData.second_name_naznch || "",
+      name_naznch: newData.naznch_first || newData.name_naznch || "",
+      patronymic_naznch: newData.naznch_middle || newData.patronymic_naznch || "",
 
-      // Список экспертов
       experts: Array.isArray(newData.experts) 
         ? newData.experts.map(exp => ({
-            id: exp.id ? Number(exp.id) : 0,
+            id: Number(exp.id || 0),
             name: exp.name || "",
             second_name: exp.second_name || "",
             patronymic: exp.patronymic || ""
@@ -137,7 +132,7 @@ export const AdminPage = () => {
         : []
     };
 
-    console.log("=== JSON ОТПРАВЛЯЕМЫЙ НА БЭКЕНД ===", mappedBackendData);
+    console.log("=== ИТОГОВЫЙ JSON ДЛЯ БЭКЕНДА ===", mappedBackendData);
 
     try {
       await api.post('/api/expertiza/save', mappedBackendData);
@@ -149,7 +144,6 @@ export const AdminPage = () => {
       alert(`Ошибка при сохранении: ${error.response?.data?.error || error.message}`);
     }
   };
-
   const handleDelete = async (id) => {
     if (window.confirm('Вы действительно хотите удалить эту запись?')) {
       try {
