@@ -137,12 +137,27 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
             {/* Блок лица, назначившего экспертизу */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
-                    value={formData.appointing_second_name || ''} onChange={handleChange('appointing_second_name')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" required fullWidth label="Имя"
-                    value={formData.appointing_name || ''} onChange={handleChange('appointing_name')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}><TextField disabled={isLocked} size="small" fullWidth label="Отчество"
-                    value={formData.appointing_patronymic || ''} onChange={handleChange('appointing_patronymic')} sx={inputStyle} /></Grid>
+
+{/* Фамилия -> соответствует json:"second_name_naznch" */}
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
+        value={formData.second_name_naznch || ''} 
+        onChange={handleChange('second_name_naznch')} sx={inputStyle} />
+</Grid>
+
+{/* Имя -> соответствует json:"name_naznch" */}
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
+        value={formData.name_naznch || ''} 
+        onChange={handleChange('name_naznch')} sx={inputStyle} />
+</Grid>
+
+{/* Отчество -> соответствует json:"patronymic_naznch" */}
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
+        value={formData.patronymic_naznch || ''} 
+        onChange={handleChange('patronymic_naznch')} sx={inputStyle} />
+</Grid>
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>

@@ -1,137 +1,137 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Импортируем хук
-import { Box, Typography, Button } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import AddIcon from '@mui/icons-material/Add';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
-import AddIcon from '@mui/icons-material/Add';
 import * as S from '../Admin/AdminStyles';
 
-// Начальные данные, если localStorage пуст
-const initialMockData = [
-  { id: 1, date: '2026-06-10', fioexpert: 'Иванов И.И.', status: 'В работе', fabula: 'Кража', ud: '12345/2026', organ: 'ОВД', result: 'В производстве' },
-  { id: 2, date: '2026-06-09', fioexpert: 'Петров П.П.', status: 'Создано', fabula: 'ДТП', ud: '67890/2026', organ: 'Суды', result: 'Ожидает' }
-];
+// Создаем экземпляр API с поддержкой авторизации
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
 export const EmployeePage = () => {
-  const navigate = useNavigate(); // 2. Инициализируем хук
+  const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
+  
+  // Состояния для работы с данными от бэкенда
+  const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [errorText, setErrorText] = useState('');
+  
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
+  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
 
-  const [rows, setRows] = useState(() => {
-    const savedRows = localStorage.getItem('expertiseData');
-    return savedRows ? JSON.parse(savedRows) : initialMockData;
-  });
+  // Функция получения списка
+  const fetchExpertise = async () => {
+    setLoading(true);
+    setErrorText('');
+    try {
+      const params = {
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+        sort_field: sortModel[0]?.field || 'id',
+        sort_order: sortModel[0]?.sort || 'desc',
+      };
 
-  // Функция выхода
-  const handleLogout = () => {
-    // Здесь можно очистить данные пользователя, если они есть
-    navigate('/login');
+      const response = await api.get('/api/expertiza/list', { params });
+      const data = response.data;
+
+      if (data && Array.isArray(data.rows)) {
+        setRows(data.rows);
+        setTotalRows(data.total || 0);
+      } else {
+        setRows([]);
+        setTotalRows(0);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+      if (error.response?.status === 303 || error.response?.status === 302) {
+        setErrorText('Сессия истекла. Перенаправление...');
+        setTimeout(() => handleLogout(), 2000);
+      } else {
+        setErrorText('Ошибка загрузки данных');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    localStorage.setItem('expertiseData', JSON.stringify(rows));
-  }, [rows]);
+    fetchExpertise();
+  }, [paginationModel, sortModel]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    navigate('/login');
+  };
 
   const handleCreate = () => {
     setSelectedExpertise(null);
     setIsDrawerOpen(true);
   };
 
-  const handleRowClick = (params) => {
-    setSelectedExpertise(params.row);
-    setIsDrawerOpen(true);
-  };
-
-  const handleSave = (newData) => {
-    if (selectedExpertise) {
-      setRows((prev) => prev.map((r) => (r.id === newData.id ? newData : r)));
-    } else {
-      const newRow = {
-        ...newData,
-        id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1,
-        status: 'Создано'
-      };
-      setRows((prev) => [...prev, newRow]);
+  const handleSave = async (newData) => {
+    try {
+      await api.post('/api/expertiza/save', newData);
+      setIsDrawerOpen(false);
+      fetchExpertise(); // Обновляем реестр после сохранения
+    } catch (error) {
+      console.error('Ошибка сохранения:', error);
+      alert('Ошибка при сохранении данных.');
     }
-    setIsDrawerOpen(false);
   };
 
   return (
-    <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      
+    <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* 1. ВЕРХНЯЯ ПАНЕЛЬ */}
-      <Box sx={{ 
-        width: '100%', 
-        height: '50px', 
-        backgroundColor: '#131924', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        px: 3,
-        color: '#fff',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        mb: 2 
-      }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>
-          Панель сотрудника
-        </Typography>
-        <Button 
-          startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} 
-          sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }}
-          onClick={handleLogout} 
-        >
-          Выйти
-        </Button>
+      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель сотрудника</Typography>
+        <Button startIcon={<LogoutIcon />} sx={{ color: '#fff', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
       </Box>
 
       {/* 2. ОСНОВНОЙ КОНТЕНТ */}
-      <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>
+      <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
         
-        {/* Панель управления реестром */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          backgroundColor: '#1e293b',
-          padding: '8px 16px',
-          borderRadius: '10px',
-          mb: 1.5,
-          boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
-        }}>
-          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>
-            Реестр экспертиз
-          </Typography>
-          
-          <S.ActionButton 
-            startIcon={<AddIcon fontSize="small" />} 
-            onClick={handleCreate}
-            size="small"
-            sx={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
-              color: '#ffffff',
-              fontSize: '12px',
-              py: 0.5
-            }}
-          >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
+          <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small" variant="contained">
             Добавить
           </S.ActionButton>
         </Box>
         
-        <S.TableWrapper sx={{ '& .MuiDataGrid-root': { minHeight: '300px' } }}>
+        <Box sx={{ flexGrow: 1, mb: 3 }}>
           <DataGridTable 
-            rows={rows} 
-            density="compact"
-            onRowClick={handleRowClick} 
+            rows={rows}
+            rowCount={totalRows}
+            loading={loading}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            onSortModelChange={setSortModel}
+            onRowClick={(params) => { setSelectedExpertise(params.row); setIsDrawerOpen(true); }}
+            isAdmin={false} 
+            isManager={false}
           />
-        </S.TableWrapper>
+        </Box>
 
         <DetailsDrawer 
           open={isDrawerOpen} 
           onClose={() => setIsDrawerOpen(false)} 
           data={selectedExpertise}
           onSave={handleSave} 
+          isManager={false}
         />
       </Box>
     </S.AdminContainer>
