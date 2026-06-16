@@ -157,22 +157,15 @@ const handleComplete = async (dataFromClosing) => {
 
   try {
     
-    const response = await fetch(`/api/expertize/${dataForServer.id}/complete`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dataForServer),
-    });
-
-    if (!response.ok) throw new Error('Ошибка при завершении экспертизы');
-
-    // Если всё успешно, обновляем данные и закрываем
+    const response = await api.put(`/api/expertize/${dataForServer.id}/complete`, dataForServer);
+    // Если всё успешно
     onUpdate(dataForServer); 
     if (onClose) onClose();
     alert('Экспертиза успешно завершена!');
     
   } catch (error) {
     console.error(error);
-    alert('Не удалось завершить экспертизу. Попробуйте еще раз.');
+    alert('Не удалось завершить экспертизу. Проверьте соединение с сервером.');
   }
 };
 
