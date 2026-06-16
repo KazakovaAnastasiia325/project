@@ -9,11 +9,12 @@ import * as AdminS from '../../pages/Admin/AdminStyles';
 
 export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) => {
   
-  // 1. Функция: Превращаем JSON с бэкенда в формат для полей формы
+  // 1. Превращаем JSON с бэкенда в формат для полей формы
   const parseDataFromBackend = (data) => {
     if (!data) return { 
       date: '', ud: '', fabula: '', 
-      organCode: '', organName: '', appointingPerson: '', 
+      organCode: '', organName: '', 
+      name_naznch: '', second_name_naznch: '', patronymic_naznch: '',
       kolvo: '', kolvoobj: '', 
       experts: [], 
       stat_id: 1, category_id: 1, region_id: 1, iz_nix_id: 1, diff_cat_id: 1,
@@ -27,7 +28,10 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       ud: data.nom_statyi || '',
       organCode: data.organ || '',
       organName: data.name_organ || '',
-      appointingPerson: data.name_naznch || '',
+      // Синхронизируем имена полей с тем, что ожидает RegistrationSection
+      name_naznch: data.name_naznch || '',
+      second_name_naznch: data.second_name_naznch || '',
+      patronymic_naznch: data.patronymic_naznch || '',
       kolvo: data.question_count || '',
       kolvoobj: data.object_count || '',
       experts: data.experts || [],
@@ -46,18 +50,17 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
-  // Список полей, обязательных для заполнения на этапе регистрации
-  const registrationFields = ['date', 'ud', 'fabula', 'organCode', 'organName', 'kolvo', 'kolvoobj'];
+  const registrationFields = ['date', 'ud', 'fabula', 'organCode', 'organName', 'kolvo', 'kolvoobj', 'name_naznch', 'second_name_naznch'];
 
   const isRegistrationComplete = () => registrationFields.every(field => 
     formData[field]?.toString().trim() !== ''
   );
 
-  // 2. Функция: Превращаем данные формы в JSON для отправки на Go-бэкенд
+  // 2. Превращаем данные формы в JSON для отправки на Go-бэкенд
   const prepareDataForServer = (data) => {
     return {
       id: data.id || 0,
-      creator_id: 1, // Заглушка текущего пользователя
+      creator_id: 1,
       data_post: data.date || "",
       fab: data.fabula || "",
       adm_material: 1,
@@ -65,9 +68,11 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       vid_exp: 1,
       organ: data.organCode || "",
       name_organ: data.organName || "",
-      name_naznch: data.appointingPerson || "",
-      second_name_naznch: "Фамилия", // Можно вынести в стейт при необходимости
-      experts: data.experts || [], // Отправляем массив объектов
+      // Передаем то, что пришло из стейта формы
+      name_naznch: data.name_naznch || "",
+      second_name_naznch: data.second_name_naznch || "",
+      patronymic_naznch: data.patronymic_naznch || "",
+      experts: data.experts || [],
       question_count: Number(data.kolvo) || 0,
       object_count: Number(data.kolvoobj) || 0,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
@@ -89,7 +94,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
 
   const handleSave = () => {
     if (isNewRecord && !isRegistrationComplete()) {
-      alert('Заполните обязательные поля');
+      alert('Заполните все обязательные поля, включая ФИО лица, назначившего экспертизу');
       return;
     }
     

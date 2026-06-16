@@ -64,7 +64,6 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
     };
 
-    // Исправленный обработчик: преобразует числа и сохраняет имена
     const handleChange = (field) => (event) => {
         if (isLocked) return;
         let value = event.target.value;
@@ -73,7 +72,8 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         const numberFields = [
             'statys', 'typeExpertise', 'category', 'complexity', 
             'kolvo', 'kolvoobj', 'region', 'stat_id', 'category_id', 
-            'region_id', 'adm_material', 'diff_cat_id', 'vid_exp'
+            'region_id', 'adm_material', 'diff_cat_id', 'vid_exp',
+            'state', 'view' 
         ];
 
         if (numberFields.includes(field)) {
@@ -170,15 +170,15 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             {experts.map((expert, index) => (
                 <Grid container spacing={2} key={index} sx={{ mb: 1, alignItems: 'center' }}>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия" value={expert.second_name}
+                        <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия" value={expert.second_name || ''}
                             onChange={(e) => handleExpertChange(index, 'second_name', e.target.value)} sx={inputStyle} />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField disabled={isLocked} size="small" required fullWidth label="Имя" value={expert.name}
+                        <TextField disabled={isLocked} size="small" required fullWidth label="Имя" value={expert.name || ''}
                             onChange={(e) => handleExpertChange(index, 'name', e.target.value)} sx={inputStyle} />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <TextField disabled={isLocked} size="small" fullWidth label="Отчество" value={expert.patronymic}
+                        <TextField disabled={isLocked} size="small" fullWidth label="Отчество" value={expert.patronymic || ''}
                             onChange={(e) => handleExpertChange(index, 'patronymic', e.target.value)} sx={inputStyle} />
                         {!isLocked && (
                             <Box sx={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>

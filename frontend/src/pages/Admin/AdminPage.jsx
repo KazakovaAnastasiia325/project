@@ -78,22 +78,16 @@ export const AdminPage = () => {
   };
 
   const handleCreate = () => {
-    setSelectedExpertise(null);
+    setSelectedExpertise(null); // Новая запись
     setIsDrawerOpen(true);
   };
 
-  const handleSave = async (newData) => {
-    // Явно собираем объект для бэкенда, чтобы гарантировать ключи
-    const dataToSave = {
-      ...newData,
-      second_name_naznch: newData.naznch_last || "", 
-      name_naznch: newData.naznch_first || "",
-      patronymic_naznch: newData.naznch_middle || ""
-    };
-
+  const handleSave = async (dataToSave) => {
     try {
       console.log("Отправляем на сервер:", dataToSave);
+      // Данные уже подготовлены в ExpertForm методом prepareDataForServer
       await api.post('/api/expertiza/save', dataToSave);
+      
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
       fetchExpertise();
@@ -141,15 +135,8 @@ export const AdminPage = () => {
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
             onRowClick={(params) => { 
-              // Обратный маппинг: при открытии превращаем поля бэкенда в поля формы
-              const row = params.row;
-              const mappedData = {
-                ...row,
-                naznch_last: row.second_name_naznch,
-                naznch_first: row.name_naznch,
-                naznch_middle: row.patronymic_naznch
-              };
-              setSelectedExpertise(mappedData); 
+              // Передаем данные напрямую, так как ExpertForm сама умеет их парсить
+              setSelectedExpertise(params.row); 
               setIsDrawerOpen(true); 
             }}
             onDelete={handleDelete}
