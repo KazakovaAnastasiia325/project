@@ -18,6 +18,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       kolvo: '', kolvoobj: '', 
       experts: [], 
       stat_id: 1, category_id: 1, region_id: 1, iz_nix_id: 1, diff_cat_id: 1,
+      region_id: '',
       status: EXPERTISE_STATUSES.NEW.label 
     };
 
@@ -37,7 +38,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       experts: data.experts || [],
       stat_id: data.stat_id || 1,
       category_id: data.category_id || 1,
-      region_id: data.region_id || 1,
+      region_id: data.region_id || '',
       iz_nix_id: data.iz_nix_id || 1,
       diff_cat_id: data.diff_cat_id || 1,
       status: data.is_closed ? EXPERTISE_STATUSES.COMPLETED.label : EXPERTISE_STATUSES.IN_PROGRESS.label,
@@ -78,7 +79,7 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
       stat_id: Number(data.stat_id) || 1,
       category_id: Number(data.category_id) || 1,
-      region_id: Number(data.region_id) || 1,
+      region_id: data.region_id || '',
       iz_nix_id: Number(data.iz_nix_id) || 1,
       diff_cat_id: Number(data.diff_cat_id) || 1
     };

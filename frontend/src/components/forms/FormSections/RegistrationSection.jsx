@@ -131,7 +131,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked || loading} size="small" required select fullWidth label={loading ? "Загрузка..." : "Регион"}
-                    value={formData.region || ''} onChange={handleChange('region')} sx={inputStyle}>
+                    value={formData.region_id || ''} onChange={handleChange('region_id')} sx={inputStyle}>
                     {loading ? (
                         <MenuItem disabled><CircularProgress size={20} /></MenuItem>
                     ) : (
