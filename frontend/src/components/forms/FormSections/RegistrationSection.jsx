@@ -124,7 +124,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                         <MenuItem disabled><CircularProgress size={20} /></MenuItem>
                     ) : (
                         regions.map((region) => (
-                            <MenuItem key={region.id} value={region.id}>{region.id} - {region.name}</MenuItem>
+                            <MenuItem key={region.id} value={region.id}>{region.name}</MenuItem>
                         ))
                     )}
                 </TextField>
