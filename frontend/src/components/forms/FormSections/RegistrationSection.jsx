@@ -6,7 +6,6 @@ import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-// Создаем настроенный инстанс
 const api = axios.create({
     baseURL: 'http://localhost:8080',
     withCredentials: true,
@@ -65,26 +64,34 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         setFormData((prev) => updateStatus({ ...prev, experts: newExperts }));
     };
 
+    // Исправленный обработчик: преобразует числа и сохраняет имена
     const handleChange = (field) => (event) => {
-    if (isLocked) return;
-    
-    // Просто берем значение из инпута. 
-    // Если поле пустое, value будет "" (пустая строка), что безопасно для большинства API.
-    const value = event.target.value;
+        if (isLocked) return;
+        let value = event.target.value;
 
-    setFormData((prev) => updateStatus({ ...prev, [field]: value }));
-};
+        // Поля, которые сервер ожидает как числа
+        const numberFields = [
+            'statys', 'typeExpertise', 'category', 'complexity', 
+            'kolvo', 'kolvoobj', 'region', 'stat_id', 'category_id', 
+            'region_id', 'adm_material', 'diff_cat_id', 'vid_exp'
+        ];
+
+        if (numberFields.includes(field)) {
+            value = value === '' ? null : Number(value);
+        }
+
+        setFormData((prev) => updateStatus({ ...prev, [field]: value }));
+    };
 
     return (
         <Grid container spacing={2} sx={{ mt: 0 }}>
-            {/* Основная информация */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Основная информация</Typography></Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="Дата поступления" type="date"
                     slotProps={{ inputLabel: { shrink: true } }} value={formData.date || ''} onChange={handleChange('date')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела"
+                <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР"
                     value={formData.ud || ''} onChange={handleChange('ud')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фабула" multiline rows={2}
@@ -140,22 +147,23 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                     value={formData.kolvoobj || ''} onChange={handleChange('kolvoobj')} sx={inputStyle} /></Grid>
 
             {/* Блок лица, назначившего экспертизу */}
-            <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
-                    value={formData.second_name_naznch || ''} 
-                    onChange={handleChange('second_name_naznch')} sx={inputStyle} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
-                    value={formData.name_naznch || ''} 
-                    onChange={handleChange('name_naznch')} sx={inputStyle} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
-                    value={formData.patronymic_naznch || ''} 
-                    onChange={handleChange('patronymic_naznch')} sx={inputStyle} />
-            </Grid>
+<Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Лицо, назначившее экспертизу</Typography></Grid>
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
+        value={formData.naznch_last || ''} 
+        onChange={handleChange('naznch_last')} sx={inputStyle} />
+</Grid>
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
+        value={formData.naznch_first || ''} 
+        onChange={handleChange('naznch_first')} sx={inputStyle} />
+</Grid>
+<Grid size={{ xs: 12, sm: 4 }}>
+    <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
+        value={formData.naznch_middle || ''} 
+        onChange={handleChange('naznch_middle')} sx={inputStyle} />
+</Grid>
+
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
