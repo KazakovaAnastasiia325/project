@@ -19,12 +19,25 @@ export const DataGridTable = ({
 }) => {
 
     const columns = useMemo(() => [
-        { field: 'id', headerName: '№', width: 70, headerAlign: 'center', align: 'center' },
-        { field: 'data_post', headerName: 'Дата', width: 130 },
+        { 
+            field: 'id', 
+            headerName: '№', 
+            width: 70, 
+            headerAlign: 'center', 
+            align: 'center',
+            sortable: true // Разрешено
+        },
+        { 
+            field: 'data_post', 
+            headerName: 'Дата', 
+            width: 130,
+            sortable: true // Разрешено
+        },
         { 
             field: 'experts', 
             headerName: 'Эксперт', 
             width: 220,
+            sortable: false, // Отключено
             valueGetter: (value, row) => {
                 if (Array.isArray(row?.experts)) {
                     return row.experts.map(e => e.name).join(', ');
@@ -38,6 +51,7 @@ export const DataGridTable = ({
             width: 160,
             headerAlign: 'center',
             align: 'center',
+            sortable: true, // Разрешено
             renderCell: (params) => {
                 const isClosed = !!params.value; 
                 return (
@@ -55,12 +69,17 @@ export const DataGridTable = ({
                 );
             }
         },
-        { field: 'fab', headerName: 'Фабула', flex: 1 },
+        { 
+            field: 'fab', 
+            headerName: 'Фабула', 
+            flex: 1,
+            sortable: false // Отключено
+        },
         {
             field: 'actions',
             headerName: 'Действия',
             width: 120,
-            sortable: false,
+            sortable: false, // Отключено
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
@@ -106,7 +125,6 @@ export const DataGridTable = ({
             pageSizeOptions={[25, 50, 100]}
             disableRowSelectionOnClick
             rowHeight={55}
-            // Включаем встроенные границы для сетки
             showCellVerticalBorder
             showColumnVerticalBorder
             sx={{

@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from './AdminStyles';
 
+// Создаем экземпляр API
 const api = axios.create({
   baseURL: 'http://localhost:8080',
-  withCredentials: true,
+  withCredentials: true, // Критично для передачи куки сессии
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json' // Просим сервер присылать JSON, а не HTML-страницу логина
+  }
 });
 
 export const AdminPage = () => {
@@ -18,17 +23,17 @@ export const AdminPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
   
-  // Состояния для данных с сервера
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [errorText, setErrorText] = useState('');
   
-  // Модели пагинации и сортировки
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
 
   const fetchExpertise = async () => {
     setLoading(true);
+    setErrorText('');
     try {
       const params = {
         page: paginationModel.page,
@@ -38,17 +43,21 @@ export const AdminPage = () => {
 
       const response = await api.get('/api/expertiza/list', { params });
       
-      // Логируем для отладки
-      console.log('Ответ сервера:', response.data);
-      
-      // Обеспечиваем корректное извлечение данных
-      // Если сервер возвращает { content: [], totalElements: 0 }
       const data = response.data || {};
       setRows(Array.isArray(data.content) ? data.content : []);
       setTotalRows(typeof data.totalElements === 'number' ? data.totalElements : 0);
       
     } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
+      console.error('Детали ошибки:', error);
+      
+      // Если сервер возвращает редирект (303), значит сессия истекла или нет прав
+      if (error.response?.status === 303 || error.response?.status === 302) {
+        setErrorText('Ошибка доступа: Сессия истекла. Перенаправление на логин...');
+        setTimeout(() => handleLogout(), 2000);
+      } else {
+        setErrorText(`Ошибка загрузки: ${error.response?.status || error.message}`);
+      }
+      
       setRows([]);
       setTotalRows(0);
     } finally {
@@ -56,7 +65,6 @@ export const AdminPage = () => {
     }
   };
 
-  // Перезагружаем данные при изменении пагинации или сортировки
   useEffect(() => {
     fetchExpertise();
   }, [paginationModel, sortModel]);
@@ -72,21 +80,15 @@ export const AdminPage = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleRowClick = (params) => {
-    // Передаем полную строку данных
-    setSelectedExpertise(params.row);
-    setIsDrawerOpen(true);
-  };
-
   const handleSave = async (newData) => {
     try {
       await api.post('/api/expertiza/save', newData);
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
-      fetchExpertise(); // Обновляем список после сохранения
+      fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Ошибка при сохранении данных');
+      alert('Ошибка при сохранении данных. Проверьте авторизацию.');
     }
   };
 
@@ -104,14 +106,14 @@ export const AdminPage = () => {
 
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      {/* Header */}
       <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>Выйти</Button>
       </Box>
 
-      {/* Main Content */}
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
+        
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
           <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small" variant="contained">
@@ -127,7 +129,7 @@ export const AdminPage = () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onRowClick={handleRowClick}
+            onRowClick={(params) => { setSelectedExpertise(params.row); setIsDrawerOpen(true); }}
             onDelete={handleDelete}
             isAdmin={true} 
             isManager={false}

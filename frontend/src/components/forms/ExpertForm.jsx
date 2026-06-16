@@ -103,8 +103,8 @@ export const ExpertForm = ({ initialData, onSave, onClose, isManager = false }) 
       <S.CustomTabs>
         <Tabs value={tab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
           <Tab label="Регистрация" />
-          <Tab label="Ход производства" disabled={isNewRecord} />
-          <Tab label="Результаты" disabled={isNewRecord} />
+          {!isNewRecord && <Tab label="Ход производства" />}
+          {!isNewRecord && <Tab label="Результаты" />}
         </Tabs>
       </S.CustomTabs>
 

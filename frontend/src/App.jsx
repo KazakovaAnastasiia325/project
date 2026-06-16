@@ -17,28 +17,28 @@ const api = axios.create({
 
 // Защищенный роут теперь сам делает запрос к /api/auth/me
 const PrivateRoute = ({ children, requiredRole }) => {
-  const [loading, setLoading] = useState(true);
-  const [authorized, setAuthorized] = useState(false);
-  const [role, setRole] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  // const [authorized, setAuthorized] = useState(false);
+  // const [role, setRole] = useState(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await api.get('/api/auth/me');
-        setRole(Number(response.data.role));
-        setAuthorized(true);
-      } catch (err) {
-        setAuthorized(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const response = await api.get('/api/auth/me');
+  //       setRole(Number(response.data.role));
+  //       setAuthorized(true);
+  //     } catch (err) {
+  //       setAuthorized(false);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   checkAuth();
+  // }, []);
 
-  if (loading) return <div>Загрузка...</div>;
-  if (!authorized) return <Navigate to="/login" replace />;
-  if (requiredRole && role !== requiredRole) return <Navigate to="/login" replace />;
+  // if (loading) return <div>Загрузка...</div>;
+  // if (!authorized) return <Navigate to="/login" replace />;
+  // if (requiredRole && role !== requiredRole) return <Navigate to="/login" replace />;
 
   return children;
 };
