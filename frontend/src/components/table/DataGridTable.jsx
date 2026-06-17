@@ -140,6 +140,7 @@ export const DataGridTable = ({
             onPaginationModelChange={onPaginationModelChange}
             onSortModelChange={onSortModelChange}
             loading={loading}
+            sortingOrder={['asc', 'desc']}
             pageSizeOptions={[25, 50, 100]}
             disableRowSelectionOnClick
             rowHeight={55}

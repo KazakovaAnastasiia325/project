@@ -15,6 +15,10 @@ const api = axios.create({
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
 
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
+
     useImperativeHandle(ref, () => ({
         getData: () => data
     }));
@@ -112,16 +116,21 @@ export const Users = () => {
         const response = await api.get('/api/users');
         const rawData = response.data.rows || response.data || [];
         
-        // Преобразуем данные перед установкой в state
-        const formattedUsers = rawData.map(user => ({
-            ...user,
-            // Объединяем ФИО для колонки 'fio'
-            fio: `${user.lastName || ''} ${user.firstName || ''} ${user.middleName || ''}`.trim()
-        }));
+        const formattedUsers = rawData.map(user => {
+            // Форматирование: Иванов И. И.
+            const lastName = user.lastName || '';
+            const firstName = user.firstName ? `${user.firstName[0].toUpperCase()}.` : '';
+            const middleName = user.middleName ? `${user.middleName[0].toUpperCase()}.` : '';
+            
+            return {
+                ...user,
+                fio: `${lastName} ${firstName} ${middleName}`.trim()
+            };
+        });
         
         setUsers(formattedUsers);
     } catch (error) {
-        console.error(error);
+        console.error('Ошибка загрузки:', error);
     }
 };
     useEffect(() => {
@@ -129,39 +138,56 @@ export const Users = () => {
     }, []);
 
     const handleOpen = (user = null) => {
-        setEditingUser(user);
-        setOpen(true);
-    };
+    let userData = user ? { ...user } : { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' };
+
+    // Обратное преобразование роли из числа в строку для формы
+    if (user && typeof user.role === 'number') {
+        const roleMapReverse = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
+        userData.role = roleMapReverse[user.role] || '';
+    }
+
+    setEditingUser(userData);
+    setOpen(true);
+};
 
     const handleSave = async () => {
-    const formData = formRef.current.getData();
-    
-    // Валидация
-    if (!formData.lastName || !formData.login || !formData.password) {
-        alert('Заполните обязательные поля');
-        return;
-    }
-
-    // Сопоставление роли (у вас в БД роль - число, а в UI - строка)
-    const roleMap = { 'Админ': 1, 'Сотрудник': 3, 'Руководитель': 2 };
-
-    try {
-        /*if (editingUser) {
-            // Для PUT (обновления)
-            await api.put(`/api/users/${editingUser.id}`, { ...formData, role: roleMap[formData.role] });
-        } else {*/
-            // Для POST (добавления)
-            await api.post('/api/users', { ...formData, role: roleMap[formData.role] });
-        //}
+        const formData = formRef.current.getData();
+        const isEditing = !!editingUser?.id; // Проверяем, есть ли ID для редактирования
         
-        alert('Успешно сохранено');
-        setOpen(false);
-        // fetchUsers();
-    } catch (error) {
-        console.error(error);
-        alert('Ошибка при сохранении на сервере');
-    }
-};
+        // Базовая валидация
+        if (!formData.lastName || !formData.login || (!isEditing && !formData.password)) {
+            alert('Заполните обязательные поля (Фамилия, Логин и Пароль)');
+            return;
+        }
+
+        const roleMap = { 'Админ': 1, 'Сотрудник': 3, 'Руководитель': 2 };
+        
+        // Подготовка данных
+        const payload = { 
+            ...formData, 
+            role: typeof formData.role === 'number' ? formData.role : roleMap[formData.role] 
+        };
+
+        // Если редактируем и пароль пустой — не отправляем его на сервер
+        if (isEditing && !formData.password) {
+            delete payload.password;
+        }
+
+        try {
+            if (isEditing) {
+                await api.put(`/api/users/${editingUser.id}`, payload);
+                alert('Успешно обновлено');
+            } else {
+                await api.post('/api/users', payload);
+                alert('Успешно создано');
+            }
+            setOpen(false);
+            fetchUsers(); // Обновляем список
+        } catch (error) {
+            console.error("Ошибка:", error);
+            alert(error.response?.data?.message || 'Ошибка при сохранении');
+        }
+    };
 
     const handleDelete = async (id) => {
     if (window.confirm('Удалить пользователя?')) {
@@ -234,28 +260,26 @@ export const Users = () => {
                 </Paper>
             </Box>
 
-            <Dialog
-                open={open}
-                onClose={() => setOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                slotProps={{
-                    paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } }
-                }}
-            >
-                <DialogTitle sx={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '16px 24px', mb: 2 }}>
-                    {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
-                </DialogTitle>
-
-                <DialogContent sx={{ pt: 0 }}>
-                    {open && <FormFields ref={formRef} initialData={editingUser || { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' }} />}
-                </DialogContent>
-
-                <DialogActions sx={{ p: 3, pt: 1 }}>
-                    <S.GreyButton onClick={() => setOpen(false)}>Отмена</S.GreyButton>
-                    <S.ActionButton onClick={handleSave} sx={{ px: 4 }}>Сохранить</S.ActionButton>
-                </DialogActions>
-            </Dialog>
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+            {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+            {open && (
+                <FormFields 
+                    ref={formRef} 
+                    initialData={editingUser || { 
+                        lastName: '', firstName: '', middleName: '', 
+                        role: '', email: '', phone: '', login: '', password: '' 
+                    }} 
+                />
+            )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+            <Button onClick={() => setOpen(false)}>Отмена</Button>
+            <Button onClick={handleSave} variant="contained">Сохранить</Button>
+        </DialogActions>
+    </Dialog>
         </S.AdminContainer>
     );
 };

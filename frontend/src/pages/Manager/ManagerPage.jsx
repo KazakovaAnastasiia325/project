@@ -3,6 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from '../Admin/AdminStyles';
@@ -25,9 +29,9 @@ export const ManagerPage = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState('');
-  
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
-  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
+  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
 
   const fetchExpertise = async () => {
     setLoading(true);
@@ -36,8 +40,10 @@ export const ManagerPage = () => {
       const params = {
         page: paginationModel.page,
         limit: paginationModel.pageSize,
+        date_from: dateRange.start ? dateRange.start.format('YYYY-MM-DD') : undefined,
+        date_to: dateRange.end ? dateRange.end.format('YYYY-MM-DD') : undefined,
         sort_field: sortModel[0]?.field || 'id',
-        sort_order: sortModel[0]?.sort || 'desc',
+        sort_order: sortModel[0]?.sort || 'asc',
       };
 
       const response = await api.get('/api/expertiza/list', { params });
@@ -61,20 +67,14 @@ export const ManagerPage = () => {
 
   useEffect(() => {
     fetchExpertise();
-  }, [paginationModel, sortModel]);
+  }, [paginationModel, sortModel, dateRange]);
 
   const handleLogout = async () => {
     try {
-      // Отправляем запрос на сервер для завершения сессии
-      // Сервер должен ответить успешно (200 OK) и, если используются куки,
-      // прислать заголовок Set-Cookie для удаления куки сессии
       await api.post('/api/logout');
     } catch (error) {
       console.error('Ошибка при вызове logout на сервере:', error);
-      // Мы не прерываем выполнение, так как пользователь должен выйти 
-      // из приложения в любом случае
     } finally {
-      // Выполняем переход на страницу логина
       navigate('/login');
     }
   };
@@ -92,7 +92,13 @@ export const ManagerPage = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр всех экспертиз</Typography>
         </Box>
-        
+        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', p: 1.5, mb: 2, borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+                <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+            </LocalizationProvider>
+            <Button size="small" variant="outlined" onClick={() => setDateRange({ start: null, end: null })} sx={{ height: '40px' }}>Сбросить</Button>
+        </Box>
         <Box sx={{ flexGrow: 1, mb: 3 }}>
           <DataGridTable 
             rows={rows}

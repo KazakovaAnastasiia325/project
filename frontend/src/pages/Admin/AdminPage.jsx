@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from './AdminStyles';
@@ -28,7 +32,8 @@ export const AdminPage = () => {
   const [errorText, setErrorText] = useState('');
   
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
-  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'desc' }]);
+  const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
 
   const fetchExpertise = async () => {
     setLoading(true);
@@ -37,15 +42,12 @@ export const AdminPage = () => {
       const params = {
         page: paginationModel.page,
         limit: paginationModel.pageSize,
+        // Имена параметров исправлены для соответствия Go-хендлеру
+        date_from: dateRange.start ? dateRange.start.format('YYYY-MM-DD') : undefined,
+        date_to: dateRange.end ? dateRange.end.format('YYYY-MM-DD') : undefined,
+        sort_field: sortModel.length > 0 ? sortModel[0].field : 'id',
+        sort_order: sortModel.length > 0 ? sortModel[0].sort : 'desc',
       };
-
-      if (sortModel.length > 0) {
-        params.sort_field = sortModel[0].field;
-        params.sort_order = sortModel[0].sort;
-      } else {
-        params.sort_field = 'id';
-        params.sort_order = 'desc';
-      }
 
       const response = await api.get('/api/expertiza/list', { params });
       const data = response.data;
@@ -59,28 +61,16 @@ export const AdminPage = () => {
       }
     } catch (error) {
       console.error('Детали ошибки:', error);
-      
-      // Логика обработки истечения сессии
-      // Проверяем, вернул ли сервер 401 (Unauthorized) или 403 (Forbidden)
-      // Либо проверяем, не перенаправил ли нас сервер на /login (если браузер подставил responseURL)
       const isAuthError = error.response?.status === 401 || 
                           error.response?.status === 403 || 
                           error.request?.responseURL?.includes('/login');
 
       if (isAuthError) {
         setErrorText('Сессия истекла. Пожалуйста, перезайдите в систему.');
-        // Можно добавить задержку перед выходом, чтобы пользователь успел прочитать сообщение
-        setTimeout(() => {
-            handleLogout();
-        }, 2500);
+        setTimeout(() => handleLogout(), 2500);
       } else {
-        // Для прочих ошибок оставляем понятное сообщение
         setErrorText('Ошибка при получении данных. Попробуйте обновить страницу.');
-        setTimeout(() => {
-            handleLogout();
-        }, 2500);
       }
-      
       setRows([]);
       setTotalRows(0);
     } finally {
@@ -90,57 +80,46 @@ export const AdminPage = () => {
 
   useEffect(() => {
     fetchExpertise();
-  }, [paginationModel, sortModel]);
+  }, [paginationModel, sortModel, dateRange]);
 
   const handleLogout = async () => {
     try {
-      // Отправляем запрос на сервер для завершения сессии
-      // Сервер должен ответить успешно (200 OK) и, если используются куки,
-      // прислать заголовок Set-Cookie для удаления куки сессии
       await api.post('/api/logout');
     } catch (error) {
-      console.error('Ошибка при вызове logout на сервере:', error);
-      // Мы не прерываем выполнение, так как пользователь должен выйти 
-      // из приложения в любом случае
+      console.error('Ошибка при вызове logout:', error);
     } finally {
-      // Выполняем переход на страницу логина
       navigate('/login');
     }
   };
 
   const handleCreate = () => {
-    setSelectedExpertise(null); // Новая запись
+    setSelectedExpertise(null);
     setIsDrawerOpen(true);
   };
 
   const handleSave = async (dataToSave) => {
     try {
-      console.log("Отправляем на сервер:", dataToSave);
-      // Данные уже подготовлены в ExpertForm методом prepareDataForServer
       await api.post('/api/expertiza/save', dataToSave);
-      
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
       fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Ошибка при сохранении данных. Проверьте консоль.');
+      alert('Ошибка при сохранении данных.');
     }
   };
+
   const handleUpdate = async (dataToUpdate) => {
-  try {
-    console.log("Обновляем запись:", dataToUpdate.id);
-    // Используем PUT для изменения существующей записи
-    await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
-    
-    setIsDrawerOpen(false);
-    alert('Успешно обновлено');
-    fetchExpertise(); // Перезагружаем таблицу
-  } catch (error) {
-    console.error('Ошибка обновления:', error);
-    alert('Ошибка при обновлении данных.');
-  }
-};
+    try {
+      await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
+      setIsDrawerOpen(false);
+      alert('Успешно обновлено');
+      fetchExpertise();
+    } catch (error) {
+      console.error('Ошибка обновления:', error);
+      alert('Ошибка при обновлении данных.');
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Вы действительно хотите удалить эту запись?')) {
@@ -156,35 +135,43 @@ export const AdminPage = () => {
 
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* Header */}
       <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>Выйти</Button>
       </Box>
 
-      <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
+        {/* Title Bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '8px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
-          <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small" variant="contained">
+          <S.ActionButton startIcon={<AddIcon />} onClick={() => { setSelectedExpertise(null); setIsDrawerOpen(true); }} size="small" variant="contained">
             Добавить
           </S.ActionButton>
         </Box>
-        
-        <Box sx={{ flexGrow: 1, mb: 3 }}>
+
+        {/* Filter Bar */}
+        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', p: 1.5, mb: 2, borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+                <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+            </LocalizationProvider>
+            <Button size="small" variant="outlined" onClick={() => setDateRange({ start: null, end: null })} sx={{ height: '40px' }}>Сбросить</Button>
+        </Box>
+
+        {/* Table Container */}
+        <Box sx={{ flexGrow: 1, mb: 3, overflow: 'auto', '& .MuiDataGrid-root': { border: '1px solid #e2e8f0', borderRadius: '8px' } }}>
           <DataGridTable 
             rows={rows}
             rowCount={totalRows}
             loading={loading}
+            density="compact"
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onRowClick={(params) => { 
-              // Передаем данные напрямую, так как ExpertForm сама умеет их парсить
-              setSelectedExpertise(params.row); 
-              setIsDrawerOpen(true); 
-            }}
-            onDelete={handleDelete}
+            onRowClick={(params) => { setSelectedExpertise(params.row); setIsDrawerOpen(true); }}
             isAdmin={true} 
             isManager={false}
           />
@@ -194,8 +181,8 @@ export const AdminPage = () => {
   open={isDrawerOpen} 
   onClose={() => setIsDrawerOpen(false)} 
   expertiseId={selectedExpertise?.id}
-  onSave={handleSave}     // Для создания (POST)
-  onUpdate={handleUpdate} // Для обновления (PUT) - ДОБАВЬТЕ ЭТО
+  onSave={handleSave} // Оставьте как есть
+  onUpdate={handleUpdate} // Передавайте именно функцию handleUpdate, а не fetchExpertise
   isManager={false}
 />
       </Box>
