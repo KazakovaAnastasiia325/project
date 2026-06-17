@@ -42,6 +42,7 @@ export const EmployeePage = () => {
       };
 
       const response = await api.get('/api/expertiza/list', { params });
+      console.log('Данные от бэкенда:', response.data);
       const data = response.data;
 
       if (data && Array.isArray(data.rows)) {
@@ -75,10 +76,20 @@ export const EmployeePage = () => {
     fetchExpertise();
   }, [paginationModel, sortModel]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Отправляем запрос на сервер для завершения сессии
+      // Сервер должен ответить успешно (200 OK) и, если используются куки,
+      // прислать заголовок Set-Cookie для удаления куки сессии
+      await api.post('/api/logout');
+    } catch (error) {
+      console.error('Ошибка при вызове logout на сервере:', error);
+      // Мы не прерываем выполнение, так как пользователь должен выйти 
+      // из приложения в любом случае
+    } finally {
+      // Выполняем переход на страницу логина
+      navigate('/login');
+    }
   };
 
   const handleCreate = () => {

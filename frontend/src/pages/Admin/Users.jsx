@@ -86,22 +86,39 @@ const FormFields = memo(({ initialData, ref }) => {
 
 export const Users = () => {
     const navigate = useNavigate(); // Инициализация
-    const [users, setUsers] = useState(() => {
-        const saved = localStorage.getItem('myUsers');
-        return saved ? JSON.parse(saved) : [{ id: 1, lastName: 'Петров', firstName: 'Иван', middleName: 'Иванович', role: 'Администратор', email: 'test@mail.ru', login: 'ivanov', phone: '+77777777777', password: '123', fio: 'Петров И.И.' }];
-    });
+    const [users, setUsers] = useState([]);
 
     const [open, setOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const formRef = useRef();
 
-    const handleLogout = () => {
-        navigate('/login');
+    const handleLogout = async () => {
+    try {
+      // Отправляем запрос на сервер для завершения сессии
+      // Сервер должен ответить успешно (200 OK) и, если используются куки,
+      // прислать заголовок Set-Cookie для удаления куки сессии
+      await api.post('/api/logout');
+    } catch (error) {
+      console.error('Ошибка при вызове logout на сервере:', error);
+      // Мы не прерываем выполнение, так как пользователь должен выйти 
+      // из приложения в любом случае
+    } finally {
+      // Выполняем переход на страницу логина
+      navigate('/login');
+    }
+  };
+    const fetchUsers = async () => {
+        try {
+            const response = await api.get('/api/users'); // Укажите ваш эндпоинт
+            setUsers(response.data);
+        } catch (error) {
+            console.error('Ошибка загрузки пользователей', error);
+            alert('Не удалось загрузить список пользователей');
+        }
     };
-
     useEffect(() => {
-        localStorage.setItem('myUsers', JSON.stringify(users));
-    }, [users]);
+        fetchUsers();
+    }, []);
 
     const handleOpen = (user = null) => {
         setEditingUser(user);
@@ -118,20 +135,20 @@ export const Users = () => {
     }
 
     // Сопоставление роли (у вас в БД роль - число, а в UI - строка)
-    const roleMap = { 'Админ': 1, 'Сотрудник': 2, 'Руководитель': 3 };
+    const roleMap = { 'Админ': 1, 'Сотрудник': 3, 'Руководитель': 2 };
 
     try {
-        if (editingUser) {
+        /*if (editingUser) {
             // Для PUT (обновления)
             await api.put(`/api/users/${editingUser.id}`, { ...formData, role: roleMap[formData.role] });
-        } else {
+        } else {*/
             // Для POST (добавления)
             await api.post('/api/users', { ...formData, role: roleMap[formData.role] });
-        }
+        //}
         
         alert('Успешно сохранено');
         setOpen(false);
-        // Тут нужно вызвать функцию получения списка пользователей (fetchUsers)
+        // fetchUsers();
     } catch (error) {
         console.error(error);
         alert('Ошибка при сохранении на сервере');

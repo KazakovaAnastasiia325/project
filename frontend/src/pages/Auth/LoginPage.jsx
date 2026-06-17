@@ -36,8 +36,6 @@ export const LoginPage = () => {
         throw new Error('Роль не получена');
       }
 
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userRole', role);
       
       // Перенаправление по числовым ролям
       switch (role) {

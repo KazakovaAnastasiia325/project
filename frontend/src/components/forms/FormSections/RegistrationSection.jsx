@@ -11,16 +11,16 @@ const api = axios.create({
     withCredentials: true,
 });
 const ORGAN_CODES = [
-    { code: '01', label: '01 - Суды' },
-    { code: '02', label: '02 - Прокуратура' },
-    { code: '03', label: '03 - ОВД' },
-    { code: '04', label: '04 - КНБ' },
-    { code: '05', label: '05 - МДГС' },
-    { code: '06', label: '06 - КДГ' },
-    { code: '07', label: '07 - ВСД' },
-    { code: '08', label: '08 - Адвокатура' },
-    { code: '09', label: '09 - Следственный суд' },
-    { code: '10', label: '10 - Прочие' },
+    { code: '01', label: 'Суды' },
+    { code: '02', label: 'Прокуратура' },
+    { code: '03', label: 'ОВД' },
+    { code: '04', label: 'КНБ' },
+    { code: '05', label: 'МДГС' },
+    { code: '06', label: 'КДГ' },
+    { code: '07', label: 'ВСД' },
+    { code: '08', label: 'Адвокатура' },
+    { code: '09', label: 'Следственный суд' },
+    { code: '10', label: 'Прочие' },
 ];
 export const RegistrationSection = ({ formData, setFormData, isManager = false }) => {
     
