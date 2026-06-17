@@ -108,14 +108,22 @@ export const Users = () => {
     }
   };
     const fetchUsers = async () => {
-        try {
-            const response = await api.get('/api/users'); // Укажите ваш эндпоинт
-            setUsers(response.data);
-        } catch (error) {
-            console.error('Ошибка загрузки пользователей', error);
-            alert('Не удалось загрузить список пользователей');
-        }
-    };
+    try {
+        const response = await api.get('/api/users');
+        const rawData = response.data.rows || response.data || [];
+        
+        // Преобразуем данные перед установкой в state
+        const formattedUsers = rawData.map(user => ({
+            ...user,
+            // Объединяем ФИО для колонки 'fio'
+            fio: `${user.lastName || ''} ${user.firstName || ''} ${user.middleName || ''}`.trim()
+        }));
+        
+        setUsers(formattedUsers);
+    } catch (error) {
+        console.error(error);
+    }
+};
     useEffect(() => {
         fetchUsers();
     }, []);

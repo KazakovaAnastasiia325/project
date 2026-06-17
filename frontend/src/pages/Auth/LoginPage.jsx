@@ -109,10 +109,7 @@ export const LoginPage = () => {
             />
           </InputWrapper>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-            <FormControlLabel control={<Checkbox />} label="Запомнить меня" />
-            <Link href="#" underline="hover">Забыли пароль?</Link>
-          </Box>
+          
 
           <GradientButton type="submit" disabled={loading}>
             <ButtonInner>
