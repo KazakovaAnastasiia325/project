@@ -25,29 +25,30 @@ export const EmployeePage = () => {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
-  
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState('');
-  const [dateRange, setDateRange] = useState({ start: null, end: null });
+  const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
 
   const fetchExpertise = async () => {
-    setLoading(true);
-    setErrorText('');
-    try {
-      const params = {
-        page: paginationModel.page,
-        limit: paginationModel.pageSize,
-        date_from: dateRange.start ? dateRange.start.format('YYYY-MM-DD') : undefined,
-        date_to: dateRange.end ? dateRange.end.format('YYYY-MM-DD') : undefined,
-        sort_field: sortModel[0]?.field || 'id',
-        sort_order: sortModel[0]?.sort || 'asc',
-      };
+  setLoading(true);
+  setErrorText('');
+  try {
+    const params = {
+      page: paginationModel.page,
+      limit: paginationModel.pageSize,
+      // Используем appliedFilters вместо несуществующего dateRange
+      date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
+      date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
+      sort_field: sortModel[0]?.field || 'id',
+      sort_order: sortModel[0]?.sort || 'asc',
+    };
 
-      const response = await api.get('/api/expertiza/list', { params });
+    const response = await api.get('/api/expertiza/list', { params });
       console.log('Данные от бэкенда:', response.data);
       const data = response.data;
 
@@ -79,8 +80,8 @@ export const EmployeePage = () => {
   };
 
   useEffect(() => {
-    fetchExpertise();
-  }, [paginationModel, sortModel, dateRange]);
+  fetchExpertise();
+}, [paginationModel, sortModel, appliedFilters]);
 
   const handleLogout = async () => {
     try {
@@ -97,29 +98,33 @@ export const EmployeePage = () => {
     setIsDrawerOpen(true);
   };
 
-  // Метод для создания новой записи (POST)
+  // Метод для создания новой записи
   const handleSave = async (dataToSave) => {
     try {
       await api.post('/api/expertiza/save', dataToSave);
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
-      fetchExpertise();
+      // ВАЖНО: принудительно сбрасываем выбранную экспертизу
+      setSelectedExpertise(null);
+      await fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Ошибка при сохранении данных.');
+      alert('Ошибка при сохранении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
     }
   };
 
-  // Метод для обновления существующей записи (PUT)
+  // Метод для обновления существующей записи
   const handleUpdate = async (dataToUpdate) => {
     try {
+      console.log("Отправляем на обновление:", dataToUpdate);
       await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
       setIsDrawerOpen(false);
       alert('Успешно обновлено');
-      fetchExpertise();
+      // ВАЖНО: обновляем данные в таблице
+      await fetchExpertise();
     } catch (error) {
       console.error('Ошибка обновления:', error);
-      alert('Ошибка при обновлении данных.');
+      alert('Ошибка при обновлении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
     }
   };
 
@@ -144,24 +149,52 @@ export const EmployeePage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button size="small" variant="outlined" onClick={() => setDateRange({ start: null, end: null })} sx={{ height: '40px' }}>Сбросить</Button>
+            <Button 
+  variant="contained" 
+  size="small" 
+  onClick={() => setAppliedFilters(dateRange)} 
+  sx={{ height: '40px' }}
+>
+  Найти
+</Button>
+            <Button 
+  size="small" 
+  variant="outlined" 
+  onClick={() => {
+    setDateRange({ start: null, end: null });
+    setAppliedFilters({ start: null, end: null });
+  }} 
+  sx={{ height: '40px' }}
+>
+  Сбросить
+</Button>
         </Box>
-        <Box sx={{ flexGrow: 1, mb: 3 }}>
-          <DataGridTable 
-            rows={rows}
-            rowCount={totalRows}
-            loading={loading}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => { 
-              setSelectedExpertise(params.row); 
-              setIsDrawerOpen(true); 
-            }}
-            isAdmin={false} // Важно: удаление у сотрудника скрыто (через Table компоненты)
-            isManager={false}
-          />
-        </Box>
+        <Box sx={{ 
+    height: 550, // Фиксированная высота контейнера для стабильности
+    width: '100%', 
+    mb: 2,
+    '& .MuiDataGrid-root': {
+        border: 'none', // Опционально: убирает лишние рамки
+    }
+}}>
+    <DataGridTable 
+        rows={rows}
+        rowCount={totalRows}
+        loading={loading}
+        density="compact"        // Встроенный режим компактности
+        rowHeight={40}           // Явное задание высоты строки (убирает конфликт min/max)
+        columnHeaderHeight={40}  // Сжимает высоту заголовков
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        onSortModelChange={setSortModel}
+        onRowClick={(params) => { 
+            setSelectedExpertise(params.row); 
+            setIsDrawerOpen(true); 
+        }}
+        isAdmin={true} 
+        isManager={false}
+    />
+</Box>
 
         <DetailsDrawer 
           open={isDrawerOpen} 

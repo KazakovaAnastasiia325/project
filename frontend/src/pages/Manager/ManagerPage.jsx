@@ -32,21 +32,23 @@ export const ManagerPage = () => {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
+  const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
 
   const fetchExpertise = async () => {
-    setLoading(true);
-    setErrorText('');
-    try {
-      const params = {
-        page: paginationModel.page,
-        limit: paginationModel.pageSize,
-        date_from: dateRange.start ? dateRange.start.format('YYYY-MM-DD') : undefined,
-        date_to: dateRange.end ? dateRange.end.format('YYYY-MM-DD') : undefined,
-        sort_field: sortModel[0]?.field || 'id',
-        sort_order: sortModel[0]?.sort || 'asc',
-      };
+  setLoading(true);
+  setErrorText('');
+  try {
+    const params = {
+      page: paginationModel.page,
+      limit: paginationModel.pageSize,
+      // Используем appliedFilters вместо несуществующего dateRange
+      date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
+      date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
+      sort_field: sortModel[0]?.field || 'id',
+      sort_order: sortModel[0]?.sort || 'asc',
+    };
 
-      const response = await api.get('/api/expertiza/list', { params });
+    const response = await api.get('/api/expertiza/list', { params });
       const data = response.data;
 
       if (data && Array.isArray(data.rows)) {
@@ -67,7 +69,7 @@ export const ManagerPage = () => {
 
   useEffect(() => {
     fetchExpertise();
-  }, [paginationModel, sortModel, dateRange]);
+  }, [paginationModel, sortModel, appliedFilters]);
 
   const handleLogout = async () => {
     try {
@@ -97,24 +99,52 @@ export const ManagerPage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button size="small" variant="outlined" onClick={() => setDateRange({ start: null, end: null })} sx={{ height: '40px' }}>Сбросить</Button>
+            <Button 
+              variant="contained" 
+              size="small" 
+              onClick={() => setAppliedFilters(dateRange)} 
+              sx={{ height: '40px' }}
+            >
+              Найти
+            </Button>
+                        <Button 
+              size="small" 
+              variant="outlined" 
+              onClick={() => {
+                setDateRange({ start: null, end: null });
+                setAppliedFilters({ start: null, end: null });
+              }} 
+              sx={{ height: '40px' }}
+            >
+              Сбросить
+            </Button>
         </Box>
-        <Box sx={{ flexGrow: 1, mb: 3 }}>
-          <DataGridTable 
-            rows={rows}
-            rowCount={totalRows}
-            loading={loading}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => { 
-              setSelectedExpertise(params.row); 
-              setIsDrawerOpen(true); 
-            }}
-            isAdmin={false}
-            isManager={true} // Передаем, что это менеджер
-          />
-        </Box>
+        <Box sx={{ 
+    height: 550, // Фиксированная высота контейнера для стабильности
+    width: '100%', 
+    mb: 2,
+    '& .MuiDataGrid-root': {
+        border: 'none', // Опционально: убирает лишние рамки
+    }
+}}>
+    <DataGridTable 
+        rows={rows}
+        rowCount={totalRows}
+        loading={loading}
+        density="compact"        // Встроенный режим компактности
+        rowHeight={40}           // Явное задание высоты строки (убирает конфликт min/max)
+        columnHeaderHeight={40}  // Сжимает высоту заголовков
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        onSortModelChange={setSortModel}
+        onRowClick={(params) => { 
+            setSelectedExpertise(params.row); 
+            setIsDrawerOpen(true); 
+        }}
+        isAdmin={false} 
+        isManager={true}
+    />
+</Box>
 
         <DetailsDrawer 
           open={isDrawerOpen} 

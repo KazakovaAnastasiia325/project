@@ -30,26 +30,26 @@ export const AdminPage = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState('');
-  
+   const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
   const [dateRange, setDateRange] = useState({ start: null, end: null });
 
   const fetchExpertise = async () => {
-    setLoading(true);
-    setErrorText('');
-    try {
-      const params = {
-        page: paginationModel.page,
-        limit: paginationModel.pageSize,
-        // Имена параметров исправлены для соответствия Go-хендлеру
-        date_from: dateRange.start ? dateRange.start.format('YYYY-MM-DD') : undefined,
-        date_to: dateRange.end ? dateRange.end.format('YYYY-MM-DD') : undefined,
-        sort_field: sortModel.length > 0 ? sortModel[0].field : 'id',
-        sort_order: sortModel.length > 0 ? sortModel[0].sort : 'desc',
-      };
+  setLoading(true);
+  setErrorText('');
+  try {
+    const params = {
+      page: paginationModel.page,
+      limit: paginationModel.pageSize,
+      // Используем appliedFilters вместо несуществующего dateRange
+      date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
+      date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
+      sort_field: sortModel[0]?.field || 'id',
+      sort_order: sortModel[0]?.sort || 'asc',
+    };
 
-      const response = await api.get('/api/expertiza/list', { params });
+    const response = await api.get('/api/expertiza/list', { params });
       const data = response.data;
 
       if (data && Array.isArray(data.rows)) {
@@ -78,9 +78,9 @@ export const AdminPage = () => {
     }
   };
 
-  useEffect(() => {
+    useEffect(() => {
     fetchExpertise();
-  }, [paginationModel, sortModel, dateRange]);
+  }, [paginationModel, sortModel, appliedFilters]);
 
   const handleLogout = async () => {
     try {
@@ -121,17 +121,17 @@ export const AdminPage = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Вы действительно хотите удалить эту запись?')) {
-      try {
-        await api.delete(`/api/expertiza/delete/${id}`);
-        fetchExpertise();
-      } catch (error) {
-        console.error('Ошибка удаления:', error);
-        alert('Ошибка при удалении');
-      }
-    }
-  };
+  // const handleDelete = async (id) => {
+  //   if (window.confirm('Вы действительно хотите удалить эту запись?')) {
+  //     try {
+  //       await api.delete(`/api/expertiza/delete/${id}`);
+  //       fetchExpertise();
+  //     } catch (error) {
+  //       console.error('Ошибка удаления:', error);
+  //       alert('Ошибка при удалении');
+  //     }
+  //   }
+  // };
 
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -158,24 +158,54 @@ export const AdminPage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button size="small" variant="outlined" onClick={() => setDateRange({ start: null, end: null })} sx={{ height: '40px' }}>Сбросить</Button>
+            <Button 
+              variant="contained" 
+              size="small" 
+              onClick={() => setAppliedFilters(dateRange)} 
+              sx={{ height: '40px' }}
+            >
+              Найти
+            </Button>
+                        <Button 
+              size="small" 
+              variant="outlined" 
+              onClick={() => {
+                setDateRange({ start: null, end: null });
+                setAppliedFilters({ start: null, end: null });
+              }} 
+              sx={{ height: '40px' }}
+            >
+              Сбросить
+            </Button>
         </Box>
 
         {/* Table Container */}
-        <Box sx={{ flexGrow: 1, mb: 3, overflow: 'auto', '& .MuiDataGrid-root': { border: '1px solid #e2e8f0', borderRadius: '8px' } }}>
-          <DataGridTable 
-            rows={rows}
-            rowCount={totalRows}
-            loading={loading}
-            density="compact"
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => { setSelectedExpertise(params.row); setIsDrawerOpen(true); }}
-            isAdmin={true} 
-            isManager={false}
-          />
-        </Box>
+        <Box sx={{ 
+    height: 550, // Фиксированная высота контейнера для стабильности
+    width: '100%', 
+    mb: 2,
+    '& .MuiDataGrid-root': {
+        border: 'none', // Опционально: убирает лишние рамки
+    }
+}}>
+    <DataGridTable 
+        rows={rows}
+        rowCount={totalRows}
+        loading={loading}
+        density="compact"        // Встроенный режим компактности
+        rowHeight={40}           // Явное задание высоты строки (убирает конфликт min/max)
+        columnHeaderHeight={40}  // Сжимает высоту заголовков
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        onSortModelChange={setSortModel}
+        onRowClick={(params) => { 
+            setSelectedExpertise(params.row); 
+            setIsDrawerOpen(true); 
+        }}
+        isAdmin={true} 
+        isManager={false}
+    />
+</Box>
 
         <DetailsDrawer 
   open={isDrawerOpen} 

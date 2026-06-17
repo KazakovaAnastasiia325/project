@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Импорт хука
 import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+//import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import * as S from './AdminStyles';
@@ -111,20 +111,22 @@ export const Users = () => {
       navigate('/login');
     }
   };
+  const roleMap = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
     const fetchUsers = async () => {
     try {
         const response = await api.get('/api/users');
         const rawData = response.data.rows || response.data || [];
         
         const formattedUsers = rawData.map(user => {
-            // Форматирование: Иванов И. И.
             const lastName = user.lastName || '';
             const firstName = user.firstName ? `${user.firstName[0].toUpperCase()}.` : '';
             const middleName = user.middleName ? `${user.middleName[0].toUpperCase()}.` : '';
             
             return {
                 ...user,
-                fio: `${lastName} ${firstName} ${middleName}`.trim()
+                fio: `${lastName} ${firstName} ${middleName}`.trim(),
+                // Добавляем преобразованное название роли
+                roleName: roleMap[user.role] || 'Неизвестно' 
             };
         });
         
@@ -160,13 +162,14 @@ export const Users = () => {
             return;
         }
 
-        const roleMap = { 'Админ': 1, 'Сотрудник': 3, 'Руководитель': 2 };
+        const roleMapping = { 'Админ': 1, 'Руководитель': 2, 'Сотрудник': 3 };
         
         // Подготовка данных
         const payload = { 
-            ...formData, 
-            role: typeof formData.role === 'number' ? formData.role : roleMap[formData.role] 
-        };
+        ...formData,
+        // Преобразуем строку "Админ" в число 1, если пришла строка
+        role: typeof formData.role === 'number' ? formData.role : roleMapping[formData.role]
+    };
 
         // Если редактируем и пароль пустой — не отправляем его на сервер
         if (isEditing && !formData.password) {
@@ -175,7 +178,10 @@ export const Users = () => {
 
         try {
             if (isEditing) {
-                await api.put(`/api/users/${editingUser.id}`, payload);
+                const { fio, roleName, ...cleanPayload } = payload;
+
+// Отправляйте cleanPayload вместо payload
+await api.put(`/api/users/${editingUser.id}`, cleanPayload);
                 alert('Успешно обновлено');
             } else {
                 await api.post('/api/users', payload);
@@ -189,20 +195,20 @@ export const Users = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-    if (window.confirm('Удалить пользователя?')) {
-        try {
-            await api.delete(`/api/users/${id}`);
-            setUsers(prev => prev.filter(u => u.id !== id));
-        } catch (error) {
-            alert('Ошибка удаления');
-        }
-    }
-};
+//     const handleDelete = async (id) => {
+//     if (window.confirm('Удалить пользователя?')) {
+//         try {
+//             await api.delete(`/api/users/${id}`);
+//             setUsers(prev => prev.filter(u => u.id !== id));
+//         } catch (error) {
+//             alert('Ошибка удаления');
+//         }
+//     }
+// };
 
     const columns = [
         { field: 'fio', headerName: 'ФИО', flex: 1.5 },
-        { field: 'role', headerName: 'Роль', flex: 2 },
+        { field: 'roleName', headerName: 'Роль', flex: 2 },
         { field: 'login', headerName: 'Логин', flex: 1 },
         { field: 'email', headerName: 'Email', flex: 1 },
         { field: 'phone', headerName: 'Телефон', flex: 1 },
@@ -211,7 +217,7 @@ export const Users = () => {
             renderCell: (params) => (
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                     <IconButton size="small" onClick={() => handleOpen(params.row)}><EditIcon fontSize="small" /></IconButton>
-                    <IconButton size="small" onClick={() => handleDelete(params.row.id)}><DeleteIcon fontSize="small" /></IconButton>
+                    {/* <IconButton size="small" onClick={() => handleDelete(params.row.id)}><DeleteIcon fontSize="small" /></IconButton> */}
                 </Box>
             )
         }

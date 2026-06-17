@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, IconButton, Chip } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+//import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -13,7 +13,7 @@ export const DataGridTable = ({
     onPaginationModelChange, 
     onSortModelChange, 
     onRowClick, 
-    onDelete, 
+    // onDelete, 
     isAdmin = false, 
     isManager = false 
 }) => {
@@ -117,16 +117,16 @@ export const DataGridTable = ({
                             )}
                         </IconButton>
                         
-                        {isAdmin && (
+                        {/* {isAdmin && (
                             <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
-                        )}
+                        )} */}
                     </Box>
                 );
             }
         }
-    ], [isManager, isAdmin, onRowClick, onDelete]);
+    ], [isManager, isAdmin, onRowClick,{/* onDelete*/}]);
 
     return (
         <DataGrid

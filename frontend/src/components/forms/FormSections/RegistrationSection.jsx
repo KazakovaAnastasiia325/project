@@ -26,7 +26,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
     
     const [regions, setRegions] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    
     useEffect(() => {
         const fetchRegions = async () => {
             setLoading(true);
@@ -102,7 +102,12 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
         setFormData((prev) => updateStatus({ ...prev, [field]: value }));
     };
-
+    const expertsToDisplay = React.useMemo(() => {
+        if (!formData.experts || formData.experts.length === 0) {
+            return [{ name: '', second_name: '', patronymic: '' }];
+        }
+        return formData.experts;
+    }, [formData.experts]);
     return (
         <Grid container spacing={2} sx={{ mt: 0 }}>
             {/* Основная информация */}
@@ -210,7 +215,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
-            {(formData.experts || []).map((expert, index) => (
+            {expertsToDisplay.map((expert, index) => (
                 <Grid container spacing={2} key={index} sx={{ mb: 1, alignItems: 'center' }}>
                     <Grid size={{ xs: 12, sm: 4 }}>
                         <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия" value={expert.second_name || ''}
@@ -225,7 +230,16 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
                             onChange={(e) => handleExpertChange(index, 'patronymic', e.target.value)} sx={inputStyle} />
                         {!isLocked && (
                             <Box sx={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>
-                                <IconButton onClick={() => removeExpert(index)} disabled={(formData.experts || []).length === 1} color="error">
+                                <IconButton 
+                        // Убираем disabled, чтобы кнопка всегда была яркой
+                        onClick={() => expertsToDisplay.length > 1 ? removeExpert(index) : null} 
+                        color={expertsToDisplay.length > 1 ? "error" : "default"}
+                        sx={{ 
+                            // Дополнительно: делаем кнопку "прозрачной" или визуально неактивной, если она одна
+                            opacity: expertsToDisplay.length > 1 ? 1 : 0.3,
+                            cursor: expertsToDisplay.length > 1 ? 'pointer' : 'default'
+                        }}
+                    >
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
