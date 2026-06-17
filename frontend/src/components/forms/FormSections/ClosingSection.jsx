@@ -42,7 +42,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
         <TextField 
           disabled={isLocked}
           size="small" fullWidth required error={!!errors.dateend}
-          label="Дата завершения" type="date" sx={inputStyle}
+          label="Дата завершения исследования" type="date" sx={inputStyle}
           slotProps={{ inputLabel: { shrink: true } }}
           value={formData.dateend || ''} onChange={handleChange('dateend')}
         />
@@ -64,14 +64,14 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
       <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Typography sx={sectionHeaderStyle}>Количество дней нахождения материалов</Typography>
+        <Typography sx={sectionHeaderStyle}>Фактическое количество дней нахождения материалов</Typography>
       </Grid>
       
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField 
           disabled={isLocked}
           size="small" fullWidth required error={!!errors.daysInUnit}
-          label="Дней в подразделении" type="number" sx={inputStyle} 
+          label="Дней в территориальном подразделении" type="number" sx={inputStyle} 
           value={formData.daysInUnit || ''} onChange={handleChange('daysInUnit')}
         />
       </Grid>
@@ -80,7 +80,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
         <TextField 
           disabled={isLocked}
           size="small" fullWidth required error={!!errors.daysWithExpert}
-          label="Дней у эксперта" type="number" sx={inputStyle} 
+          label="Дней у эксперта в производстве" type="number" sx={inputStyle} 
           value={formData.daysWithExpert || ''} onChange={handleChange('daysWithExpert')}
         />
       </Grid>
@@ -90,7 +90,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
       </Grid>
       
       <Grid size={{ xs: 4 }}>
-        <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclCategorical} label="Категор." type="number" sx={inputStyle} value={formData.conclCategorical || ''} onChange={handleChange('conclCategorical')} />
+        <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclCategorical} label="Категорические" type="number" sx={inputStyle} value={formData.conclCategorical || ''} onChange={handleChange('conclCategorical')} />
       </Grid>
       <Grid size={{ xs: 4 }}>
         <TextField disabled={isLocked} size="small" fullWidth required error={!!errors.conclProbable} label="Вероятные" type="number" sx={inputStyle} value={formData.conclProbable || ''} onChange={handleChange('conclProbable')} />
@@ -103,10 +103,76 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
         <TextField 
           disabled={isLocked}
           size="small" fullWidth required error={!!errors.hoursSpent}
-          label="Кол-во часов на производство" type="number" sx={inputStyle} 
+          label="Кол-во часов затраченных на производство экспертизы" type="number" sx={inputStyle} 
           value={formData.hoursSpent || ''} onChange={handleChange('hoursSpent')}
         />
       </Grid>
+      {/* Блок Затраты */}
+      <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
+      <Grid size={{ xs: 12 }}>
+        <Typography sx={sectionHeaderStyle}>Затраты</Typography>
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Трудозатраты эксперта" type="number" 
+          value={formData.laborCosts || ''} onChange={handleChange('laborCosts')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Материальные затраты" type="number" 
+          value={formData.materialCosts || ''} onChange={handleChange('materialCosts')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Расходы по эксплуатации оборудования" type="number" 
+          value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Общая стоимость исследования" type="number" 
+          value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle} 
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TextField 
+          disabled={isLocked}
+          size="small" fullWidth label="Примечание (№ пломбы)" value={formData.plomba || ''} 
+          onChange={handleChange('plomba')} sx={inputStyle} 
+        />
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+  <Typography sx={sectionHeaderStyle}>
+    Итоговые расчеты
+  </Typography>
+</Grid>
+
+<Grid size={{ xs: 6 }}>
+  <TextField 
+    size="small" fullWidth label="Стоимость без НДС" 
+    value={formData.totalWithoutVat || '0.00'} 
+    disabled // Поле только для чтения
+    InputProps={{ readOnly: true }} 
+    sx={inputStyle} 
+  />
+</Grid>
+
+<Grid size={{ xs: 6 }}>
+  <TextField 
+    size="small" fullWidth label="Стоимость с НДС" 
+    value={formData.totalWithVat || '0.00'} 
+    disabled // Поле только для чтения
+    InputProps={{ readOnly: true }} 
+    sx={inputStyle} 
+  />
+</Grid>
 
       {/* Кнопка завершения */}
       {!isManager && (

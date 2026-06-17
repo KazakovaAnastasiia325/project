@@ -145,12 +145,32 @@ export const AdminPage = () => {
         {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
         
         {/* Title Bar */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '8px', mb: 2 }}>
-          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
-          <S.ActionButton startIcon={<AddIcon />} onClick={() => { setSelectedExpertise(null); setIsDrawerOpen(true); }} size="small" variant="contained">
+        <Box sx={{ 
+    display: 'grid', 
+    gridTemplateColumns: '1fr auto 1fr', // Три колонки: левая, центр, правая
+    alignItems: 'center', 
+    backgroundColor: '#1e293b', 
+    padding: '10px 20px', 
+    borderRadius: '8px', 
+    mb: 2 
+}}>
+    <Box /> {/* Пустое место слева */}
+    
+    <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600, justifySelf: 'center' }}>
+        Реестр экспертиз
+    </Typography>
+    
+    <Box sx={{ justifySelf: 'end' }}> {/* Кнопка справа */}
+        <S.ActionButton 
+            startIcon={<AddIcon />} 
+            onClick={() => { setSelectedExpertise(null); setIsDrawerOpen(true); }} 
+            size="small" 
+            variant="contained"
+        >
             Добавить
-          </S.ActionButton>
-        </Box>
+        </S.ActionButton>
+    </Box>
+</Box>
 
         {/* Filter Bar */}
         <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', p: 1.5, mb: 2, borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -158,15 +178,15 @@ export const AdminPage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button 
+            <S.ActionButton 
               variant="contained" 
               size="small" 
               onClick={() => setAppliedFilters(dateRange)} 
               sx={{ height: '40px' }}
             >
               Найти
-            </Button>
-                        <Button 
+            </S.ActionButton>
+                        <S.ActionButton 
               size="small" 
               variant="outlined" 
               onClick={() => {
@@ -176,7 +196,7 @@ export const AdminPage = () => {
               sx={{ height: '40px' }}
             >
               Сбросить
-            </Button>
+            </S.ActionButton>
         </Box>
 
         {/* Table Container */}

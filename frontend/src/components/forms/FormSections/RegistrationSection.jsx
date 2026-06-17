@@ -113,11 +113,11 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             {/* Основная информация */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Основная информация</Typography></Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField disabled={isLocked} size="small" required fullWidth label="Дата поступления" type="date"
+                <TextField disabled={isLocked} size="small" required fullWidth label="Дата поступления материала" type="date"
                     slotProps={{ inputLabel: { shrink: true } }} value={formData.date || ''} onChange={handleChange('date')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела"
+                <TextField disabled={isLocked} size="small" required fullWidth label="№ у/д, Куи, ЕРДР, адм.материала, гр.дела" type="number"
                     value={formData.adm_material || ''} onChange={handleChange('adm_material')} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12 }}><TextField disabled={isLocked} size="small" required fullWidth label="Фабула" multiline rows={2}
@@ -125,7 +125,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             {/* Переименованы поля state -> iz_nix_id, view -> vid_exp (или оставьте как удобно, но обновите в ExpertForm) */}
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="№ Статьи"
                     value={formData.nom_statyi || ''} onChange={handleChange('nom_statyi')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)"
+            <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)" type="number"
                     value={formData.vid_exp || ''} onChange={handleChange('vid_exp')} sx={inputStyle} /></Grid>
 
             {/* Параметры экспертизы */}

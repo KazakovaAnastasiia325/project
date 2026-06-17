@@ -266,26 +266,29 @@ await api.put(`/api/users/${editingUser.id}`, cleanPayload);
                 </Paper>
             </Box>
 
-            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-            {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-            {open && (
-                <FormFields 
-                    ref={formRef} 
-                    initialData={editingUser || { 
-                        lastName: '', firstName: '', middleName: '', 
-                        role: '', email: '', phone: '', login: '', password: '' 
-                    }} 
-                />
-            )}
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setOpen(false)}>Отмена</Button>
-            <Button onClick={handleSave} variant="contained">Сохранить</Button>
-        </DialogActions>
-    </Dialog>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                slotProps={{
+                    paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } }
+                }}
+            >
+                <DialogTitle sx={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '16px 24px', mb: 2, textAlign: 'center', // Центрируем текст
+        fontWeight: 600 }}>
+                    {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 0 }}>
+                    {open && <FormFields ref={formRef} initialData={editingUser || { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' }} />}
+                </DialogContent>
+
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    <S.GreyButton onClick={() => setOpen(false)}>Отмена</S.GreyButton>
+                    <S.ActionButton onClick={handleSave} sx={{ px: 4 }}>Сохранить</S.ActionButton>
+                </DialogActions>
+            </Dialog>
         </S.AdminContainer>
     );
 };

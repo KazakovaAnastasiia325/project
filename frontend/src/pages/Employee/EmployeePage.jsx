@@ -149,15 +149,15 @@ export const EmployeePage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button 
+            <S.ActionButton 
   variant="contained" 
   size="small" 
   onClick={() => setAppliedFilters(dateRange)} 
   sx={{ height: '40px' }}
 >
   Найти
-</Button>
-            <Button 
+</S.ActionButton>
+            <S.ActionButton 
   size="small" 
   variant="outlined" 
   onClick={() => {
@@ -167,7 +167,7 @@ export const EmployeePage = () => {
   sx={{ height: '40px' }}
 >
   Сбросить
-</Button>
+</S.ActionButton>
         </Box>
         <Box sx={{ 
     height: 550, // Фиксированная высота контейнера для стабильности

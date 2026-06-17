@@ -33,7 +33,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
       <Grid size={{ xs: 12 }}>
         <TextField 
           disabled={isLocked} // Используем isLocked
-          size="small" fullWidth label="Срок производства экспертизы (в днях)" type="number"
+          size="small" fullWidth label="Срок производства экспертизы, установленный нач.тер подразделения (в днях)" type="number"
           value={formData.deadlineDays || ''} onChange={handleChange('deadlineDays')} sx={inputStyle}
         />
       </Grid>
@@ -45,7 +45,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
       <Grid size={{ xs: 4 }}>
         <TextField 
           disabled={isLocked}
-          size="small" fullWidth label="Дата приост." type="date" 
+          size="small" fullWidth label="Дата приостановления" type="date" 
           slotProps={{ inputLabel: { shrink: true } }} value={formData.stop_date || ''} 
           onChange={handleChange('stop_date')} sx={inputStyle} 
         />
@@ -53,7 +53,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
       <Grid size={{ xs: 4 }}>
         <TextField 
           disabled={isLocked}
-          size="small" fullWidth label="Дата возоб." type="date" 
+          size="small" fullWidth label="Дата возобновления" type="date" 
           slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''} 
           onChange={handleChange('resumeDate')} sx={inputStyle} 
         />
@@ -61,7 +61,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
       <Grid size={{ xs: 4 }}>
         <TextField 
           disabled={isLocked}
-          size="small" fullWidth label="Причина" value={formData.suspendReason || ''} 
+          size="small" fullWidth label="Причина приостановления" value={formData.suspendReason || ''} 
           onChange={handleChange('suspendReason')} sx={inputStyle} 
         />
       </Grid>
@@ -75,47 +75,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
         />
       </Grid>
 
-      {/* Блок Затраты */}
-      <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
-      <Grid size={{ xs: 12 }}>
-        <Typography sx={sectionHeaderStyle}>Затраты</Typography>
-      </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          disabled={isLocked}
-          size="small" fullWidth label="Трудозатраты (чел/час)" type="number" 
-          value={formData.laborCosts || ''} onChange={handleChange('laborCosts')} sx={inputStyle} 
-        />
-      </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          disabled={isLocked}
-          size="small" fullWidth label="Материал. затраты" type="number" 
-          value={formData.materialCosts || ''} onChange={handleChange('materialCosts')} sx={inputStyle} 
-        />
-      </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          disabled={isLocked}
-          size="small" fullWidth label="Эксплуатация оборуд." type="number" 
-          value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle} 
-        />
-      </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField 
-          disabled={isLocked}
-          size="small" fullWidth label="Общая стоимость" type="number" 
-          value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle} 
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <TextField 
-          disabled={isLocked}
-          size="small" fullWidth label="Примечание (№ пломбы)" value={formData.plomba || ''} 
-          onChange={handleChange('plomba')} sx={inputStyle} 
-        />
-      </Grid>
+      
     </Grid>
   );
 };

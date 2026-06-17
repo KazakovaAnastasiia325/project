@@ -83,7 +83,7 @@ export const ManagerPage = () => {
 
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(254, 252, 252, 0.1)' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель руководителя</Typography>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
       </Box>
@@ -99,15 +99,15 @@ export const ManagerPage = () => {
                 <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
                 <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
             </LocalizationProvider>
-            <Button 
+            <S.ActionButton 
               variant="contained" 
               size="small" 
               onClick={() => setAppliedFilters(dateRange)} 
               sx={{ height: '40px' }}
             >
               Найти
-            </Button>
-                        <Button 
+            </S.ActionButton>
+                        <S.ActionButton 
               size="small" 
               variant="outlined" 
               onClick={() => {
@@ -117,7 +117,7 @@ export const ManagerPage = () => {
               sx={{ height: '40px' }}
             >
               Сбросить
-            </Button>
+            </S.ActionButton>
         </Box>
         <Box sx={{ 
     height: 550, // Фиксированная высота контейнера для стабильности
