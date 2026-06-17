@@ -35,20 +35,19 @@ export const EmployeePage = () => {
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
 
   const fetchExpertise = async () => {
-  setLoading(true);
-  setErrorText('');
-  try {
-    const params = {
-      page: paginationModel.page,
-      limit: paginationModel.pageSize,
-      // Используем appliedFilters вместо несуществующего dateRange
-      date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
-      date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
-      sort_field: sortModel[0]?.field || 'id',
-      sort_order: sortModel[0]?.sort || 'asc',
-    };
+    setLoading(true);
+    setErrorText('');
+    try {
+      const params = {
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+        date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
+        date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
+        sort_field: sortModel[0]?.field || 'id',
+        sort_order: sortModel[0]?.sort || 'asc',
+      };
 
-    const response = await api.get('/api/expertiza/list', { params });
+      const response = await api.get('/api/expertiza/list', { params });
       console.log('Данные от бэкенда:', response.data);
       const data = response.data;
 
@@ -61,10 +60,10 @@ export const EmployeePage = () => {
       }
     } catch (error) {
       console.error('Ошибка загрузки:', error);
-      
-      const isAuthError = error.response?.status === 401 || 
-                          error.response?.status === 403 || 
-                          error.request?.responseURL?.includes('/login');
+
+      const isAuthError = error.response?.status === 401 ||
+        error.response?.status === 403 ||
+        error.request?.responseURL?.includes('/login');
 
       if (isAuthError) {
         setErrorText('Сессия истекла. Пожалуйста, перезайдите.');
@@ -80,8 +79,8 @@ export const EmployeePage = () => {
   };
 
   useEffect(() => {
-  fetchExpertise();
-}, [paginationModel, sortModel, appliedFilters]);
+    fetchExpertise();
+  }, [paginationModel, sortModel, appliedFilters]);
 
   const handleLogout = async () => {
     try {
@@ -97,14 +96,11 @@ export const EmployeePage = () => {
     setSelectedExpertise(null);
     setIsDrawerOpen(true);
   };
-
-  // Метод для создания новой записи
   const handleSave = async (dataToSave) => {
     try {
       await api.post('/api/expertiza/save', dataToSave);
       setIsDrawerOpen(false);
       alert('Успешно сохранено');
-      // ВАЖНО: принудительно сбрасываем выбранную экспертизу
       setSelectedExpertise(null);
       await fetchExpertise();
     } catch (error) {
@@ -120,7 +116,6 @@ export const EmployeePage = () => {
       await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
       setIsDrawerOpen(false);
       alert('Успешно обновлено');
-      // ВАЖНО: обновляем данные в таблице
       await fetchExpertise();
     } catch (error) {
       console.error('Ошибка обновления:', error);
@@ -137,7 +132,7 @@ export const EmployeePage = () => {
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
-        
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>
           <S.ActionButton startIcon={<AddIcon />} onClick={handleCreate} size="small" variant="contained">
@@ -145,63 +140,63 @@ export const EmployeePage = () => {
           </S.ActionButton>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', p: 1.5, mb: 2, borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-                <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
-                <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
-            </LocalizationProvider>
-            <S.ActionButton 
-  variant="contained" 
-  size="small" 
-  onClick={() => setAppliedFilters(dateRange)} 
-  sx={{ height: '40px' }}
->
-  Найти
-</S.ActionButton>
-            <S.ActionButton 
-  size="small" 
-  variant="outlined" 
-  onClick={() => {
-    setDateRange({ start: null, end: null });
-    setAppliedFilters({ start: null, end: null });
-  }} 
-  sx={{ height: '40px' }}
->
-  Сбросить
-</S.ActionButton>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+            <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({ ...p, start: v }))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+            <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({ ...p, end: v }))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+          </LocalizationProvider>
+          <S.ActionButton
+            variant="contained"
+            size="small"
+            onClick={() => setAppliedFilters(dateRange)}
+            sx={{ height: '40px' }}
+          >
+            Найти
+          </S.ActionButton>
+          <S.ActionButton
+            size="small"
+            variant="outlined"
+            onClick={() => {
+              setDateRange({ start: null, end: null });
+              setAppliedFilters({ start: null, end: null });
+            }}
+            sx={{ height: '40px' }}
+          >
+            Сбросить
+          </S.ActionButton>
         </Box>
-        <Box sx={{ 
-    height: 550, // Фиксированная высота контейнера для стабильности
-    width: '100%', 
-    mb: 2,
-    '& .MuiDataGrid-root': {
-        border: 'none', // Опционально: убирает лишние рамки
-    }
-}}>
-    <DataGridTable 
-        rows={rows}
-        rowCount={totalRows}
-        loading={loading}
-        density="compact"        // Встроенный режим компактности
-        rowHeight={40}           // Явное задание высоты строки (убирает конфликт min/max)
-        columnHeaderHeight={40}  // Сжимает высоту заголовков
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        onSortModelChange={setSortModel}
-        onRowClick={(params) => { 
-            setSelectedExpertise(params.row); 
-            setIsDrawerOpen(true); 
-        }}
-        isAdmin={true} 
-        isManager={false}
-    />
-</Box>
+        <Box sx={{
+          height: 550,
+          width: '100%',
+          mb: 2,
+          '& .MuiDataGrid-root': {
+            border: 'none',
+          }
+        }}>
+          <DataGridTable
+            rows={rows}
+            rowCount={totalRows}
+            loading={loading}
+            density="compact"
+            rowHeight={40}
+            columnHeaderHeight={40}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            onSortModelChange={setSortModel}
+            onRowClick={(params) => {
+              setSelectedExpertise(params.row);
+              setIsDrawerOpen(true);
+            }}
+            isAdmin={true}
+            isManager={false}
+          />
+        </Box>
 
-        <DetailsDrawer 
-          open={isDrawerOpen} 
-          onClose={() => setIsDrawerOpen(false)} 
-          expertiseId={selectedExpertise?.id} // Передаем ID для корректной работы формы
-          onSave={handleSave} 
-          onUpdate={handleUpdate} // Передаем метод обновления
+        <DetailsDrawer
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          expertiseId={selectedExpertise?.id}
+          onSave={handleSave}
+          onUpdate={handleUpdate}
           isManager={false}
         />
       </Box>

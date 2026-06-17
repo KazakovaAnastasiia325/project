@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Box, Button } from '@mui/material';
 
-// Основной цвет текста для заголовков (глубокий синий вместо черного)
+// Основной цвет текста для заголовков 
 const primaryTextColor = '#1e3a8a';
 
 export const AdminContainer = styled(Box)`

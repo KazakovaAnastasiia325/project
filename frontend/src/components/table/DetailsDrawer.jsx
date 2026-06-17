@@ -16,7 +16,6 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Если drawer открыт и есть ID — тянем полные данные
     if (open && expertiseId) {
       const fetchFullData = async () => {
         setLoading(true);
@@ -32,20 +31,19 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
       };
       fetchFullData();
     } else if (!open) {
-      // Сбрасываем данные при закрытии
       setData(null);
     }
   }, [open, expertiseId]);
 
   return (
-    <Drawer 
-      anchor="right" 
-      open={open} 
+    <Drawer
+      anchor="right"
+      open={open}
       onClose={onClose}
       slotProps={{
         paper: {
-          sx: { 
-            width: '60%', 
+          sx: {
+            width: '60%',
             minWidth: 400,
             backgroundColor: '#f8fafc',
             borderLeft: '1px solid #e2e8f0',
@@ -55,10 +53,10 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
       }}
     >
       {/* Верхняя часть (заголовок) */}
-      <Box sx={{ 
-        p: 2.5, 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <Box sx={{
+        p: 2.5,
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#131924',
         borderBottom: '4px solid #3b82f6',
@@ -66,18 +64,18 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
         <Typography variant="h6" sx={{ color: '#ffffff', fontWeight: 700, fontSize: '1.1rem' }}>
           {expertiseId ? `Редактирование: №${expertiseId}` : 'Создание экспертизы'}
         </Typography>
-        
-        <IconButton 
-          onClick={onClose} 
-          sx={{ 
-            color: '#ffffff', 
-            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' } 
+
+        <IconButton
+          onClick={onClose}
+          sx={{
+            color: '#ffffff',
+            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
           }}
         >
           <CloseIcon />
         </IconButton>
       </Box>
-      
+
       {/* Основное содержимое с лоадером */}
       <Box sx={{ p: 3, height: '100%', overflowY: 'auto' }}>
         {loading ? (
@@ -85,17 +83,17 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
             <CircularProgress />
           </Box>
         ) : (
-          <S.FormContainer sx={{ 
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)', 
+          <S.FormContainer sx={{
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
             border: '1px solid #e2e8f0',
             backgroundColor: '#ffffff'
           }}>
-            <ExpertForm 
-              initialData={data} 
-              onSave={onSave}      // Вызывается при создании (POST)
+            <ExpertForm
+              initialData={data}
+              onSave={onSave}
               onUpdate={onUpdate}
-              onClose={onClose} 
-              isManager={isManager} 
+              onClose={onClose}
+              isManager={isManager}
             />
           </S.FormContainer>
         )}

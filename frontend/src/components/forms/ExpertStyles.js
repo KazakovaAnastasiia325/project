@@ -2,9 +2,9 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 
 // Основной цвет текста для всего интерфейса
-const MAIN_TEXT = '#334155'; // Уверенный темно-серый
-const LABEL_TEXT = '#64748b'; // Спокойный серый для подписей
-const ACCENT_BLUE = '#3b82f6'; // Ваш основной синий
+const MAIN_TEXT = '#334155';
+const LABEL_TEXT = '#64748b';
+const ACCENT_BLUE = '#3b82f6';
 
 export const FormContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -25,7 +25,7 @@ export const CustomTabs = styled(Box)({
     color: LABEL_TEXT,
     textTransform: 'none',
     '&.Mui-selected': {
-      color: ACCENT_BLUE, // Теперь выбранная вкладка синяя
+      color: ACCENT_BLUE,
       fontWeight: 600,
     },
   },
@@ -35,11 +35,11 @@ export const CustomTabs = styled(Box)({
 export const SectionWrapper = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  gap: '16px', 
-  padding: '0', 
+  gap: '16px',
+  padding: '0',
 });
 
-// Единый стиль заголовка секции (используйте его в Typography)
+
 export const sectionHeaderStyle = {
   mt: 2,
   mb: 1,
@@ -55,13 +55,13 @@ export const inputStyle = {
     borderRadius: '8px',
     height: '42px',
     backgroundColor: '#f8fafc',
-    color: MAIN_TEXT, // Цвет вводимого текста
+    color: MAIN_TEXT,
     '& fieldset': { borderColor: '#cbd5e1' },
     '&:hover fieldset': { borderColor: '#94a3b8' },
     '&.Mui-focused fieldset': { borderColor: ACCENT_BLUE, borderWidth: '2px' },
   },
   '& .MuiInputLabel-root': {
-    color: LABEL_TEXT, // Цвет лейбла
+    color: LABEL_TEXT,
     fontSize: '0.85rem',
   },
   '& .MuiInputLabel-root.Mui-focused': {

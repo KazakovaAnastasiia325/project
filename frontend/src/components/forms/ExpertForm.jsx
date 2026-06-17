@@ -8,37 +8,37 @@ import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 import * as S from './ExpertStyles';
 import * as AdminS from '../../pages/Admin/AdminStyles';
 const api = axios.create({
-    baseURL: 'http://localhost:8080',
-    withCredentials: true,
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
 });
 export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager = false }) => {
-  
+
   // 1. Превращаем JSON с бэкенда в формат для полей формы
   const parseDataFromBackend = (data) => {
-    if (!data) return { 
-      date: '', ud: '', fabula: '', 
-      organCode: '', organName: '', 
+    if (!data) return {
+      date: '', ud: '', fabula: '',
+      organCode: '', organName: '',
       name_naznch: '', second_name_naznch: '', patronymic_naznch: '',
-      kolvo: '', kolvoobj: '', 
-      experts: [], 
+      kolvo: '', kolvoobj: '',
+      experts: [],
       stat_id: '', category_id: '', region_id: '', iz_nix_id: '', diff_cat_id: '',
       region_id: '',
-      status: EXPERTISE_STATUSES.NEW.label 
+      status: EXPERTISE_STATUSES.NEW.label
     };
 
     return {
       id: data.id,
-    date: data.data_post ? data.data_post.split('T')[0] : '',
-    fab: data.fab || '',
-    adm_material: data.adm_material || '',
-    nom_statyi: data.nom_statyi || '',
-    organCode: data.organ || '',
-    organName: data.name_organ || '',
-    name_naznch: data.name_naznch || '',
-    second_name_naznch: data.second_name_naznch || '',
-    patronymic_naznch: data.patronymic_naznch || '',
-    kolvo: data.question_count || '',
-    kolvoobj: data.object_count || '',
+      date: data.data_post ? data.data_post.split('T')[0] : '',
+      fab: data.fab || '',
+      adm_material: data.adm_material || '',
+      nom_statyi: data.nom_statyi || '',
+      organCode: data.organ || '',
+      organName: data.name_organ || '',
+      name_naznch: data.name_naznch || '',
+      second_name_naznch: data.second_name_naznch || '',
+      patronymic_naznch: data.patronymic_naznch || '',
+      kolvo: data.question_count || '',
+      kolvoobj: data.object_count || '',
       deadlineDays: data.srok_exp ?? '',
       stop_date: data.stop_date ? data.stop_date.split('T')[0] : '',
       resumeDate: data.resuming_date ? data.resuming_date.split('T')[0] : '',
@@ -51,12 +51,12 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       extensionDays: data.srok_resuming ?? '',
       experts: data.experts || [],
       stat_id: data.stat_id ? String(data.stat_id) : '',
-    category_id: data.category_id ? String(data.category_id) : '',
-    region_id: data.region_id ?? '',
-    iz_nix_id: data.iz_nix_id ? String(data.iz_nix_id) : '',
-    nom_statyi: data.nom_statyi ?? '',
-    diff_cat_id: data.diff_cat_id ? String(data.diff_cat_id) : '',
-    vid_exp: data.vid_exp ?? '',
+      category_id: data.category_id ? String(data.category_id) : '',
+      region_id: data.region_id ?? '',
+      iz_nix_id: data.iz_nix_id ? String(data.iz_nix_id) : '',
+      nom_statyi: data.nom_statyi ?? '',
+      diff_cat_id: data.diff_cat_id ? String(data.diff_cat_id) : '',
+      vid_exp: data.vid_exp ?? '',
       dateend: data.end_date ? data.end_date.split('T')[0] : '',
       result: data.exp_res_id || '',
       daysInUnit: data.day_count ?? '',
@@ -81,48 +81,48 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
   const registrationFields = [
-    'date', 
-    'nom_statyi',      // вместо 'ud'
-    'fab',             // вместо 'fabula'
-    'organCode', 
-    'organName', 
-    'kolvo', 
-    'kolvoobj', 
-    'name_naznch', 
+    'date',
+    'nom_statyi',
+    'fab',
+    'organCode',
+    'organName',
+    'kolvo',
+    'kolvoobj',
+    'name_naznch',
     'second_name_naznch',
-    'stat_id',         // добавьте эти, если они обязательны
+    'stat_id',
     'category_id',
     'region_id',
     'vid_exp'
-];
+  ];
   const isRegistrationComplete = () => {
-    const missing = registrationFields.filter(field => 
-        !formData[field] || formData[field].toString().trim() === ''
+    const missing = registrationFields.filter(field =>
+      !formData[field] || formData[field].toString().trim() === ''
     );
     if (missing.length > 0) {
-        console.log("Не заполнены обязательные поля:", missing);
+      console.log("Не заполнены обязательные поля:", missing);
     }
     return missing.length === 0;
-};
+  };
 
-  // 2. Превращаем данные формы в JSON для отправки на Go-бэкенд
+  // Превращаем данные формы в JSON для отправки на Go-бэкенд
   const prepareDataForServer = (data) => {
     return {
       id: data.id || 0,
-    creator_id: 1,
-    data_post: data.date || "",
-    fab: data.fab || "",
-    adm_material: Number(data.adm_material) || 0,
-    nom_statyi: data.nom_statyi || "",
-    vid_exp: Number(data.vid_exp) || 0,
-    organ: data.organCode || "",
-    name_organ: data.organName || "",
-    name_naznch: data.name_naznch || "",
-    second_name_naznch: data.second_name_naznch || "",
-    patronymic_naznch: data.patronymic_naznch || null,
-    experts: data.experts || [],
-    question_count: Number(data.kolvo) || 0,
-    object_count: Number(data.kolvoobj) || 0,
+      creator_id: 1,
+      data_post: data.date || "",
+      fab: data.fab || "",
+      adm_material: Number(data.adm_material) || 0,
+      nom_statyi: data.nom_statyi || "",
+      vid_exp: Number(data.vid_exp) || 0,
+      organ: data.organCode || "",
+      name_organ: data.organName || "",
+      name_naznch: data.name_naznch || "",
+      second_name_naznch: data.second_name_naznch || "",
+      patronymic_naznch: data.patronymic_naznch || null,
+      experts: data.experts || [],
+      question_count: Number(data.kolvo) || 0,
+      object_count: Number(data.kolvoobj) || 0,
       srok_exp: Number(data.deadlineDays) || 0,
       stop_date: data.stop_date || null,
       resuming_date: data.resumeDate || null,
@@ -143,8 +143,8 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       hour_count: Number(data.hoursSpent) || null,
       is_closed: data.status === EXPERTISE_STATUSES.COMPLETED.label,
       stat_id: data.stat_id ? Number(data.stat_id) : 0,
-    category_id: data.category_id ? Number(data.category_id) : 0,
-    region_id: data.region_id ? Number(data.region_id) : 0,
+      category_id: data.category_id ? Number(data.category_id) : 0,
+      region_id: data.region_id ? Number(data.region_id) : 0,
       iz_nix_id: Number(data.iz_nix_id) || 1,
       diff_cat_id: data.diff_cat_id ? Number(data.diff_cat_id) : 0,
     };
@@ -169,25 +169,25 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     if (onClose) onClose();
   };
 
- 
-const handleComplete = async (dataFromClosing) => {
-  const dataForServer = prepareDataForServer({
-    ...dataFromClosing,
-    status: EXPERTISE_STATUSES.COMPLETED.label 
-  });
 
-  try {
-    
-    const response = await api.put(`/api/expertize/${dataForServer.id}/complete`, dataForServer);
-    
-    if (onClose) onClose();
-    alert('Экспертиза успешно завершена!');
-    
-  } catch (error) {
-    console.error(error);
-    alert('Не удалось завершить экспертизу. Проверьте соединение с сервером.');
-  }
-};
+  const handleComplete = async (dataFromClosing) => {
+    const dataForServer = prepareDataForServer({
+      ...dataFromClosing,
+      status: EXPERTISE_STATUSES.COMPLETED.label
+    });
+
+    try {
+
+      const response = await api.put(`/api/expertize/${dataForServer.id}/complete`, dataForServer);
+
+      if (onClose) onClose();
+      alert('Экспертиза успешно завершена!');
+
+    } catch (error) {
+      console.error(error);
+      alert('Не удалось завершить экспертизу. Проверьте соединение с сервером.');
+    }
+  };
 
   return (
     <S.FormContainer>
@@ -207,11 +207,11 @@ const handleComplete = async (dataFromClosing) => {
           <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} />
         )}
         {tab === 2 && !isNewRecord && (
-          <ClosingSection 
-            formData={formData} 
-            setFormData={setFormData} 
-            onSave={handleComplete} 
-            isManager={isManager} 
+          <ClosingSection
+            formData={formData}
+            setFormData={setFormData}
+            onSave={handleComplete}
+            isManager={isManager}
           />
         )}
       </S.SectionWrapper>

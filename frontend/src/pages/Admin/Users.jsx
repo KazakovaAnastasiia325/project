@@ -89,7 +89,7 @@ const FormFields = memo(({ initialData, ref }) => {
 });
 
 export const Users = () => {
-    const navigate = useNavigate(); // Инициализация
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
 
     const [open, setOpen] = useState(false);
@@ -97,79 +97,72 @@ export const Users = () => {
     const formRef = useRef();
 
     const handleLogout = async () => {
-    try {
-      // Отправляем запрос на сервер для завершения сессии
-      // Сервер должен ответить успешно (200 OK) и, если используются куки,
-      // прислать заголовок Set-Cookie для удаления куки сессии
-      await api.post('/api/logout');
-    } catch (error) {
-      console.error('Ошибка при вызове logout на сервере:', error);
-      // Мы не прерываем выполнение, так как пользователь должен выйти 
-      // из приложения в любом случае
-    } finally {
-      // Выполняем переход на страницу логина
-      navigate('/login');
-    }
-  };
-  const roleMap = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
+        try {
+
+            await api.post('/api/logout');
+        } catch (error) {
+            console.error('Ошибка при вызове logout на сервере:', error);
+
+        } finally {
+            navigate('/login');
+        }
+    };
+    const roleMap = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
     const fetchUsers = async () => {
-    try {
-        const response = await api.get('/api/users');
-        const rawData = response.data.rows || response.data || [];
-        
-        const formattedUsers = rawData.map(user => {
-            const lastName = user.lastName || '';
-            const firstName = user.firstName ? `${user.firstName[0].toUpperCase()}.` : '';
-            const middleName = user.middleName ? `${user.middleName[0].toUpperCase()}.` : '';
-            
-            return {
-                ...user,
-                fio: `${lastName} ${firstName} ${middleName}`.trim(),
-                // Добавляем преобразованное название роли
-                roleName: roleMap[user.role] || 'Неизвестно' 
-            };
-        });
-        
-        setUsers(formattedUsers);
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-    }
-};
+        try {
+            const response = await api.get('/api/users');
+            const rawData = response.data.rows || response.data || [];
+
+            const formattedUsers = rawData.map(user => {
+                const lastName = user.lastName || '';
+                const firstName = user.firstName ? `${user.firstName[0].toUpperCase()}.` : '';
+                const middleName = user.middleName ? `${user.middleName[0].toUpperCase()}.` : '';
+
+                return {
+                    ...user,
+                    fio: `${lastName} ${firstName} ${middleName}`.trim(),
+                    // Добавляем преобразованное название роли
+                    roleName: roleMap[user.role] || 'Неизвестно'
+                };
+            });
+
+            setUsers(formattedUsers);
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+        }
+    };
     useEffect(() => {
         fetchUsers();
     }, []);
 
     const handleOpen = (user = null) => {
-    let userData = user ? { ...user } : { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' };
+        let userData = user ? { ...user } : { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' };
 
-    // Обратное преобразование роли из числа в строку для формы
-    if (user && typeof user.role === 'number') {
-        const roleMapReverse = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
-        userData.role = roleMapReverse[user.role] || '';
-    }
+        // Обратное преобразование роли из числа в строку для формы
+        if (user && typeof user.role === 'number') {
+            const roleMapReverse = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
+            userData.role = roleMapReverse[user.role] || '';
+        }
 
-    setEditingUser(userData);
-    setOpen(true);
-};
+        setEditingUser(userData);
+        setOpen(true);
+    };
 
     const handleSave = async () => {
         const formData = formRef.current.getData();
-        const isEditing = !!editingUser?.id; // Проверяем, есть ли ID для редактирования
-        
-        // Базовая валидация
+        const isEditing = !!editingUser?.id;
+
         if (!formData.lastName || !formData.login || (!isEditing && !formData.password)) {
             alert('Заполните обязательные поля (Фамилия, Логин и Пароль)');
             return;
         }
 
         const roleMapping = { 'Админ': 1, 'Руководитель': 2, 'Сотрудник': 3 };
-        
-        // Подготовка данных
-        const payload = { 
-        ...formData,
-        // Преобразуем строку "Админ" в число 1, если пришла строка
-        role: typeof formData.role === 'number' ? formData.role : roleMapping[formData.role]
-    };
+
+        const payload = {
+            ...formData,
+            role: typeof formData.role === 'number' ? formData.role : roleMapping[formData.role]
+        };
 
         // Если редактируем и пароль пустой — не отправляем его на сервер
         if (isEditing && !formData.password) {
@@ -180,31 +173,30 @@ export const Users = () => {
             if (isEditing) {
                 const { fio, roleName, ...cleanPayload } = payload;
 
-// Отправляйте cleanPayload вместо payload
-await api.put(`/api/users/${editingUser.id}`, cleanPayload);
+                await api.put(`/api/users/${editingUser.id}`, cleanPayload);
                 alert('Успешно обновлено');
             } else {
                 await api.post('/api/users', payload);
                 alert('Успешно создано');
             }
             setOpen(false);
-            fetchUsers(); // Обновляем список
+            fetchUsers();
         } catch (error) {
             console.error("Ошибка:", error);
             alert(error.response?.data?.message || 'Ошибка при сохранении');
         }
     };
 
-//     const handleDelete = async (id) => {
-//     if (window.confirm('Удалить пользователя?')) {
-//         try {
-//             await api.delete(`/api/users/${id}`);
-//             setUsers(prev => prev.filter(u => u.id !== id));
-//         } catch (error) {
-//             alert('Ошибка удаления');
-//         }
-//     }
-// };
+    //     const handleDelete = async (id) => {
+    //     if (window.confirm('Удалить пользователя?')) {
+    //         try {
+    //             await api.delete(`/api/users/${id}`);
+    //             setUsers(prev => prev.filter(u => u.id !== id));
+    //         } catch (error) {
+    //             alert('Ошибка удаления');
+    //         }
+    //     }
+    // };
 
     const columns = [
         { field: 'fio', headerName: 'ФИО', flex: 1.5 },
@@ -275,8 +267,10 @@ await api.put(`/api/users/${editingUser.id}`, cleanPayload);
                     paper: { sx: { borderRadius: '20px', p: 0, overflow: 'hidden' } }
                 }}
             >
-                <DialogTitle sx={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '16px 24px', mb: 2, textAlign: 'center', // Центрируем текст
-        fontWeight: 600 }}>
+                <DialogTitle sx={{
+                    backgroundColor: '#1e293b', color: '#ffffff', padding: '16px 24px', mb: 2, textAlign: 'center', // Центрируем текст
+                    fontWeight: 600
+                }}>
                     {editingUser ? 'Редактирование пользователя' : 'Новый пользователь'}
                 </DialogTitle>
 

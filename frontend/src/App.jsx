@@ -15,7 +15,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Компонент красивой анимации загрузки
+// Компонент анимации загрузки
 const LoadingScreen = () => (
   <Box 
     sx={{ 

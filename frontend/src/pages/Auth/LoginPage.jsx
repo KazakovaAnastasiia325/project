@@ -7,9 +7,8 @@ import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './St
 import SoftAurora from '../../components/AuroraBackground/SoftAurora';
 import LogoImage from '../../assets/logo.png';
 
-// Настройка axios (можно вынести в отдельный файл, но для одного компонента сойдет здесь)
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // Укажите порт вашего Go сервера
+  baseURL: 'http://localhost:8080',
   withCredentials: true,
 });
 
@@ -25,18 +24,18 @@ export const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await api.post('/api/login', formData);
-      
+
       // Приводим роль к числу для единообразия
-      const role = Number(response.data.role); 
-      
+      const role = Number(response.data.role);
+
       if (!role) {
         throw new Error('Роль не получена');
       }
 
-      
+
       // Перенаправление по числовым ролям
       switch (role) {
         case 1: // Админ
@@ -52,7 +51,7 @@ export const LoginPage = () => {
           alert('Неизвестная роль пользователя');
           navigate('/login');
       }
-      
+
     } catch (error) {
       console.error('Ошибка входа:', error);
       alert('Ошибка авторизации');
@@ -82,34 +81,34 @@ export const LoginPage = () => {
 
       <FormSide>
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: '400px' }}>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>Вход</Typography>
-          <Typography sx={{ color: 'text.secondary', mb: 4 }}>Введите данные учетной записи</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>Вход</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 4, textAlign: 'center' }}>Введите данные учетной записи</Typography>
 
           <InputWrapper>
-            <StyledTextField 
-              fullWidth 
-              label="Логин" 
-              name="login" 
-              variant="outlined" 
-              value={formData.login} 
-              onChange={handleChange} 
-              required 
+            <StyledTextField
+              fullWidth
+              label="Логин"
+              name="login"
+              variant="outlined"
+              value={formData.login}
+              onChange={handleChange}
+              required
             />
           </InputWrapper>
           <InputWrapper>
-            <StyledTextField 
-              fullWidth 
-              label="Пароль" 
-              name="password" 
-              type="password" 
-              variant="outlined" 
-              value={formData.password} 
-              onChange={handleChange} 
-              required 
+            <StyledTextField
+              fullWidth
+              label="Пароль"
+              name="password"
+              type="password"
+              variant="outlined"
+              value={formData.password}
+              onChange={handleChange}
+              required
             />
           </InputWrapper>
 
-          
+
 
           <GradientButton type="submit" disabled={loading}>
             <ButtonInner>

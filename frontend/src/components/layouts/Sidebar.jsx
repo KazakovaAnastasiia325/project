@@ -30,7 +30,7 @@ export const Sidebar = () => {
     },
     // Показываем пользователей ТОЛЬКО если это админ
     ...(isAdmin ? [{ text: 'Пользователи', icon: <PeopleIcon />, path: '/admin/users' }] : []),
-    
+
   ];
 
   return (
@@ -70,7 +70,7 @@ export const Sidebar = () => {
         <Box sx={{ mt: 4, px: 1 }}>
           <List>
             {menuItems.map((item) => {
-              // Подсветка активного пункта (проверяем, входит ли текущий путь в путь пункта)
+
               const isActive = location.pathname.includes(item.path);
 
               return (

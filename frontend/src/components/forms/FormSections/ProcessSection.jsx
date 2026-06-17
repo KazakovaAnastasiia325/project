@@ -4,10 +4,10 @@ import { Grid, TextField, Divider, Typography } from '@mui/material';
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 const api = axios.create({
-    baseURL: 'http://localhost:8080',
-    withCredentials: true,
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
 });
-// Добавляем isManager в пропсы
+
 export const ProcessSection = ({ formData, setFormData, isManager = false }) => {
   // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
   const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
@@ -20,7 +20,7 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
   };
 
   const handleChange = (field) => (event) => {
-    if (isLocked) return; 
+    if (isLocked) return;
     setFormData((prev) => updateStatus({ ...prev, [field]: event.target.value }));
   };
 
@@ -31,8 +31,8 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
         <Typography sx={sectionHeaderStyle}>Сроки производства</Typography>
       </Grid>
       <Grid size={{ xs: 12 }}>
-        <TextField 
-          disabled={isLocked} // Используем isLocked
+        <TextField
+          disabled={isLocked}
           size="small" fullWidth label="Срок производства экспертизы, установленный нач.тер подразделения (в днях)" type="number"
           value={formData.deadlineDays || ''} onChange={handleChange('deadlineDays')} sx={inputStyle}
         />
@@ -43,39 +43,39 @@ export const ProcessSection = ({ formData, setFormData, isManager = false }) => 
         <Typography sx={sectionHeaderStyle}>Приостановление производства</Typography>
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField 
+        <TextField
           disabled={isLocked}
-          size="small" fullWidth label="Дата приостановления" type="date" 
-          slotProps={{ inputLabel: { shrink: true } }} value={formData.stop_date || ''} 
-          onChange={handleChange('stop_date')} sx={inputStyle} 
+          size="small" fullWidth label="Дата приостановления" type="date"
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.stop_date || ''}
+          onChange={handleChange('stop_date')} sx={inputStyle}
         />
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField 
+        <TextField
           disabled={isLocked}
-          size="small" fullWidth label="Дата возобновления" type="date" 
-          slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''} 
-          onChange={handleChange('resumeDate')} sx={inputStyle} 
+          size="small" fullWidth label="Дата возобновления" type="date"
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.resumeDate || ''}
+          onChange={handleChange('resumeDate')} sx={inputStyle}
         />
       </Grid>
       <Grid size={{ xs: 4 }}>
-        <TextField 
+        <TextField
           disabled={isLocked}
-          size="small" fullWidth label="Причина приостановления" value={formData.suspendReason || ''} 
-          onChange={handleChange('suspendReason')} sx={inputStyle} 
+          size="small" fullWidth label="Причина приостановления" value={formData.suspendReason || ''}
+          onChange={handleChange('suspendReason')} sx={inputStyle}
         />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <TextField 
+        <TextField
           disabled={isLocked}
-          size="small" fullWidth label="Дата (срок) продления" type="number" 
-          slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDays || ''} 
-          onChange={handleChange('extensionDays')} sx={inputStyle} 
+          size="small" fullWidth label="Дата (срок) продления" type="number"
+          slotProps={{ inputLabel: { shrink: true } }} value={formData.extensionDays || ''}
+          onChange={handleChange('extensionDays')} sx={inputStyle}
         />
       </Grid>
 
-      
+
     </Grid>
   );
 };

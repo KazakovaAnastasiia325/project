@@ -25,31 +25,30 @@ export const AdminPage = () => {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState(null);
-  
+
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState('');
-   const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
+  const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
   const [dateRange, setDateRange] = useState({ start: null, end: null });
 
   const fetchExpertise = async () => {
-  setLoading(true);
-  setErrorText('');
-  try {
-    const params = {
-      page: paginationModel.page,
-      limit: paginationModel.pageSize,
-      // Используем appliedFilters вместо несуществующего dateRange
-      date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
-      date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
-      sort_field: sortModel[0]?.field || 'id',
-      sort_order: sortModel[0]?.sort || 'asc',
-    };
+    setLoading(true);
+    setErrorText('');
+    try {
+      const params = {
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+        date_from: appliedFilters.start ? appliedFilters.start.format('YYYY-MM-DD') : undefined,
+        date_to: appliedFilters.end ? appliedFilters.end.format('YYYY-MM-DD') : undefined,
+        sort_field: sortModel[0]?.field || 'id',
+        sort_order: sortModel[0]?.sort || 'asc',
+      };
 
-    const response = await api.get('/api/expertiza/list', { params });
+      const response = await api.get('/api/expertiza/list', { params });
       const data = response.data;
 
       if (data && Array.isArray(data.rows)) {
@@ -61,9 +60,9 @@ export const AdminPage = () => {
       }
     } catch (error) {
       console.error('Детали ошибки:', error);
-      const isAuthError = error.response?.status === 401 || 
-                          error.response?.status === 403 || 
-                          error.request?.responseURL?.includes('/login');
+      const isAuthError = error.response?.status === 401 ||
+        error.response?.status === 403 ||
+        error.request?.responseURL?.includes('/login');
 
       if (isAuthError) {
         setErrorText('Сессия истекла. Пожалуйста, перезайдите в систему.');
@@ -78,7 +77,7 @@ export const AdminPage = () => {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     fetchExpertise();
   }, [paginationModel, sortModel, appliedFilters]);
 
@@ -143,98 +142,98 @@ export const AdminPage = () => {
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
-        
+
         {/* Title Bar */}
-        <Box sx={{ 
-    display: 'grid', 
-    gridTemplateColumns: '1fr auto 1fr', // Три колонки: левая, центр, правая
-    alignItems: 'center', 
-    backgroundColor: '#1e293b', 
-    padding: '10px 20px', 
-    borderRadius: '8px', 
-    mb: 2 
-}}>
-    <Box /> {/* Пустое место слева */}
-    
-    <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600, justifySelf: 'center' }}>
-        Реестр экспертиз
-    </Typography>
-    
-    <Box sx={{ justifySelf: 'end' }}> {/* Кнопка справа */}
-        <S.ActionButton 
-            startIcon={<AddIcon />} 
-            onClick={() => { setSelectedExpertise(null); setIsDrawerOpen(true); }} 
-            size="small" 
-            variant="contained"
-        >
-            Добавить
-        </S.ActionButton>
-    </Box>
-</Box>
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr', // Три колонки: левая, центр, правая
+          alignItems: 'center',
+          backgroundColor: '#1e293b',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          mb: 2
+        }}>
+          <Box /> {/* Пустое место слева */}
+
+          <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600, justifySelf: 'center' }}>
+            Реестр экспертиз
+          </Typography>
+
+          <Box sx={{ justifySelf: 'end' }}> {/* Кнопка справа */}
+            <S.ActionButton
+              startIcon={<AddIcon />}
+              onClick={() => { setSelectedExpertise(null); setIsDrawerOpen(true); }}
+              size="small"
+              variant="contained"
+            >
+              Добавить
+            </S.ActionButton>
+          </Box>
+        </Box>
 
         {/* Filter Bar */}
         <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', p: 1.5, mb: 2, borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-                <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({...p, start: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
-                <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({...p, end: v}))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
-            </LocalizationProvider>
-            <S.ActionButton 
-              variant="contained" 
-              size="small" 
-              onClick={() => setAppliedFilters(dateRange)} 
-              sx={{ height: '40px' }}
-            >
-              Найти
-            </S.ActionButton>
-                        <S.ActionButton 
-              size="small" 
-              variant="outlined" 
-              onClick={() => {
-                setDateRange({ start: null, end: null });
-                setAppliedFilters({ start: null, end: null });
-              }} 
-              sx={{ height: '40px' }}
-            >
-              Сбросить
-            </S.ActionButton>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+            <DatePicker label="С даты" value={dateRange.start} onChange={(v) => setDateRange(p => ({ ...p, start: v }))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+            <DatePicker label="По дату" value={dateRange.end} onChange={(v) => setDateRange(p => ({ ...p, end: v }))} slotProps={{ textField: { size: 'small', sx: { maxWidth: '150px' } } }} />
+          </LocalizationProvider>
+          <S.ActionButton
+            variant="contained"
+            size="small"
+            onClick={() => setAppliedFilters(dateRange)}
+            sx={{ height: '40px' }}
+          >
+            Найти
+          </S.ActionButton>
+          <S.ActionButton
+            size="small"
+            variant="outlined"
+            onClick={() => {
+              setDateRange({ start: null, end: null });
+              setAppliedFilters({ start: null, end: null });
+            }}
+            sx={{ height: '40px' }}
+          >
+            Сбросить
+          </S.ActionButton>
         </Box>
 
         {/* Table Container */}
-        <Box sx={{ 
-    height: 550, // Фиксированная высота контейнера для стабильности
-    width: '100%', 
-    mb: 2,
-    '& .MuiDataGrid-root': {
-        border: 'none', // Опционально: убирает лишние рамки
-    }
-}}>
-    <DataGridTable 
-        rows={rows}
-        rowCount={totalRows}
-        loading={loading}
-        density="compact"        // Встроенный режим компактности
-        rowHeight={40}           // Явное задание высоты строки (убирает конфликт min/max)
-        columnHeaderHeight={40}  // Сжимает высоту заголовков
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        onSortModelChange={setSortModel}
-        onRowClick={(params) => { 
-            setSelectedExpertise(params.row); 
-            setIsDrawerOpen(true); 
-        }}
-        isAdmin={true} 
-        isManager={false}
-    />
-</Box>
+        <Box sx={{
+          height: 550,
+          width: '100%',
+          mb: 2,
+          '& .MuiDataGrid-root': {
+            border: 'none',
+          }
+        }}>
+          <DataGridTable
+            rows={rows}
+            rowCount={totalRows}
+            loading={loading}
+            density="compact"
+            rowHeight={40}
+            columnHeaderHeight={40}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            onSortModelChange={setSortModel}
+            onRowClick={(params) => {
+              setSelectedExpertise(params.row);
+              setIsDrawerOpen(true);
+            }}
+            isAdmin={true}
+            isManager={false}
+          />
+        </Box>
 
-        <DetailsDrawer 
-  open={isDrawerOpen} 
-  onClose={() => setIsDrawerOpen(false)} 
-  expertiseId={selectedExpertise?.id}
-  onSave={handleSave} // Оставьте как есть
-  onUpdate={handleUpdate} // Передавайте именно функцию handleUpdate, а не fetchExpertise
-  isManager={false}
-/>
+        <DetailsDrawer
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          expertiseId={selectedExpertise?.id}
+          onSave={handleSave}
+          onUpdate={handleUpdate}
+          isManager={false}
+        />
       </Box>
     </S.AdminContainer>
   );

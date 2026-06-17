@@ -5,61 +5,56 @@ import { Box, IconButton, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-export const DataGridTable = ({ 
-    rows, 
-    rowCount, 
-    loading, 
-    paginationModel, 
-    onPaginationModelChange, 
-    onSortModelChange, 
-    onRowClick, 
+export const DataGridTable = ({
+    rows,
+    rowCount,
+    loading,
+    paginationModel,
+    onPaginationModelChange,
+    onSortModelChange,
+    onRowClick,
     // onDelete, 
-    isAdmin = false, 
-    isManager = false 
+    isAdmin = false,
+    isManager = false
 }) => {
 
     const columns = useMemo(() => [
-        { 
-            field: 'id', 
-            headerName: '№', 
-            width: 70, 
-            headerAlign: 'center', 
+        {
+            field: 'id',
+            headerName: '№',
+            width: 70,
+            headerAlign: 'center',
             align: 'center',
-            sortable: true 
+            sortable: true
         },
-        { 
-            field: 'data_post', 
-    headerName: 'Дата', 
-    width: 130,
-    sortable: true,
-    valueFormatter: (value) => {
-        if (!value) return '';
-        // Если дата приходит как "2026-06-16T00:00:00Z", 
-        // split('T')[0] оставит только "2026-06-16"
-        return value.toString().split('T')[0]; 
-    }
+        {
+            field: 'data_post',
+            headerName: 'Дата',
+            width: 130,
+            sortable: true,
+            valueFormatter: (value) => {
+                if (!value) return '';
+
+                return value.toString().split('T')[0];
+            }
         },
-        { 
-            field: 'experts', 
-            headerName: 'Эксперты', // Изменено на "Эксперты"
+        {
+            field: 'experts',
+            headerName: 'Эксперты',
             width: 200,
             sortable: false,
             valueGetter: (value) => {
-                // Безопасно проверяем, что данные пришли и это массив
                 if (!value || !Array.isArray(value)) return '';
 
                 return value
                     .map(exp => {
                         const lastName = exp.second_name || '';
-                        // Берем первую букву имени, если оно есть
                         const firstNameInitial = exp.name ? `${exp.name[0]}.` : '';
-                        // Берем первую букву отчества, только если оно заполнено
                         const patronymicInitial = exp.patronymic && exp.patronymic.trim() ? `${exp.patronymic[0]}.` : '';
 
-                        // Склеиваем Фамилию и инициалы
                         return `${lastName} ${firstNameInitial}${patronymicInitial}`.trim();
                     })
-                    .filter(Boolean) 
+                    .filter(Boolean)
                     .join(', ');
             }
         },
@@ -71,12 +66,12 @@ export const DataGridTable = ({
             align: 'center',
             sortable: true,
             renderCell: (params) => {
-                const isClosed = !!params.value; 
+                const isClosed = !!params.value;
                 return (
                     <Chip
                         label={isClosed ? 'Завершено' : 'В работе'}
                         sx={{
-                            backgroundColor: isClosed ? '#2e7d32' : '#1976d2',
+                            backgroundColor: isClosed ? '#639266' : '#aec7e1',
                             color: '#fff',
                             fontWeight: 'bold',
                             height: '24px',
@@ -87,11 +82,11 @@ export const DataGridTable = ({
                 );
             }
         },
-        { 
-            field: 'fab', 
-            headerName: 'Фабула', 
+        {
+            field: 'fab',
+            headerName: 'Фабула',
             flex: 1,
-            sortable: false 
+            sortable: false
         },
         {
             field: 'actions',
@@ -106,8 +101,8 @@ export const DataGridTable = ({
 
                 return (
                     <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                        <IconButton 
-                            size="small" 
+                        <IconButton
+                            size="small"
                             onClick={(e) => { e.stopPropagation(); onRowClick(params); }}
                         >
                             {showViewOnly ? (
@@ -116,7 +111,7 @@ export const DataGridTable = ({
                                 <EditIcon fontSize="small" />
                             )}
                         </IconButton>
-                        
+
                         {/* {isAdmin && (
                             <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(params.row.id); }}>
                                 <DeleteIcon fontSize="small" />
@@ -126,11 +121,11 @@ export const DataGridTable = ({
                 );
             }
         }
-    ], [isManager, isAdmin, onRowClick,{/* onDelete*/}]);
+    ], [isManager, isAdmin, onRowClick, {/* onDelete*/ }]);
 
     return (
         <DataGrid
-            rows={rows || []} 
+            rows={rows || []}
             columns={columns}
             rowCount={rowCount}
             getRowId={(row) => row.id}
