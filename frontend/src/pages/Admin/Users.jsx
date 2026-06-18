@@ -282,31 +282,49 @@ export const Users = () => {
 
                 <Paper sx={{ height: 450, borderRadius: '12px', overflow: 'hidden' }}>
                     <DataGrid
-                        rows={users}
-                        columns={columns}
-                        initialState={{
-                            pagination: {
-                                paginationModel: { pageSize: 25, page: 0 },
-                            },
-                        }}
-                        pageSizeOptions={[25, 50, 100]}
-                        disableRowSelectionOnClick
-                        rowHeight={55}
-                        sx={{
-                            border: 'none',
-                            '& .MuiDataGrid-columnHeaders': { backgroundColor: '#e0f2fe', borderBottom: '2px solid rgba(46, 142, 255, 0.2)' },
-                            '& .MuiDataGrid-columnHeader': {
-                                color: '#0369a1', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase',
-                                borderRight: '1px solid rgba(46, 142, 255, 0.1)', '&:last-child': { borderRight: 'none' }
-                            },
-                            '& .MuiDataGrid-cell': {
-                                borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', color: '#334155',
-                                '&:last-child': { borderRight: 'none' }
-                            },
-                            '& .MuiDataGrid-row:hover': { backgroundColor: '#f8fafc' },
-                            '& .MuiDataGrid-columnSeparator': { display: 'none' }
-                        }}
-                    />
+    rows={users}
+    columns={columns}
+    initialState={{
+        pagination: { paginationModel: { pageSize: 25, page: 0 } },
+    }}
+    pageSizeOptions={[25, 50, 100]}
+    disableRowSelectionOnClick
+    rowHeight={50} // Чуть меньше для компактности
+    columnHeaderHeight={45}
+    sx={{
+        border: 'none',
+        // Заголовок таблицы
+       '& .MuiDataGrid-columnHeader': {
+    color: '#475569',
+    fontSize: '13px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.02em',
+    // Вот здесь добавляется разлиновка между ячейками заголовка:
+    borderRight: '1px solid #cbd5e1', 
+    '&:last-child': {
+        borderRight: 'none', // Убираем линию у последней колонки
+    }
+},
+        // Ячейки
+        '& .MuiDataGrid-cell': {
+            borderRight: '1px solid #cbd5e1',
+            borderBottom: '1px solid #f1f5f9',
+            color: '#334155',
+            fontSize: '14px',
+            '&:focus': { outline: 'none' } // Убирает синюю рамку при клике
+        },
+        // Строки
+        '& .MuiDataGrid-row': {
+            transition: 'background-color 0.2s',
+            '&:hover': { backgroundColor: '#f1f5f9' },
+            '&.Mui-selected': { backgroundColor: '#e0f2fe !important' }
+        },
+        // Убираем лишние элементы
+        '& .MuiDataGrid-columnSeparator': { display: 'none' },
+        '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #e2e8f0' }
+    }}
+/>
                 </Paper>
             </Box>
 

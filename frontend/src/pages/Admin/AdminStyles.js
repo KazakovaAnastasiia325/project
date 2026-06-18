@@ -5,9 +5,8 @@ import { Box, Button } from '@mui/material';
 const primaryTextColor = '#1e3a8a';
 
 export const AdminContainer = styled(Box)`
-  background: radial-gradient(circle at 0% 0%, rgba(46, 142, 255, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-              #ffffff;
+  background: 
+              #f0f3f8;
   min-height: 100vh;
   width: 100%; 
   padding: 0;

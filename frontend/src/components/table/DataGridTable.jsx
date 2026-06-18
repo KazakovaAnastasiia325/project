@@ -142,29 +142,48 @@ export const DataGridTable = ({
             showCellVerticalBorder
             showColumnVerticalBorder
             sx={{
-                borderRadius: '12px',
-                border: '1px solid #cbd5e1',
-                overflow: 'hidden',
-                '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#f1f5f9',
-                    borderBottom: '2px solid #cbd5e1',
-                },
-                '& .MuiDataGrid-columnHeader': {
-                    color: '#0f172a',
-                    fontWeight: 700,
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                },
-                '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #e2e8f0',
-                },
-                '& .MuiDataGrid-cell': {
-                    borderRight: '1px solid #e2e8f0',
-                    '&:last-child': { borderRight: 'none' }
-                },
-                '& .MuiDataGrid-columnSeparator': { display: 'none' },
-                '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
-            }}
+    borderRadius: '12px',
+    // Усиливаем основной контур таблицы
+    border: '1px solid #94a3b8', 
+    overflow: 'hidden',
+    
+    // Стиль заголовков
+    '& .MuiDataGrid-columnHeaders': {
+        backgroundColor: '#e2e8f0', 
+        borderBottom: '2px solid #94a3b8', // Более четкая линия под заголовком
+    },
+    '& .MuiDataGrid-columnHeader': {
+        color: '#1e293b',
+        fontWeight: 700,
+        fontSize: '12px',
+        textTransform: 'uppercase',
+        borderRight: '1px solid #cbd5e1', // Вертикальные границы в заголовке
+        '&:last-child': { borderRight: 'none' }
+    },
+    
+    // Стили строк
+    '& .MuiDataGrid-row': {
+        borderBottom: '1px solid #cbd5e1', // Более темная горизонтальная линия
+        '&:hover': {
+            backgroundColor: '#f8fafc', // Легкая подсветка при наведении
+        },
+    },
+    
+    // Стили ячеек
+    '& .MuiDataGrid-cell': {
+        borderRight: '1px solid #cbd5e1', // Более видимые вертикальные линии
+        '&:last-child': { borderRight: 'none' }
+    },
+    
+    // Пагинация (футер)
+    '& .MuiDataGrid-footerContainer': {
+        borderTop: '2px solid #94a3b8',
+        backgroundColor: '#ffffff'
+    },
+    
+    '& .MuiDataGrid-columnSeparator': { display: 'none' },
+    '& .MuiDataGrid-virtualScroller': { overflowX: 'hidden' }
+}}
         />
     );
 };
