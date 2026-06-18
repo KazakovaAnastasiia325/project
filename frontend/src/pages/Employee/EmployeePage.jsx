@@ -11,6 +11,7 @@ import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from '../Admin/AdminStyles';
+import { toast } from 'react-toastify';
 import api from '../../api/axiosConfig';
 
 
@@ -93,12 +94,12 @@ export const EmployeePage = () => {
     try {
       await api.post('/api/expertiza/save', dataToSave);
       setIsDrawerOpen(false);
-      alert('Успешно сохранено');
+      toast.success('Экспертиза успешно создана');
       setSelectedExpertise(null);
       await fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Ошибка при сохранении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
+      toast.error('Ошибка при сохранении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
     }
   };
 
@@ -108,11 +109,11 @@ export const EmployeePage = () => {
       console.log("Отправляем на обновление:", dataToUpdate);
       await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
       setIsDrawerOpen(false);
-      alert('Успешно обновлено');
+      toast.success('Данные успешно обновлены');
       await fetchExpertise();
     } catch (error) {
       console.error('Ошибка обновления:', error);
-      alert('Ошибка при обновлении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
+      toast.error('Ошибка при обновлении: ' + (error.response?.data?.error || 'неизвестная ошибка'));
     }
   };
 
@@ -124,7 +125,7 @@ export const EmployeePage = () => {
       </Box>
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
+        
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр экспертиз</Typography>

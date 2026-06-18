@@ -10,6 +10,7 @@ import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from '../Admin/AdminStyles';
+import { toast } from 'react-toastify';
 import api from '../../api/axiosConfig';
 
 
@@ -21,7 +22,7 @@ export const ManagerPage = () => {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [errorText, setErrorText] = useState('');
+
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
@@ -51,7 +52,7 @@ export const ManagerPage = () => {
         setTotalRows(0);
       }
     } catch (error) {
-      setErrorText('Ошибка при получении данных.');
+      toast.error('Ошибка при получении данных.');
       setRows([]);
       setTotalRows(0);
     } finally {
@@ -81,7 +82,7 @@ export const ManagerPage = () => {
       </Box>
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
+        
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1e293b', padding: '10px 20px', borderRadius: '10px', mb: 2 }}>
           <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 600 }}>Реестр всех экспертиз</Typography>

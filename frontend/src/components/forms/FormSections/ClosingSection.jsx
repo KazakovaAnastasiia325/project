@@ -132,13 +132,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
           value={formData.equipmentCosts || ''} onChange={handleChange('equipmentCosts')} sx={inputStyle}
         />
       </Grid>
-      <Grid size={{ xs: 6 }}>
-        <TextField
-          disabled={isLocked}
-          size="small" fullWidth label="Общая стоимость исследования" type="number"
-          value={formData.totalCost || ''} onChange={handleChange('totalCost')} sx={inputStyle}
-        />
-      </Grid>
+      
 
       <Grid size={{ xs: 12 }}>
         <TextField
@@ -155,11 +149,10 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
 
       <Grid size={{ xs: 6 }}>
         <TextField
-          size="small" fullWidth label="Стоимость без НДС"
-          value={formData.totalWithoutVat || '0.00'}
-          disabled
-          InputProps={{ readOnly: true }}
-          sx={inputStyle}
+          disabled={isLocked}
+          size="small" fullWidth label="Общая стоимость исследования"
+          value={formData.totalCost || ''} onChange={handleChange('totalCost')} disabled
+          InputProps={{ readOnly: true }} sx={inputStyle}
         />
       </Grid>
 

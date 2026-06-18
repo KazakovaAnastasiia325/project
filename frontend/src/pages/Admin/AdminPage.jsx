@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Alert } from '@mui/material';
+import { Box, Typography, Button, Badge, IconButton } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,6 +13,7 @@ import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from './AdminStyles';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosConfig';
+import { Menu, MenuItem, Divider } from '@mui/material';
 
 
 export const AdminPage = () => {
@@ -28,7 +29,32 @@ export const AdminPage = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
   const [dateRange, setDateRange] = useState({ start: null, end: null });
+const [notifications, setNotifications] = useState([]);
 
+// Вычисляем количество непрочитанных
+const unreadCount = notifications.filter(n => !n.read).length;
+const [anchorEl, setAnchorEl] = useState(null);
+const open = Boolean(anchorEl);
+
+const handleClick = (event) => setAnchorEl(event.currentTarget);
+const handleClose = () => setAnchorEl(null);
+
+  const fetchNotifications = async () => {
+    
+    try {
+    const res = await api.get('/api/notifications');
+    setNotifications(res.data);
+    } catch (error) {
+    console.error('Ошибка загрузки уведомлений:', error);
+  }
+  };
+  useEffect(() => {
+  fetchNotifications();
+}, []);
+const markAsRead = async (id) => {
+  await api.put(`/api/notifications/read/${id}`);
+  setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+};
   const fetchExpertise = async () => {
     setLoading(true);
     
@@ -129,10 +155,40 @@ export const AdminPage = () => {
   return (
     <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* Header */}
-      <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
-        <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>Выйти</Button>
-      </Box>
+      <Box sx={{ 
+  width: '100%', height: '50px', backgroundColor: '#131924', 
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+  px: 3, color: '#fff' 
+}}>
+  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Панель администратора</Typography>
+  
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    {/* Колокольчик */}
+    <IconButton color="inherit" onClick={handleClick}>
+  <Badge badgeContent={unreadCount} color="error">
+    <NotificationsIcon />
+  </Badge>
+</IconButton>
+
+<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+  {notifications.length > 0 ? (
+    notifications.map((n) => (
+      <MenuItem key={n.id} onClick={() => { markAsRead(n.id); handleClose(); }}>
+        <Typography variant="body2" sx={{ fontWeight: n.read ? 'normal' : 'bold' }}>
+          {n.text}
+        </Typography>
+      </MenuItem>
+    ))
+  ) : (
+    <MenuItem>Нет новых уведомлений</MenuItem>
+  )}
+</Menu>
+
+    <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>
+      Выйти
+    </Button>
+  </Box>
+</Box>
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         

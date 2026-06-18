@@ -43,7 +43,8 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       laborCosts: data.expert_cost ?? '',
       materialCosts: data.material_cost ?? '',
       equipmentCosts: data.exploitation_cost ?? '',
-      totalCost: data.full_cost ?? '',
+      totalCost: data.full_cost ?? '0.00',
+      totalWithVat: data.full_cost_nds ?? '0.00',
       plomba: data.descrip ?? '',
       extensionDays: data.srok_resuming ?? '',
       experts: data.experts || [],
@@ -73,7 +74,22 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     setFormData(parseDataFromBackend(initialData));
     setTab(0);
   }, [initialData]);
-
+// Замените ваш текущий useEffect на этот:
+useEffect(() => {
+  // Вычисляем только если totalCost есть и это число
+  const cost = parseFloat(formData.totalCost);
+  
+  if (!isNaN(cost)) {
+    // Допустим, НДС = 20% (умножаем на 1.2). 
+    // Замените 1.2 на ваш коэффициент, если он другой.
+    const withVat = (cost * 1.2).toFixed(2);
+    
+    // Обновляем только если значение действительно изменилось, чтобы избежать зацикливания
+    if (formData.totalWithVat !== withVat) {
+      setFormData(prev => ({ ...prev, totalWithVat: withVat }));
+    }
+  }
+}, [formData.totalCost]); // Срабатывает при изменении общей стоимости
   const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
@@ -129,6 +145,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
       material_cost: Number(data.materialCosts) || 0,
       exploitation_cost: Number(data.equipmentCosts) || 0,
       full_cost: Number(data.totalCost) || 0,
+      full_cost_nds: Number(data.totalWithVat) || 0,
       descrip: data.plomba || "",
       end_date: data.dateend || null,
       exp_res_id: Number(data.result) || null,
