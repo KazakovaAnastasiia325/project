@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -11,15 +11,9 @@ import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from './AdminStyles';
+import { toast } from 'react-toastify';
+import api from '../../api/axiosConfig';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
 
 export const AdminPage = () => {
   const navigate = useNavigate();
@@ -29,7 +23,7 @@ export const AdminPage = () => {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [errorText, setErrorText] = useState('');
+
   const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
@@ -37,7 +31,7 @@ export const AdminPage = () => {
 
   const fetchExpertise = async () => {
     setLoading(true);
-    setErrorText('');
+    
     try {
       const params = {
         page: paginationModel.page,
@@ -65,10 +59,10 @@ export const AdminPage = () => {
         error.request?.responseURL?.includes('/login');
 
       if (isAuthError) {
-        setErrorText('Сессия истекла. Пожалуйста, перезайдите в систему.');
+        toast.error('Сессия истекла. Переадресация...');
         setTimeout(() => handleLogout(), 2500);
       } else {
-        setErrorText('Ошибка при получении данных. Попробуйте обновить страницу.');
+        toast.error('Ошибка при загрузке данных');
       }
       setRows([]);
       setTotalRows(0);
@@ -100,11 +94,11 @@ export const AdminPage = () => {
     try {
       await api.post('/api/expertiza/save', dataToSave);
       setIsDrawerOpen(false);
-      alert('Успешно сохранено');
+      toast.success('Запись успешно сохранена');
       fetchExpertise();
     } catch (error) {
       console.error('Ошибка сохранения:', error);
-      alert('Ошибка при сохранении данных.');
+      toast.error('Ошибка при сохранении данных.');
     }
   };
 
@@ -112,11 +106,11 @@ export const AdminPage = () => {
     try {
       await api.put(`/api/expertiza/update/${dataToUpdate.id}`, dataToUpdate);
       setIsDrawerOpen(false);
-      alert('Успешно обновлено');
+      toast.success('Запись успешно обновлена');
       fetchExpertise();
     } catch (error) {
       console.error('Ошибка обновления:', error);
-      alert('Ошибка при обновлении данных.');
+      toast.error('Ошибка при обновлении данных.');
     }
   };
 
@@ -141,7 +135,7 @@ export const AdminPage = () => {
       </Box>
 
       <Box sx={{ px: 3, pt: 2, width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {errorText && <Alert severity="error" sx={{ mb: 2 }}>{errorText}</Alert>}
+        
 
         {/* Title Bar */}
         <Box sx={{

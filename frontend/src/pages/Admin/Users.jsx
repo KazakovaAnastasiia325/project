@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo, useRef, useImperativeHandle } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom'; // Импорт хука
 import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
@@ -8,10 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import * as S from './AdminStyles';
-const api = axios.create({
-    baseURL: 'http://localhost:8080',
-    withCredentials: true,
-});
+import api from '../../api/axiosConfig';
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
 

@@ -1,13 +1,9 @@
 import React from 'react';
-import axios from 'axios';
+
 import { Grid, TextField, Divider, Typography } from '@mui/material';
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-});
-
+import api from '../../../api/axiosConfig';
 export const ProcessSection = ({ formData, setFormData, isManager = false }) => {
   // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
   const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;

@@ -182,3 +182,26 @@
     border-right-color: var(--border);
   }
 }
+/* Стили для контейнера */
+.Toastify__toast {
+  border-radius: 12px;
+  font-family: sans-serif;
+  font-weight: 500;
+}
+
+/* Цвет для успешных уведомлений (зеленый -> синий) */
+.Toastify__toast--success {
+  background: #1e293b !important; /* Ваш темный цвет */
+  color: #ffffff !important;
+}
+
+/* Цвет для ошибок (остается красным, но можно сделать темнее) */
+.Toastify__toast--error {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* Цвет прогресс-бара */
+.Toastify__progress-bar--success {
+  background: #38bdf8 !important; /* Ваш яркий голубой из загрузчика */
+}

@@ -17,10 +17,10 @@ export const InputWrapper = styled.div`
     height: 40px;
     right: 0;
     top: 0;
-    background: #e100ff;
+    background: #ffffff;
     border-radius: 50%;
     filter: blur(20px);
-    box-shadow: -60px 20px 20px 10px #F9B0B9;
+    box-shadow: -60px 20px 20px 10px #ffffff;
     pointer-events: none;
   }
 `;

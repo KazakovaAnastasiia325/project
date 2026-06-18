@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { Drawer, Box, IconButton, Typography, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { ExpertForm } from '../forms/ExpertForm';
 import * as S from '../forms/ExpertStyles';
-
-// Создаем экземпляр axios для этого компонента
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true
-});
+import api from '../../api/axiosConfig';
 
 export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, isManager = false }) => {
   const [data, setData] = useState(null);

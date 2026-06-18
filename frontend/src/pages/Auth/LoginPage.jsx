@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
 import { Typography, Checkbox, FormControlLabel, Link, Box } from '@mui/material';
 import { SplitLayout, BrandingSide, FormSide, ContentOverlay } from './AuthStyles';
 import { InputWrapper, StyledTextField, GradientButton, ButtonInner } from './StyledInput';
 import SoftAurora from '../../components/AuroraBackground/SoftAurora';
 import LogoImage from '../../assets/logo.png';
-
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-});
+import api from '../../api/axiosConfig';
 
 export const LoginPage = () => {
   const navigate = useNavigate();

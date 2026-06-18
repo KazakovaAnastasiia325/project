@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { TextField, MenuItem, Grid, IconButton, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-
-const api = axios.create({
-    baseURL: 'http://localhost:8080',
-    withCredentials: true,
-});
+import api from '../../../api/axiosConfig';
 const ORGAN_CODES = [
     { code: '01', label: 'Суды' },
     { code: '02', label: 'Прокуратура' },

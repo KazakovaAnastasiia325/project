@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Alert } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -11,15 +11,8 @@ import 'dayjs/locale/ru';
 import { DataGridTable } from '../../components/table/DataGridTable';
 import { DetailsDrawer } from '../../components/table/DetailsDrawer';
 import * as S from '../Admin/AdminStyles';
+import api from '../../api/axiosConfig';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
 
 export const EmployeePage = () => {
   const navigate = useNavigate();

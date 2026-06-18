@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/Auth/LoginPage';
@@ -8,12 +8,10 @@ import { Users } from './pages/Admin/Users';
 import { AdminPage } from './pages/Admin/AdminPage';
 import { EmployeePage } from './pages/Employee/EmployeePage';
 import { ManagerPage } from './pages/Manager/ManagerPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import api from './api/axiosConfig';
 
-// Создаем инстанс axios
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-});
 
 // Компонент анимации загрузки
 const LoadingScreen = () => (
@@ -66,6 +64,18 @@ function App() {
   return (
     <Router>
       <CssBaseline />
+      <ToastContainer 
+  position="bottom-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop={true}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="colored" // Добавьте это, чтобы библиотека лучше подхватывала цвета
+/>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         

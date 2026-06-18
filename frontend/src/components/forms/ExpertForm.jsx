@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { Box, Tabs, Tab } from '@mui/material';
 import { RegistrationSection } from './FormSections/RegistrationSection';
 import { ProcessSection } from './FormSections/ProcessSection';
@@ -7,10 +7,7 @@ import { ClosingSection } from './FormSections/ClosingSection';
 import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 import * as S from './ExpertStyles';
 import * as AdminS from '../../pages/Admin/AdminStyles';
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-});
+import api from '../../api/axiosConfig';
 export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager = false }) => {
 
   // 1. Превращаем JSON с бэкенда в формат для полей формы
