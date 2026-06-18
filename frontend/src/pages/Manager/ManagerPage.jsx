@@ -31,9 +31,7 @@ const [errorText, setErrorText] = useState('');
 const [notifications, setNotifications] = useState([]);
 
 // Вычисляем количество непрочитанных
-const unreadCount = Array.isArray(notifications) 
-    ? notifications.filter(n => !n.read).length 
-    : 0;
+const unreadCount = (notifications || []).filter(n => !n.read).length;
 const [anchorEl, setAnchorEl] = useState(null);
 const open = Boolean(anchorEl);
 
@@ -44,9 +42,10 @@ const handleClose = () => setAnchorEl(null);
     
     try {
     const res = await api.get('/api/notifications');
-    setNotifications(res.data);
+    setNotifications(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
     console.error('Ошибка загрузки уведомлений:', error);
+    setNotifications([]);
   }
   };
   useEffect(() => {
@@ -55,6 +54,12 @@ const handleClose = () => setAnchorEl(null);
 const markAsRead = async (id) => {
   await api.put(`/api/notifications/read/${id}`);
   setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+};
+const markAllAsRead = async () => {
+    try {
+        await api.put('/api/notifications/read-all');
+        setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch (error) { toast.error('Ошибка при обновлении'); }
 };
   const fetchExpertise = async () => {
     setLoading(true);
@@ -114,18 +119,61 @@ const markAsRead = async (id) => {
   </Badge>
 </IconButton>
 
-<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-  {Array.isArray(notifications) && notifications.length > 0 ? (
-    notifications.map((n) => (
-      <MenuItem key={n.id} onClick={() => { markAsRead(n.id); handleClose(); }}>
-        <Typography variant="body2" sx={{ fontWeight: n.read ? 'normal' : 'bold' }}>
-          {n.text}
-        </Typography>
-      </MenuItem>
-    ))
-  ) : (
-    <MenuItem>Нет новых уведомлений</MenuItem>
-  )}
+<Menu 
+    anchorEl={anchorEl} 
+    open={open} 
+    onClose={handleClose}
+    slotProps={{
+        paper: {
+            sx: { 
+                width: 350, 
+                maxHeight: 400, 
+                borderRadius: '12px',
+                mt: 1,
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+            }
+        }
+    }}
+>
+    {/* Заголовок с кнопкой прочитать все */}
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1, borderBottom: '1px solid #e2e8f0' }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem' }}>Уведомления</Typography>
+        {unreadCount > 0 && (
+            <Button size="small" onClick={() => {markAllAsRead()}} sx={{ fontSize: '11px', textTransform: 'none' }}>
+                Прочитать все
+            </Button>
+        )}
+    </Box>
+
+    {/* Список уведомлений */}
+    {notifications.length > 0 ? (
+        notifications.map((n) => (
+            <MenuItem 
+                key={n.id} 
+                onClick={() => markAsRead(n.id)}
+                sx={{ 
+                    whiteSpace: 'normal', 
+                    py: 1.5, 
+                    borderBottom: '1px solid #f1f5f9',
+                    backgroundColor: n.is_read ? 'transparent' : '#f0f7ff' 
+                }}
+            >
+                <Box>
+                    <Typography variant="body2" sx={{ fontWeight: n.is_read ? 400 : 600, color: '#1e293b' }}>
+                        {n.text}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                        {new Date(n.created_at).toLocaleString()}
+                    </Typography>
+                </Box>
+            </MenuItem>
+        ))
+    ) : (
+        <Box sx={{ p: 3, textAlign: 'center', color: '#94a3b8' }}>
+            <NotificationsIcon sx={{ fontSize: 40, opacity: 0.3 }} />
+            <Typography variant="body2">Нет новых уведомлений</Typography>
+        </Box>
+    )}
 </Menu>
         <Button startIcon={<LogoutIcon />} sx={{ color: '#fff', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
       </Box>

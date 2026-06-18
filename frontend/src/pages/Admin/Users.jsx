@@ -122,6 +122,12 @@ export const Users = () => {
         fetchUsers();
         fetchNotifications();
     }, []);
+    const markAllAsRead = async () => {
+    try {
+        await api.put('/api/notifications/read-all');
+        setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch (error) { toast.error('Ошибка при обновлении'); }
+};
     const handleLogout = async () => {
         try {
 
@@ -254,19 +260,62 @@ export const Users = () => {
                         </Badge>
                     </IconButton>
 
-                    <Menu anchorEl={anchorEl} open={openNotif} onClose={handleClose}>
-                        {notifications.length > 0 ? (
-                            notifications.map((n) => (
-                                <MenuItem key={n.id} onClick={() => { markAsRead(n.id); handleClose(); }}>
-                                    <Typography variant="body2" sx={{ fontWeight: n.read ? 'normal' : 'bold' }}>
-                                        {n.text}
-                                    </Typography>
-                                </MenuItem>
-                            ))
-                        ) : (
-                            <MenuItem disabled>Нет новых уведомлений</MenuItem>
-                        )}
-                    </Menu>
+                    <Menu 
+    anchorEl={anchorEl} 
+    open={openNotif} 
+    onClose={handleClose}
+    slotProps={{
+        paper: {
+            sx: { 
+                width: 350, 
+                maxHeight: 400, 
+                borderRadius: '12px',
+                mt: 1,
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+            }
+        }
+    }}
+>
+    {/* Заголовок с кнопкой прочитать все */}
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1, backgroundColor: '#1e293b', borderBottom: '1px solid #e2e8f0' }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#ffffff' }}>Уведомления</Typography>
+        {unreadCount > 0 && (
+            <Button size="small" onClick={() => {markAllAsRead()}} sx={{ fontSize: '11px', textTransform: 'none',color: '#ffffff' }}>
+                Прочитать все
+            </Button>
+        )}
+    </Box>
+
+    {/* Список уведомлений */}
+    {notifications.length > 0 ? (
+        notifications.map((n) => (
+            <MenuItem 
+                key={n.id} 
+                onClick={() => markAsRead(n.id)}
+                sx={{ 
+                    whiteSpace: 'normal', 
+                    py: 1.5, 
+                    borderBottom: '1px solid #f1f5f9',
+                    backgroundColor: n.is_read ? 'transparent' : '#f0f7ff' 
+                }}
+            >
+                <Box>
+                    <Typography variant="body2" sx={{ fontWeight: n.is_read ? 400 : 600, color: '#1e293b' }}>
+                        {n.text}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                        {new Date(n.created_at).toLocaleString()}
+                    </Typography>
+                </Box>
+            </MenuItem>
+        ))
+    ) : (
+        <Box sx={{ p: 3, textAlign: 'center', color: '#94a3b8' }}>
+            <NotificationsIcon sx={{ fontSize: 40, opacity: 0.3 }} />
+            <Typography variant="body2">Нет новых уведомлений</Typography>
+        </Box>
+    )}
+</Menu>
 
                     <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={handleLogout}>
                         Выйти
