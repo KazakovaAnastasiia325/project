@@ -31,7 +31,9 @@ export const EmployeePage = () => {
   const [notifications, setNotifications] = useState([]);
 
 // Вычисляем количество непрочитанных
-const unreadCount = (notifications || []).filter(n => !n.read).length;
+const unreadCount = Array.isArray(notifications) 
+  ? notifications.filter(n => !n.is_read).length 
+  : 0;
 const [anchorEl, setAnchorEl] = useState(null);
 const open = Boolean(anchorEl);
 
@@ -189,7 +191,7 @@ const markAllAsRead = async () => {
     </Box>
 
     {/* Список уведомлений */}
-    {Array.isArray(notifications) && notifications.length > 0 ? (
+    {notifications.length > 0 ? (
         notifications.map((n) => (
             <MenuItem 
                 key={n.id} 
