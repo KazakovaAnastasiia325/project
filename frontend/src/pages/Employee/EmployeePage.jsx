@@ -31,9 +31,7 @@ export const EmployeePage = () => {
   const [notifications, setNotifications] = useState([]);
 
 // Вычисляем количество непрочитанных
-const unreadCount = Array.isArray(notifications) 
-  ? notifications.filter(n => !n.is_read).length 
-  : 0;
+const unreadCount = (notifications || []).filter(n => !n.read).length;
 const [anchorEl, setAnchorEl] = useState(null);
 const open = Boolean(anchorEl);
 
@@ -44,9 +42,10 @@ const handleClose = () => setAnchorEl(null);
     
     try {
     const res = await api.get('/api/notifications');
-    setNotifications(res.data);
+    setNotifications(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
     console.error('Ошибка загрузки уведомлений:', error);
+    setNotifications([]);
   }
   };
   useEffect(() => {
@@ -190,7 +189,7 @@ const markAllAsRead = async () => {
     </Box>
 
     {/* Список уведомлений */}
-    {notifications.length > 0 ? (
+    {Array.isArray(notifications) && notifications.length > 0 ? (
         notifications.map((n) => (
             <MenuItem 
                 key={n.id} 
@@ -284,20 +283,14 @@ const markAllAsRead = async () => {
             }}
             slotProps={{
     noRowsOverlay: {
-      sx: { 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100%' 
-      },
       children: (
-        <Box sx={{ p: 2, color: '#64748b' }}>
-          <Typography variant="body1">Записей нет</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+           <Typography variant="body2" sx={{ color: '#64748b' }}>Записей нет</Typography>
         </Box>
       )
     }
   }}
-            isAdmin={true}
+  isAdmin={true}
             isManager={false}
           />
         </Box>

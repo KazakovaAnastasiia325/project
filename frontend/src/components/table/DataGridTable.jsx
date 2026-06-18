@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridOverlay } from '@mui/x-data-grid';
 import { Box, IconButton, Chip } from '@mui/material';
 //import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,7 +15,9 @@ export const DataGridTable = ({
     onRowClick,
     // onDelete, 
     isAdmin = false,
-    isManager = false
+    isManager = false,
+    slotProps, // 1. Убедитесь, что приняли его в аргументах
+    ...props
 }) => {
 
     const columns = useMemo(() => [
@@ -126,6 +128,7 @@ export const DataGridTable = ({
     return (
         <DataGrid
             rows={rows || []}
+            
             columns={columns}
             rowCount={rowCount}
             getRowId={(row) => row.id}
@@ -141,6 +144,7 @@ export const DataGridTable = ({
             rowHeight={55}
             showCellVerticalBorder
             showColumnVerticalBorder
+            slotProps={slotProps}
             sx={{
     borderRadius: '12px',
     // Усиливаем основной контур таблицы

@@ -320,6 +320,7 @@ const markAllAsRead = async () => {
               setSelectedExpertise(params.row);
               setIsDrawerOpen(true);
             }}
+            
             isAdmin={true}
             isManager={false}
           />
