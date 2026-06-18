@@ -282,6 +282,21 @@ const markAllAsRead = async () => {
               setSelectedExpertise(params.row);
               setIsDrawerOpen(true);
             }}
+            slotProps={{
+    noRowsOverlay: {
+      sx: { 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100%' 
+      },
+      children: (
+        <Box sx={{ p: 2, color: '#64748b' }}>
+          <Typography variant="body1">Записей нет</Typography>
+        </Box>
+      )
+    }
+  }}
             isAdmin={true}
             isManager={false}
           />
