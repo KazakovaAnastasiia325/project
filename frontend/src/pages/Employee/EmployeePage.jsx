@@ -174,18 +174,16 @@ const markAllAsRead = async () => {
                 maxHeight: 400, 
                 borderRadius: '12px',
                 mt: 1,
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                padding: 0, // ОБЯЗАТЕЛЬНО: убираем padding контейнера
-                overflow: 'hidden'
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
             }
         }
     }}
 >
     {/* Заголовок с кнопкой прочитать все */}
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1, backgroundColor: '#1e293b',borderBottom: '1px solid #e2e8f0' }}>
-        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem',color: '#ffffff' }}>Уведомления</Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1, borderBottom: '1px solid #e2e8f0' }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.9rem' }}>Уведомления</Typography>
         {unreadCount > 0 && (
-            <Button size="small" onClick={() => {markAllAsRead()}} sx={{ fontSize: '11px', textTransform: 'none',color: '#ffffff' }}>
+            <Button size="small" onClick={() => {markAllAsRead()}} sx={{ fontSize: '11px', textTransform: 'none' }}>
                 Прочитать все
             </Button>
         )}
