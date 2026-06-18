@@ -74,22 +74,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
     setFormData(parseDataFromBackend(initialData));
     setTab(0);
   }, [initialData]);
-// Замените ваш текущий useEffect на этот:
-useEffect(() => {
-  // Вычисляем только если totalCost есть и это число
-  const cost = parseFloat(formData.totalCost);
-  
-  if (!isNaN(cost)) {
-    // Допустим, НДС = 20% (умножаем на 1.2). 
-    // Замените 1.2 на ваш коэффициент, если он другой.
-    const withVat = (cost * 1.2).toFixed(2);
-    
-    // Обновляем только если значение действительно изменилось, чтобы избежать зацикливания
-    if (formData.totalWithVat !== withVat) {
-      setFormData(prev => ({ ...prev, totalWithVat: withVat }));
-    }
-  }
-}, [formData.totalCost]); // Срабатывает при изменении общей стоимости
+
   const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
 
