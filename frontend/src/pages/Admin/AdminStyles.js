@@ -45,7 +45,7 @@ export const TableWrapper = styled.div`
 `;
 
 export const ActionButton = styled(Button)`
-  background: linear-gradient(135deg, #2e8eff 0%, #8b5cf6 100%) !important;
+  background: linear-gradient(135deg, #e7f0fb 0%, #672eea 100%) !important;
   color: #ffffff !important;
   border-radius: 13px !important;
   text-transform: none !important;

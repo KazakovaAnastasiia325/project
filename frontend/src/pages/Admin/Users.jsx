@@ -1,7 +1,8 @@
 import React, { useState, useEffect, memo, useRef, useImperativeHandle } from 'react';
 
 import { useNavigate } from 'react-router-dom'; // Импорт хука
-import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button } from '@mui/material';
+
+import { Box, Paper, Dialog, DialogTitle, DialogContent, TextField, MenuItem, DialogActions, IconButton, Grid, Typography, Button, Menu, Divider, Badge } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 //import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,6 +10,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import * as S from './AdminStyles';
 import api from '../../api/axiosConfig';
+import { toast } from 'react-toastify';
+import NotificationsIcon from '@mui/icons-material/Notifications'; // И этот иконку
+
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
 
@@ -92,7 +96,32 @@ export const Users = () => {
     const [open, setOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const formRef = useRef();
+    const [notifications, setNotifications] = useState([]);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const openNotif = Boolean(anchorEl);
+    const unreadCount = notifications.filter(n => !n.is_read).length;
 
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await api.get('/api/notifications');
+            setNotifications(Array.isArray(res.data) ? res.data : []);
+        } catch (error) { console.error('Ошибка загрузки уведомлений:', error); }
+    };
+
+    const markAsRead = async (id) => {
+        try {
+            await api.put(`/api/notifications/read/${id}`);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+        } catch (error) { console.error('Ошибка:', error); }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+        fetchNotifications();
+    }, []);
     const handleLogout = async () => {
         try {
 
@@ -171,16 +200,16 @@ export const Users = () => {
                 const { fio, roleName, ...cleanPayload } = payload;
 
                 await api.put(`/api/users/${editingUser.id}`, cleanPayload);
-                alert('Успешно обновлено');
+                toast.success('Успешно обновлено');
             } else {
                 await api.post('/api/users', payload);
-                alert('Успешно создано');
+                toast.success('Успешно создано');
             }
             setOpen(false);
             fetchUsers();
         } catch (error) {
             console.error("Ошибка:", error);
-            alert(error.response?.data?.message || 'Ошибка при сохранении');
+            toast.error(error.response?.data?.message || 'Ошибка при сохранении');
         }
     };
 
@@ -216,7 +245,33 @@ export const Users = () => {
         <S.AdminContainer sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Box sx={{ width: '100%', height: '50px', backgroundColor: '#131924', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, color: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', mb: 2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, letterSpacing: '0.5px' }}>Панель администратора</Typography>
-                <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={handleLogout}>Выйти</Button>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    {/* Колокольчик */}
+                    <IconButton color="inherit" onClick={handleClick}>
+                        <Badge badgeContent={unreadCount} color="error">
+                            <NotificationsIcon />
+                        </Badge>
+                    </IconButton>
+
+                    <Menu anchorEl={anchorEl} open={openNotif} onClose={handleClose}>
+                        {notifications.length > 0 ? (
+                            notifications.map((n) => (
+                                <MenuItem key={n.id} onClick={() => { markAsRead(n.id); handleClose(); }}>
+                                    <Typography variant="body2" sx={{ fontWeight: n.read ? 'normal' : 'bold' }}>
+                                        {n.text}
+                                    </Typography>
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem disabled>Нет новых уведомлений</MenuItem>
+                        )}
+                    </Menu>
+
+                    <Button startIcon={<LogoutIcon sx={{ fontSize: '16px' }} />} sx={{ color: '#fff', fontSize: '12px', textTransform: 'none' }} onClick={handleLogout}>
+                        Выйти
+                    </Button>
+                </Box>
             </Box>
 
             <Box sx={{ px: 3, pt: 0, width: '100%', flexGrow: 1 }}>

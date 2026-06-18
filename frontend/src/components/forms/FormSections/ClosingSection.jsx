@@ -170,22 +170,33 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isM
       {!isManager && (
         <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
           <Button
-            variant="contained"
-            fullWidth
-            disabled={isLocked}
-            onClick={handleComplete}
-            sx={{
-              backgroundColor: isLocked ? '#bdbdbd' : EXPERTISE_STATUSES.COMPLETED.color,
-              color: '#fff',
-              borderRadius: '10px',
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: isLocked ? '#bdbdbd' : '#527a55'
-              }
-            }}
-          >
-            {formData.status === EXPERTISE_STATUSES.COMPLETED.label ? 'Экспертиза завершена' : 'Завершить экспертизу'}
-          </Button>
+  variant="contained"
+  fullWidth
+  disabled={isLocked}
+  onClick={handleComplete}
+  sx={{
+    // Если кнопка заблокирована — используем серый цвет, иначе — градиент
+    backgroundImage: isLocked 
+      ? 'none' 
+      : 'linear-gradient(45deg, #90ae91 30%, #2e7d32 90%)',
+    backgroundColor: isLocked ? '#bdbdbd' : 'transparent', // Фон должен быть прозрачным для градиента
+    color: '#fff',
+    borderRadius: '10px',
+    textTransform: 'none',
+    // Убираем стандартную тень при наведении, если нужно
+    boxShadow: isLocked ? 'none' : '0 3px 5px 2px rgba(76, 175, 80, .3)',
+    '&:hover': {
+      backgroundImage: isLocked 
+        ? 'none' 
+        : 'linear-gradient(45deg, #527a55 30%, #1b5e20 90%)',
+      backgroundColor: isLocked ? '#bdbdbd' : 'transparent',
+    }
+  }}
+>
+  {formData.status === EXPERTISE_STATUSES.COMPLETED.label 
+    ? 'Экспертиза завершена' 
+    : 'Завершить экспертизу'}
+</Button>
         </Grid>
       )}
     </Grid>

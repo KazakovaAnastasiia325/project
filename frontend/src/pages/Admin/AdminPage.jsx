@@ -32,7 +32,7 @@ export const AdminPage = () => {
 const [notifications, setNotifications] = useState([]);
 
 // Вычисляем количество непрочитанных
-const unreadCount = notifications.filter(n => !n.read).length;
+const unreadCount = notifications.filter(n => !n.is_read).length;
 const [anchorEl, setAnchorEl] = useState(null);
 const open = Boolean(anchorEl);
 
@@ -53,7 +53,7 @@ const handleClose = () => setAnchorEl(null);
 }, []);
 const markAsRead = async (id) => {
   await api.put(`/api/notifications/read/${id}`);
-  setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
 };
   const fetchExpertise = async () => {
     setLoading(true);
@@ -184,7 +184,7 @@ const markAsRead = async (id) => {
   )}
 </Menu>
 
-    <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout}>
+    <Button startIcon={<LogoutIcon />} sx={{ color: '#fff' }} onClick={handleLogout} >
       Выйти
     </Button>
   </Box>
