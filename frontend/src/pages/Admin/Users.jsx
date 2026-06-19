@@ -99,7 +99,7 @@ const handleNameChange = (e, key) => {
                 setData(prev => ({ ...prev, login: val }));
             }
         } 
-        // Остальные поля (пароль и т.д.)
+        
         else {
             setData(prev => ({ ...prev, [field.key]: val }));
         }

@@ -21,7 +21,9 @@ const ORGAN_CODES = [
 export const RegistrationSection = ({ formData, setFormData, isManager = false, isLocked }) => {
 
     const [regions, setRegions] = useState([]);
+    const [vids, setVids] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [loadingVids, setLoadingVids] = useState(false);
 const isValidName = (value) => {
     const regex = /^[а-яёіұүқөәңһ\s-]*$/i;
     return value === '' || regex.test(value);
@@ -39,6 +41,18 @@ const isValidName = (value) => {
             }
         };
         fetchRegions();
+        const fetchVids = async () => {
+        setLoadingVids(true);
+        try {
+            const response = await api.get('/api/vids'); // Убедитесь, что эндпоинт правильный
+            setVids(response.data);
+        } catch (error) {
+            console.error("Ошибка загрузки видов экспертиз:", error);
+        } finally {
+            setLoadingVids(false);
+        }
+    };
+    fetchVids();
     }, []);
 
     
@@ -124,8 +138,25 @@ const isValidName = (value) => {
 
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="№ Статьи"
                 value={formData.nom_statyi || ''} onChange={handleChange('nom_statyi')} sx={inputStyle} /></Grid>
-            <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required fullWidth label="Вид экспертизы (код)" type="number"
-                value={formData.vid_exp || ''} onChange={handleChange('vid_exp')} sx={inputStyle} /></Grid>
+            <Grid size={{ xs: 6 }}>
+    <TextField 
+        disabled={isLocked || loadingVids} 
+        size="small" 
+        required 
+        select 
+        fullWidth 
+        label={loadingVids ? "Загрузка..." : "Вид экспертизы"}
+        value={formData.vid_exp || ''} 
+        onChange={handleChange('vid_exp')} 
+        sx={inputStyle}
+    >
+        {vids.map((vid) => (
+            <MenuItem key={vid.id} value={vid.id}>
+                {vid.name} (Шифр: {vid.shifr})
+            </MenuItem>
+        ))}
+    </TextField>
+</Grid>
 
             {/* Параметры экспертизы */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Параметры экспертизы</Typography></Grid>
