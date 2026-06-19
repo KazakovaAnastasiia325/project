@@ -191,12 +191,17 @@ const isReadOnly = (isCompleted || isManager || mode === 'view') && !isNewRecord
   return (
     <S.FormContainer>
       <S.CustomTabs>
-        <Tabs value={tab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
-          <Tab label="Регистрация" />
-          {!isNewRecord && <Tab label="Ход производства" />}
-          {!isNewRecord && <Tab label="Результаты" />}
-        </Tabs>
-      </S.CustomTabs>
+  <Tabs 
+    value={tab} 
+    onChange={handleTabChange} 
+    variant="scrollable" 
+    scrollButtons="auto"
+  >
+    <Tab label="Регистрация" value={0} />
+    {!isNewRecord && <Tab label="Ход производства" value={1} />}
+    {!isNewRecord && <Tab label="Результаты" value={2} />}
+  </Tabs>
+</S.CustomTabs>
 
       <S.SectionWrapper>
         {tab === 0 && (

@@ -150,7 +150,7 @@ export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isL
         <TextField
           disabled={isLocked}
           size="small" fullWidth label="Общая стоимость исследования"
-          value={formData.totalCost || '0.00'} onChange={handleChange('totalCost')} disabled
+          value={formData.totalCost || '0.00'} onChange={handleChange('totalCost')} 
           InputProps={{ readOnly: true }} sx={inputStyle}
         />
       </Grid>
