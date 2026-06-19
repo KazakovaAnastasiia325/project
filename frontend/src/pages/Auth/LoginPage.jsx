@@ -12,9 +12,23 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ login: '', password: '' });
   const [loading, setLoading] = useState(false);
-
+const isValidLogin = (value) => {
+    const regex = /^[a-zA-Z0-9._-]*$/;
+    return regex.test(value);
+  };
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Если меняется поле логина, проверяем его содержимое
+    if (name === 'login') {
+      if (isValidLogin(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return; // Если ввод не прошел валидацию, просто игнорируем его
+    }
+
+    // Для пароля оставляем обычную обработку
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {

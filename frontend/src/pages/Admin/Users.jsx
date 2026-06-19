@@ -15,7 +15,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications'; // И это�
 
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
-    
+    const isValidLogin = (value) => /^[a-zA-Z0-9._-]*$/.test(value);
 const [emailPrefix, setEmailPrefix] = useState(initialData.email?.split('@')[0] || '');
     const [emailDomain, setEmailDomain] = useState(initialData.email?.includes('@') 
         ? `@${initialData.email.split('@')[1]}` 
@@ -86,11 +86,24 @@ const handleNameChange = (e, key) => {
                         label={field.label}
                         type={field.type || 'text'}
                         value={data[field.key]}
-                        onChange={(e) => 
-                            ['lastName', 'firstName', 'middleName'].includes(field.key) 
-                                ? handleNameChange(e, field.key)
-                                : setData(prev => ({ ...prev, [field.key]: e.target.value }))
-                        }
+                        onChange={(e) => {
+        const val = e.target.value;
+        
+        // Проверка для имен (кириллица)
+        if (['lastName', 'firstName', 'middleName'].includes(field.key)) {
+            handleNameChange(e, field.key);
+        } 
+        // Проверка для логина (латиница, цифры, точка, подчеркивание, дефис)
+        else if (field.key === 'login') {
+            if (isValidLogin(val)) {
+                setData(prev => ({ ...prev, login: val }));
+            }
+        } 
+        // Остальные поля (пароль и т.д.)
+        else {
+            setData(prev => ({ ...prev, [field.key]: val }));
+        }
+    }}
                         required={field.required !== false}
                         size="small"
                         slotProps={{
