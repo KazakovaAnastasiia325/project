@@ -8,7 +8,7 @@ import { EXPERTISE_STATUSES } from '../../data/mockExpertise';
 import * as S from './ExpertStyles';
 import * as AdminS from '../../pages/Admin/AdminStyles';
 import api from '../../api/axiosConfig';
-export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager = false }) => {
+export const ExpertForm = ({ initialData, onSave, onUpdate, onClose,mode, isManager = false }) => {
 
   // 1. Превращаем JSON с бэкенда в формат для полей формы
   const parseDataFromBackend = (data) => {
@@ -77,7 +77,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
 
   const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
-
+const isReadOnly = isCompleted || isManager || mode === 'view';
   const registrationFields = [
     'date',
     'nom_statyi',
@@ -200,10 +200,10 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
 
       <S.SectionWrapper>
         {tab === 0 && (
-          <RegistrationSection formData={formData} setFormData={setFormData} isManager={isManager} />
+          <RegistrationSection formData={formData} setFormData={setFormData} isManager={isManager} isLocked={isReadOnly} />
         )}
         {tab === 1 && !isNewRecord && (
-          <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} />
+          <ProcessSection formData={formData} setFormData={setFormData} isManager={isManager} isLocked={isReadOnly}/>
         )}
         {tab === 2 && !isNewRecord && (
           <ClosingSection
@@ -211,17 +211,25 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose, isManager =
             setFormData={setFormData}
             onSave={handleComplete}
             isManager={isManager}
+            isLocked={isReadOnly}
           />
         )}
       </S.SectionWrapper>
 
-      {!isManager && !isCompleted && (
-        <Box sx={{ display: 'flex', mt: 1, pt: 1, borderTop: '1px solid #eee' }}>
-          <AdminS.ActionButton variant="contained" size="small" fullWidth onClick={isNewRecord ? handleCreate : handleUpdate}>
-            {isNewRecord ? 'Сохранить' : 'Изменить'}
-          </AdminS.ActionButton>
-        </Box>
-      )}
+      {!isManager && (
+  <Box sx={{ display: 'flex', mt: 1, pt: 1, borderTop: '1px solid #eee' }}>
+    <AdminS.ActionButton 
+      variant="contained" 
+      size="small" 
+      fullWidth 
+      // Добавляем disabled, если форма только для чтения
+      disabled={isReadOnly} 
+      onClick={isNewRecord ? handleCreate : handleUpdate}
+    >
+      {isNewRecord ? 'Сохранить' : 'Изменить'}
+    </AdminS.ActionButton>
+  </Box>
+)}
     </S.FormContainer>
   );
 };

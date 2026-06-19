@@ -29,7 +29,7 @@ export const EmployeePage = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
   const [notifications, setNotifications] = useState([]);
-
+const [drawerMode, setDrawerMode] = useState('view');
 // Вычисляем количество непрочитанных
 const unreadCount = Array.isArray(notifications) 
   ? notifications.filter(n => !n.is_read).length 
@@ -279,10 +279,11 @@ const markAllAsRead = async () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onRowClick={(params) => {
-              setSelectedExpertise(params.row);
-              setIsDrawerOpen(true);
-            }}
+            onRowClick={(params, mode) => {
+    setSelectedExpertise(params.row);
+    setDrawerMode(mode); // Сохраняем режим: 'view' или 'edit'
+    setIsDrawerOpen(true);
+}}
             slotProps={{
     noRowsOverlay: {
       children: (
@@ -299,6 +300,7 @@ const markAllAsRead = async () => {
 
         <DetailsDrawer
           open={isDrawerOpen}
+          mode={drawerMode}
           onClose={() => setIsDrawerOpen(false)}
           expertiseId={selectedExpertise?.id}
           onSave={handleSave}

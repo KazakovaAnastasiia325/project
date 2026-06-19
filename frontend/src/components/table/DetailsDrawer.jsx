@@ -6,7 +6,7 @@ import { ExpertForm } from '../forms/ExpertForm';
 import * as S from '../forms/ExpertStyles';
 import api from '../../api/axiosConfig';
 
-export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, isManager = false }) => {
+export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, mode, isManager = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -85,6 +85,7 @@ export const DetailsDrawer = ({ open, onClose, expertiseId, onSave, onUpdate, is
           }}>
             <ExpertForm
               initialData={data}
+              mode={mode}
               onSave={onSave}
               onUpdate={onUpdate}
               onClose={onClose}

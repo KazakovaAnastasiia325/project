@@ -4,9 +4,8 @@ import { Grid, TextField, Divider, Typography } from '@mui/material';
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 import api from '../../../api/axiosConfig';
-export const ProcessSection = ({ formData, setFormData, isManager = false }) => {
-  // Блокируем, если экспертиза завершена ИЛИ если пользователь — менеджер
-  const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
+export const ProcessSection = ({ formData, setFormData, isLocked, isManager = false }) => {
+
 
   const updateStatus = (prevData) => {
     if (prevData.status === EXPERTISE_STATUSES.NEW.label) {

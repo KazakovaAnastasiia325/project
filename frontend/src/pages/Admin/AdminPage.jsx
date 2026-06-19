@@ -24,7 +24,7 @@ export const AdminPage = () => {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
-
+const [drawerMode, setDrawerMode] = useState('view');
   const [appliedFilters, setAppliedFilters] = useState({ start: null, end: null });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 25 });
   const [sortModel, setSortModel] = useState([{ field: 'id', sort: 'asc' }]);
@@ -316,10 +316,11 @@ const markAllAsRead = async () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onRowClick={(params) => {
-              setSelectedExpertise(params.row);
-              setIsDrawerOpen(true);
-            }}
+            onRowClick={(params, mode) => {
+    setSelectedExpertise(params.row);
+    setDrawerMode(mode); // Запоминаем: открыли для просмотра или для правки
+    setIsDrawerOpen(true);
+}}
             
             isAdmin={true}
             isManager={false}
@@ -328,6 +329,7 @@ const markAllAsRead = async () => {
 
         <DetailsDrawer
           open={isDrawerOpen}
+          mode={drawerMode}
           onClose={() => setIsDrawerOpen(false)}
           expertiseId={selectedExpertise?.id}
           onSave={handleSave}

@@ -18,7 +18,7 @@ const ORGAN_CODES = [
     { code: '09', label: 'Следственный суд' },
     { code: '10', label: 'Прочие' },
 ];
-export const RegistrationSection = ({ formData, setFormData, isManager = false }) => {
+export const RegistrationSection = ({ formData, setFormData, isManager = false, isLocked }) => {
 
     const [regions, setRegions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
         fetchRegions();
     }, []);
 
-    const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
+    
 
 
 
@@ -132,7 +132,7 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false }
             </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Тип экспертизы"
                 value={formData.iz_nix_id || ''} onChange={handleChange('iz_nix_id')} sx={inputStyle}>
-                <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem>
+                <MenuItem value={1}>Комиссионная</MenuItem><MenuItem value={2}>Комплексная</MenuItem><MenuItem value={3}>Единоличная</MenuItem>
             </TextField></Grid>
             <Grid size={{ xs: 6 }}><TextField disabled={isLocked} size="small" required select fullWidth label="Категория дел"
                 value={formData.category_id || ''} onChange={handleChange('category_id')} sx={inputStyle}>

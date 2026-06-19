@@ -4,9 +4,8 @@ import { Grid, TextField, MenuItem, Typography, Divider, Button } from '@mui/mat
 import { inputStyle, sectionHeaderStyle } from '../../Registration/RegistrationStyles';
 import { EXPERTISE_STATUSES } from '../../../data/mockExpertise';
 
-export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isManager = false }) => {
-  // Блокируем поля, если экспертиза уже завершена ИЛИ если пользователь — менеджер
-  const isLocked = (formData.status === EXPERTISE_STATUSES.COMPLETED.label) || isManager;
+export const ClosingSection = ({ formData, setFormData, errors = {}, onSave, isLocked, isManager = false }) => {
+  
 
   const handleChange = (field) => (event) => {
     if (isLocked) return;
