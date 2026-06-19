@@ -19,40 +19,32 @@ const ORGAN_CODES = [
     { code: '10', label: 'Прочие' },
 ];
 export const RegistrationSection = ({ formData, setFormData, isManager = false, isLocked }) => {
-
+const [vids, setVids] = useState([]);
     const [regions, setRegions] = useState([]);
-    const [vids, setVids] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [loadingVids, setLoadingVids] = useState(false);
 const isValidName = (value) => {
     const regex = /^[а-яёіұүқөәңһ\s-]*$/i;
     return value === '' || regex.test(value);
 };
     useEffect(() => {
-        const fetchRegions = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await api.get('/api/regions');
-                setRegions(response.data);
+                // Вызываем оба запроса параллельно
+                const [regionsRes, vidsRes] = await Promise.all([
+                    api.get('/api/regions')
+                ]);
+
+                // Используем Array.isArray для защиты от ошибок, о которых вы писали
+                setRegions(Array.isArray(regionsRes.data) ? regionsRes.data : []);
+                setVids(Array.isArray(vidsRes.data) ? vidsRes.data : []);
             } catch (error) {
-                console.error("Ошибка загрузки регионов:", error);
+                console.error("Ошибка загрузки справочников:", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchRegions();
-        const fetchVids = async () => {
-        setLoadingVids(true);
-        try {
-            const response = await api.get('/api/vids'); // Убедитесь, что эндпоинт правильный
-            setVids(response.data);
-        } catch (error) {
-            console.error("Ошибка загрузки видов экспертиз:", error);
-        } finally {
-            setLoadingVids(false);
-        }
-    };
-    fetchVids();
+        fetchData();
     }, []);
 
     
@@ -140,21 +132,25 @@ const isValidName = (value) => {
                 value={formData.nom_statyi || ''} onChange={handleChange('nom_statyi')} sx={inputStyle} /></Grid>
             <Grid size={{ xs: 6 }}>
     <TextField 
-        disabled={isLocked || loadingVids} 
+        disabled={isLocked || loading} 
         size="small" 
         required 
         select 
         fullWidth 
-        label={loadingVids ? "Загрузка..." : "Вид экспертизы"}
+        label={loading ? "Загрузка..." : "Вид экспертизы"}
         value={formData.vid_exp || ''} 
         onChange={handleChange('vid_exp')} 
         sx={inputStyle}
     >
-        {vids.map((vid) => (
-            <MenuItem key={vid.id} value={vid.id}>
-                {vid.name} (Шифр: {vid.shifr})
-            </MenuItem>
-        ))}
+        {loading ? (
+            <MenuItem disabled><CircularProgress size={20} /></MenuItem>
+        ) : (
+            vids.map((vid) => (
+                <MenuItem key={vid.id} value={vid.id}>
+                    {vid.name} (Шифр: {vid.shifr})
+                </MenuItem>
+            ))
+        )}
     </TextField>
 </Grid>
 
