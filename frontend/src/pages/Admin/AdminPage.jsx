@@ -32,7 +32,7 @@ const [drawerMode, setDrawerMode] = useState('view');
 const [notifications, setNotifications] = useState([]);
 
 // Вычисляем количество непрочитанных
-const unreadCount = notifications.filter(n => !n.is_read).length;
+const unreadCount = (notifications || []).filter(n => !n.is_read).length;
 const [anchorEl, setAnchorEl] = useState(null);
 const open = Boolean(anchorEl);
 
@@ -40,14 +40,15 @@ const handleClick = (event) => setAnchorEl(event.currentTarget);
 const handleClose = () => setAnchorEl(null);
 
   const fetchNotifications = async () => {
-    
-    try {
+  try {
     const res = await api.get('/api/notifications');
-    setNotifications(res.data);
-    } catch (error) {
+
+    setNotifications(Array.isArray(res.data) ? res.data : []);
+  } catch (error) {
     console.error('Ошибка загрузки уведомлений:', error);
+    setNotifications([]);
   }
-  };
+};
   useEffect(() => {
   fetchNotifications();
 }, []);

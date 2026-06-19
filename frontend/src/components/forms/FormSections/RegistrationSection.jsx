@@ -22,7 +22,10 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false, 
 
     const [regions, setRegions] = useState([]);
     const [loading, setLoading] = useState(false);
-
+const isValidName = (value) => {
+    const regex = /^[а-яёіұүқөәңһ\s-]*$/i;
+    return value === '' || regex.test(value);
+};
     useEffect(() => {
         const fetchRegions = async () => {
             setLoading(true);
@@ -196,52 +199,99 @@ export const RegistrationSection = ({ formData, setFormData, isManager = false, 
             <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия"
                     value={formData.second_name_naznch || ''}
-                    onChange={handleChange('second_name_naznch')} sx={inputStyle} />
+                    onChange={(e) => {
+        if (isValidName(e.target.value)) {
+            handleChange('second_name_naznch')(e);
+        }
+    }} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField disabled={isLocked} size="small" required fullWidth label="Имя"
                     value={formData.name_naznch || ''}
-                    onChange={handleChange('name_naznch')} sx={inputStyle} />
+                    onChange={(e) => {
+        if (isValidName(e.target.value)) {
+            handleChange('name_naznch')(e);
+        }
+    }} sx={inputStyle} />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField disabled={isLocked} size="small" fullWidth label="Отчество"
                     value={formData.patronymic_naznch || ''}
-                    onChange={handleChange('patronymic_naznch')} sx={inputStyle} />
+                    onChange={(e) => {
+        if (isValidName(e.target.value)) {
+            handleChange('patronymic_naznch')(e);
+        }
+    }} sx={inputStyle} />
             </Grid>
 
             {/* Блок экспертов */}
             <Grid size={{ xs: 12 }}><Typography sx={sectionHeaderStyle}>Список экспертов</Typography></Grid>
-            {expertsToDisplay.map((expert, index) => (
-                <Grid container spacing={2} key={index} sx={{ mb: 1, alignItems: 'center' }}>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField disabled={isLocked} size="small" required fullWidth label="Фамилия" value={expert.second_name || ''}
-                            onChange={(e) => handleExpertChange(index, 'second_name', e.target.value)} sx={inputStyle} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField disabled={isLocked} size="small" required fullWidth label="Имя" value={expert.name || ''}
-                            onChange={(e) => handleExpertChange(index, 'name', e.target.value)} sx={inputStyle} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <TextField disabled={isLocked} size="small" fullWidth label="Отчество" value={expert.patronymic || ''}
-                            onChange={(e) => handleExpertChange(index, 'patronymic', e.target.value)} sx={inputStyle} />
-                        {!isLocked && (
-                            <Box sx={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>
-                                <IconButton
-                                    onClick={() => expertsToDisplay.length > 1 ? removeExpert(index) : null}
-                                    color={expertsToDisplay.length > 1 ? "error" : "default"}
-                                    sx={{
-
-                                        opacity: expertsToDisplay.length > 1 ? 1 : 0.3,
-                                        cursor: expertsToDisplay.length > 1 ? 'pointer' : 'default'
-                                    }}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Box>
-                        )}
-                    </Grid>
-                </Grid>
-            ))}
+{expertsToDisplay.map((expert, index) => (
+    <Grid container spacing={2} key={index} sx={{ mb: 1, alignItems: 'center' }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField 
+                disabled={isLocked} 
+                size="small" 
+                required 
+                fullWidth 
+                label="Фамилия" 
+                value={expert.second_name || ''}
+                // ИСПОЛЬЗУЕМ handleExpertChange, а не handleChange
+                onChange={(e) => {
+                    if (isValidName(e.target.value)) {
+                        handleExpertChange(index, 'second_name', e.target.value);
+                    }
+                }} 
+                sx={inputStyle} 
+            />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField 
+                disabled={isLocked} 
+                size="small" 
+                required 
+                fullWidth 
+                label="Имя" 
+                value={expert.name || ''}
+                onChange={(e) => {
+                    if (isValidName(e.target.value)) {
+                        handleExpertChange(index, 'name', e.target.value);
+                    }
+                }} 
+                sx={inputStyle} 
+            />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField 
+                disabled={isLocked} 
+                size="small" 
+                fullWidth 
+                label="Отчество" 
+                value={expert.patronymic || ''}
+                onChange={(e) => {
+                    if (isValidName(e.target.value)) {
+                        handleExpertChange(index, 'patronymic', e.target.value);
+                    }
+                }} 
+                sx={inputStyle} 
+            />
+            {!isLocked && (
+                <Box sx={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton
+                        onClick={() => removeExpert(index)} // Здесь уже корректная функция removeExpert
+                        color={expertsToDisplay.length > 1 ? "error" : "default"}
+                        sx={{
+                            opacity: expertsToDisplay.length > 1 ? 1 : 0.3,
+                            cursor: expertsToDisplay.length > 1 ? 'pointer' : 'default'
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Box>
+            )}
+        </Grid>
+    </Grid>
+))}
 
             {!isLocked && (
                 <Grid size={{ xs: 12 }}>

@@ -30,16 +30,28 @@ export const DataGridTable = ({
             sortable: true
         },
         {
-            field: 'data_post',
-            headerName: 'Дата',
-            width: 130,
-            sortable: true,
-            valueFormatter: (value) => {
-                if (!value) return '';
+    field: 'data_post',
+    headerName: 'Дата',
+    width: 130,
+    sortable: true,
+    valueFormatter: (value) => {
+        if (!value) return '';
 
-                return value.toString().split('T')[0];
-            }
-        },
+        // Создаем объект даты из строки
+        const date = new Date(value);
+        
+        // Проверяем, корректна ли дата
+        if (isNaN(date.getTime())) return value;
+
+        // Форматируем в ДД.ММ.ГГГГ
+        // padStart(2, '0') добавляет ноль, если число меньше 10 (например, 05 вместо 5)
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+        const year = date.getFullYear();
+
+        return `${day}.${month}.${year}`;
+    }
+},
         {
             field: 'experts',
             headerName: 'Эксперты',
@@ -107,7 +119,7 @@ export const DataGridTable = ({
                             size="small"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onRowClick(params, 'view'); // Передаем режим 'view'
+                                onRowClick(params, 'view'); 
                             }}
                         >
                             <VisibilityIcon fontSize="small" color="primary" />
@@ -163,28 +175,28 @@ export const DataGridTable = ({
                 // Стиль заголовков
                 '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#e2e8f0',
-                    borderBottom: '2px solid #94a3b8', // Более четкая линия под заголовком
+                    borderBottom: '2px solid #94a3b8', 
                 },
                 '& .MuiDataGrid-columnHeader': {
                     color: '#1e293b',
                     fontWeight: 700,
                     fontSize: '12px',
                     textTransform: 'uppercase',
-                    borderRight: '1px solid #cbd5e1', // Вертикальные границы в заголовке
+                    borderRight: '1px solid #cbd5e1', 
                     '&:last-child': { borderRight: 'none' }
                 },
 
                 // Стили строк
                 '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #cbd5e1', // Более темная горизонтальная линия
+                    borderBottom: '1px solid #cbd5e1', 
                     '&:hover': {
-                        backgroundColor: '#f8fafc', // Легкая подсветка при наведении
+                        backgroundColor: '#f8fafc', 
                     },
                 },
 
                 // Стили ячеек
                 '& .MuiDataGrid-cell': {
-                    borderRight: '1px solid #cbd5e1', // Более видимые вертикальные линии
+                    borderRight: '1px solid #cbd5e1', 
                     '&:last-child': { borderRight: 'none' }
                 },
 

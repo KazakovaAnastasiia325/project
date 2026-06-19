@@ -77,7 +77,7 @@ export const ExpertForm = ({ initialData, onSave, onUpdate, onClose,mode, isMana
 
   const isNewRecord = !initialData;
   const isCompleted = formData.status === EXPERTISE_STATUSES.COMPLETED.label;
-const isReadOnly = isCompleted || isManager || mode === 'view';
+const isReadOnly = (isCompleted || isManager || mode === 'view') && !isNewRecord;
   const registrationFields = [
     'date',
     'nom_statyi',

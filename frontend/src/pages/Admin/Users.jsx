@@ -15,15 +15,60 @@ import NotificationsIcon from '@mui/icons-material/Notifications'; // И это�
 
 const FormFields = memo(({ initialData, ref }) => {
     const [data, setData] = useState(initialData);
-
+    
+const [emailPrefix, setEmailPrefix] = useState(initialData.email?.split('@')[0] || '');
+    const [emailDomain, setEmailDomain] = useState(initialData.email?.includes('@') 
+        ? `@${initialData.email.split('@')[1]}` 
+        : '@gmail.com');
+    const domains = [
+        '@gmail.com', '@mail.ru', '@inbox.ru', '@list.ru', 
+        '@bk.ru', '@yandex.kz', '@yandex.ru', '@mail.kz', 
+        '@gov.kz', '@edu.kz', '@company.kz'
+    ];
+    useEffect(() => {
+        setData(prev => ({ ...prev, email: `${emailPrefix}${emailDomain}` }));
+    }, [emailPrefix, emailDomain]);
+    
     useEffect(() => {
         setData(initialData);
+        setEmailPrefix(initialData.email?.split('@')[0] || '');
+        setEmailDomain(initialData.email?.includes('@') ? `@${initialData.email.split('@')[1]}` : '@gmail.com');
     }, [initialData]);
 
     useImperativeHandle(ref, () => ({
         getData: () => data
     }));
+const handleNameChange = (e, key) => {
+        const value = e.target.value;
+        const regex = /^[а-яёіұүқөәңһ\s-]*$/i;
+        
+        if (regex.test(value)) {
+            setData(prev => ({ ...prev, [key]: value }));
+        }
+    };
+    const fetchUsers = async () => {
+    try {
+        const response = await api.get('/api/users');
+        const rawData = response.data.rows || response.data || [];
 
+        const formattedUsers = rawData.map(user => {
+            const lastName = user.lastName || '';
+            const firstName = user.firstName || '';
+            const middleName = user.middleName || '';
+
+            return {
+                ...user,
+                // Здесь мы просто соединяем строки как есть, без изменения регистра
+                fio: `${lastName} ${firstName} ${middleName}`.trim(),
+                roleName: roleMap[user.role] || 'Неизвестно'
+            };
+        });
+
+        setUsers(formattedUsers);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    }
+};
     return (
         <Grid container spacing={1.5}>
             {[
@@ -32,16 +77,20 @@ const FormFields = memo(({ initialData, ref }) => {
                 { label: 'Отчество', key: 'middleName', xs: 4, required: false },
                 { label: 'Логин', key: 'login', xs: 6 },
                 { label: 'Пароль', key: 'password', xs: 6, type: 'password' },
-                { label: 'Email', key: 'email', xs: 6, required: false },
-                { label: 'Телефон', key: 'phone', xs: 6, required: false }
+
             ].map((field) => (
                 <Grid size={{ xs: field.xs }} key={field.key}>
                     <TextField
                         fullWidth
+                        autoComplete="off"
                         label={field.label}
                         type={field.type || 'text'}
                         value={data[field.key]}
-                        onChange={(e) => setData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        onChange={(e) => 
+                            ['lastName', 'firstName', 'middleName'].includes(field.key) 
+                                ? handleNameChange(e, field.key)
+                                : setData(prev => ({ ...prev, [field.key]: e.target.value }))
+                        }
                         required={field.required !== false}
                         size="small"
                         slotProps={{
@@ -63,7 +112,34 @@ const FormFields = memo(({ initialData, ref }) => {
                     />
                 </Grid>
             ))}
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 6 }}>
+    <TextField
+        fullWidth
+        label="Телефон"
+        size="small"
+        // Отображаем +7 и отсекаем лишние символы, если они вдруг попали
+        value={data.phone ? `+7${data.phone}` : '+7'}
+        onChange={(e) => {
+            // Убираем "+7" из значения, чтобы работать только с вводимыми цифрами
+            let rawValue = e.target.value.replace('+7', '');
+            
+            // Оставляем только цифры
+            const onlyDigits = rawValue.replace(/\D/g, '');
+            
+            // Ограничиваем длину до 10 символов
+            if (onlyDigits.length <= 10) {
+                setData(prev => ({ ...prev, phone: onlyDigits }));
+            }
+        }}
+        placeholder="7001234567"
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+        // Добавляем подсказку пользователю
+        slotProps={{
+            inputLabel: { shrink: true }
+        }}
+    />
+</Grid>
+            <Grid size={{ xs: 6 }}>
                 <TextField
                     required
                     select
@@ -85,6 +161,38 @@ const FormFields = memo(({ initialData, ref }) => {
                     <MenuItem value="Руководитель">Руководитель</MenuItem>
                 </TextField>
             </Grid>
+            <Grid size={{ xs: 12 }} sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                <TextField
+                    fullWidth
+                    label="Email"
+                    value={emailPrefix}
+                    onChange={(e) => {
+        // Разрешаем: латиницу (a-z), цифры (0-9), точку (.), подчеркивание (_) и дефис (-)
+        const value = e.target.value;
+        const regex = /^[a-zA-Z0-9._-]*$/;
+        
+        if (regex.test(value)) {
+            setEmailPrefix(value);
+        }
+    }}
+                    size="small"
+                    placeholder="user"
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                />
+                <TextField
+                    select
+                    value={emailDomain}
+                    onChange={(e) => setEmailDomain(e.target.value)}
+                    size="small"
+                    sx={{ width: '40%', '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                >
+                    {domains.map((d) => (
+                        <MenuItem key={d} value={d}>{d}</MenuItem>
+                    ))}
+                </TextField>
+            </Grid>
+            
+            
         </Grid>
     );
 });
@@ -147,8 +255,8 @@ export const Users = () => {
 
             const formattedUsers = rawData.map(user => {
                 const lastName = user.lastName || '';
-                const firstName = user.firstName ? `${user.firstName[0].toUpperCase()}.` : '';
-                const middleName = user.middleName ? `${user.middleName[0].toUpperCase()}.` : '';
+                const firstName = user.firstName ? `${user.firstName[0]}.` : '';
+                const middleName = user.middleName ? `${user.middleName[0]}.` : '';
 
                 return {
                     ...user,
@@ -168,17 +276,20 @@ export const Users = () => {
     }, []);
 
     const handleOpen = (user = null) => {
-        let userData = user ? { ...user } : { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' };
-
-        // Обратное преобразование роли из числа в строку для формы
-        if (user && typeof user.role === 'number') {
+    if (user) {
+        // Режим редактирования: подготавливаем данные
+        let userData = { ...user };
+        if (typeof user.role === 'number') {
             const roleMapReverse = { 1: 'Админ', 2: 'Руководитель', 3: 'Сотрудник' };
             userData.role = roleMapReverse[user.role] || '';
         }
-
         setEditingUser(userData);
-        setOpen(true);
-    };
+    } else {
+        // Режим создания: обнуляем editingUser
+        setEditingUser(null);
+    }
+    setOpen(true);
+};
 
     const handleSave = async () => {
         const formData = formRef.current.getData();
@@ -394,8 +505,16 @@ export const Users = () => {
                 </DialogTitle>
 
                 <DialogContent sx={{ pt: 0 }}>
-                    {open && <FormFields ref={formRef} initialData={editingUser || { lastName: '', firstName: '', middleName: '', role: '', email: '', phone: '', login: '', password: '' }} />}
-                </DialogContent>
+    {open && (
+        <FormFields 
+            ref={formRef} 
+            initialData={editingUser || { 
+                lastName: '', firstName: '', middleName: '', 
+                role: '', email: '', phone: '', login: '', password: '' 
+            }} 
+        />
+    )}
+</DialogContent>
 
                 <DialogActions sx={{ p: 3, pt: 1 }}>
                     <S.GreyButton onClick={() => setOpen(false)}>Отмена</S.GreyButton>
